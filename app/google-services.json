@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "302354368329",
+    "firebase_url": "https://hub-4dbe9.firebaseio.com",
+    "project_id": "hub-4dbe9",
+    "storage_bucket": "hub-4dbe9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302354368329:android:eadfc4d10adbd5f3",
+        "android_client_info": {
+          "package_name": "jjpartnership.hub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "302354368329-frfntmgp86cgm5h4p48ebf3l4ktbrph5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPg025-piStaX0Zd0TSEqigH2pNxhWREI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
