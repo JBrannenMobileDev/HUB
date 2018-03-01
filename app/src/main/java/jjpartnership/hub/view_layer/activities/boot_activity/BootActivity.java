@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.boot_activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,12 +27,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
+import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.data_models.UserType;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.StringValidationUtil;
 import jjpartnership.hub.utils.UserPreferences;
+import jjpartnership.hub.view_layer.activities.account_details_sales_activity.AccountDetailsActivity;
 import jjpartnership.hub.view_layer.activities.main_activity.MainActivity;
 
 public class BootActivity extends AppCompatActivity {
@@ -62,7 +66,17 @@ public class BootActivity extends AppCompatActivity {
         Realm.init(getApplicationContext());
         UserPreferences.getInstance().setContext(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
+//        DataManager.getInstance().initializeDbData();
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        hideStatusBar();
+    }
+
+    @Override
+    public void onBackPressed(){}
 
     @Override
     public void onStart() {
@@ -76,6 +90,7 @@ public class BootActivity extends AppCompatActivity {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
         Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
@@ -92,11 +107,12 @@ public class BootActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            animateLoginView();
                             accountJustCreated = true;
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            UserPreferences.getInstance().setUID(user.getUid());
+                            UserPreferences.getInstance().setAuthUID(user.getUid());
                             DataManager.getInstance().createNewUser(user.getUid(), user.getEmail(), UserType.getTypeId(salesAgentSelected));
                             updateUI(user);
                             sendEmailVerification();
@@ -196,18 +212,31 @@ public class BootActivity extends AppCompatActivity {
 
     private void updateUI(FirebaseUser user) {
         if (user != null) {
+            animateLoginView();
             launchMainActivity(user);
         }
     }
 
     private void launchMainActivity(FirebaseUser user) {
         if(user.isEmailVerified()) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
+            Intent intent;
+            RealmResults<UserRealm> realmUser = Realm.getDefaultInstance().where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getAuthUID()).findAll();
+            if(realmUser != null && realmUser.size() > 0 && realmUser.get(0).getUid().equals(UserPreferences.getInstance().getAuthUID())) {
+                if (realmUser.get(0).getFirstName() != null && realmUser.get(0).getFirstName().isEmpty()) {
+                    intent = new Intent(getApplicationContext(), AccountDetailsActivity.class);
+                } else {
+                    intent = new Intent(getApplicationContext(), MainActivity.class);
+                }
+                startActivity(intent);
+            }else{
+                mEmailField.setText(user.getEmail());
+                Toast.makeText(this, "Oops! Something went wrong. Check internet connection and try again.", Toast.LENGTH_LONG).show();
+            }
         }else{
             if(!accountJustCreated) {
                 Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();
             }
+
         }
     }
 

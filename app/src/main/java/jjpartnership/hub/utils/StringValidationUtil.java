@@ -24,7 +24,7 @@ public class StringValidationUtil {
     }
 
     public static boolean isValidPassword(String password){
-        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
+        String regex = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
         return matcher.matches();

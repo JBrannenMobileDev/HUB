@@ -21,6 +21,7 @@ public class CompanyRealm extends RealmObject{
     private RealmList<String> businessUnits;
     private RealmList<String> roles;
     private RealmList<EmployeeRealm> employeeList;
+    private RealmList<CustomerCompanyRealm> customers;
 
     public CompanyRealm() {
     }
@@ -39,33 +40,60 @@ public class CompanyRealm extends RealmObject{
         this.employeeList = createEmployeeList(company.getEmployeeList());
         this.businessUnits = createBusinessUnits(company.getBusinessUnits());
         this.roles = createRoles(company.getRoles());
-        this.companyEmailDomain = getCompanyEmailDomain();
+        this.companyEmailDomain = company.getCompanyEmailDomain();
+        this.customers = createCustomersList(company.getCustomers());
+    }
+
+    private RealmList<CustomerCompanyRealm> createCustomersList(List<CustomerCompany> customers) {
+        RealmList<CustomerCompanyRealm> realmCustomers = new RealmList<>();
+        if(customers != null) {
+            for (CustomerCompany customer : customers) {
+                realmCustomers.add(new CustomerCompanyRealm(customer));
+            }
+            Collections.reverse(realmCustomers);
+        }
+        return realmCustomers;
     }
 
     private RealmList<String> createRoles(List<String> roles) {
         RealmList<String> realmRoles = new RealmList<>();
-        for(String role : roles){
-            realmRoles.add(role);
+        if(roles != null) {
+            for (String role : roles) {
+                realmRoles.add(role);
+            }
+            Collections.reverse(realmRoles);
         }
-        Collections.reverse(realmRoles);
         return realmRoles;
     }
 
     private RealmList<String> createBusinessUnits(List<String> businessUnits) {
         RealmList<String> realmBusinessUnits = new RealmList<>();
-        for(String unit : businessUnits){
-            realmBusinessUnits.add(unit);
+        if(businessUnits != null) {
+            for (String unit : businessUnits) {
+                realmBusinessUnits.add(unit);
+            }
+            Collections.reverse(realmBusinessUnits);
         }
-        Collections.reverse(realmBusinessUnits);
         return realmBusinessUnits;
     }
 
     private RealmList<EmployeeRealm> createEmployeeList(List<Employee> employeeList) {
         RealmList<EmployeeRealm> employeeListRealm = new RealmList<>();
-        for(Employee employee : employeeList){
-            employeeListRealm.add(new EmployeeRealm(employee));
+        if(employeeList != null) {
+            for (Employee employee : employeeList) {
+                employeeListRealm.add(new EmployeeRealm(employee));
+            }
+            Collections.reverse(employeeListRealm);
         }
         return employeeListRealm;
+    }
+
+    public RealmList<CustomerCompanyRealm> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(RealmList<CustomerCompanyRealm> customers) {
+        this.customers = customers;
     }
 
     public String getCompanyEmailDomain() {

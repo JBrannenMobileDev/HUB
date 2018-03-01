@@ -16,6 +16,7 @@ import io.realm.RealmList;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CompanyType;
+import jjpartnership.hub.data_layer.data_models.CustomerCompany;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.EmployeeRealm;
@@ -30,12 +31,14 @@ import static android.content.ContentValues.TAG;
 
 public class FirebaseManager {
     private DatabaseReference userReference;
+    private DatabaseReference usersReference;
     private DatabaseReference companiesReference;
     private FirebaseDatabase database;
 
     public FirebaseManager() {
         database = FirebaseDatabase.getInstance();
-        userReference = database.getReference("users").child(UserPreferences.getInstance().getUID());
+        userReference = database.getReference("users").child(UserPreferences.getInstance().getFirebaseUID());
+        usersReference = database.getReference("users");
         companiesReference = database.getReference("companies");
         initDataListeners();
     }
@@ -79,8 +82,10 @@ public class FirebaseManager {
         companiesReference.addValueEventListener(companiesListener);
     }
 
-    public void writeNewUser(UserRealm user) {
-        database.getReference("users").push().setValue(user);
+    public void writeNewUser(User user) {
+        DatabaseReference newUserRef = usersReference.push();
+        UserPreferences.getInstance().setFirebaseUID(newUserRef.getKey());
+        newUserRef.setValue(user);
     }
 
     //setting updatedUser will replace the user currently in the database.
@@ -104,16 +109,44 @@ public class FirebaseManager {
         CompanyRealm comp2 = new CompanyRealm("Staples", "Temecula CA", CompanyType.CUSTOMER_COMPANY, comp2Employees);
 
         RealmList<EmployeeRealm> comp3Employees = new RealmList<>();
-        comp3Employees.add(new EmployeeRealm("hint", "trup", "htrup@gmail.com"));
-        comp3Employees.add(new EmployeeRealm("lint", "tnil", "ltnil@gmail.com"));
-        comp3Employees.add(new EmployeeRealm("butch", "er", "ber@gmail.com"));
-        CompanyRealm comp3 = new CompanyRealm("Staples", "Riverside CA", CompanyType.CUSTOMER_COMPANY, comp3Employees);
+        comp3Employees.add(new EmployeeRealm("hint", "trup", "htrup@nationalmerchants.com"));
+        comp3Employees.add(new EmployeeRealm("lint", "tnil", "ltnil@nationalmerchants.com"));
+        comp3Employees.add(new EmployeeRealm("Jonathan", "Brannen", "jbrannen@nationalmerchants.com"));
+        CompanyRealm comp3 = new CompanyRealm("National Merchants Association", "Temecula CA", CompanyType.CUSTOMER_COMPANY, comp3Employees);
+        RealmList<String> businessUnits = new RealmList<>();
+        businessUnits.add("Marketing");
+        businessUnits.add("Inside Sales");
+        businessUnits.add("Outside Sales");
+        businessUnits.add("Engineering");
+        comp3.setBusinessUnits(businessUnits);
+        RealmList<String> roles = new RealmList<>();
+        roles.add("VP");
+        roles.add("CEO");
+        roles.add("CTO");
+        roles.add("Android Developer");
+        comp3.setRoles(roles);
+        comp3.setCompanyEmailDomain("nationalmerchants.com");
+        CustomerCompany customer3 = new CustomerCompany();
 
         RealmList<EmployeeRealm> comp4Employees = new RealmList<>();
-        comp4Employees.add(new EmployeeRealm("John", "Childers", "jchilders@gmail.com"));
+        comp4Employees.add(new EmployeeRealm("John", "Childers", "johnraychlder@gmail.com"));
         comp4Employees.add(new EmployeeRealm("Jonathan", "Brannen", "jbinvestments15@gmail.com"));
         comp4Employees.add(new EmployeeRealm("Shawna", "Brannen", "shawnaMccollom@yahoo.com"));
         CompanyRealm comp4 = new CompanyRealm("Thermo Fisher", "Los Angeles CA", CompanyType.SALES_COMPANY, comp4Employees);
+        RealmList<String> businessUnits4 = new RealmList<>();
+        businessUnits4.add("Marketing");
+        businessUnits4.add("Sales");
+        businessUnits4.add("Engineering");
+        businessUnits4.add("ChemicalWeapons");
+        comp4.setBusinessUnits(businessUnits4);
+        RealmList<String> roles4 = new RealmList<>();
+        roles4.add("VP");
+        roles4.add("CEO");
+        roles4.add("CTO");
+        roles4.add("Manager");
+        roles4.add("Sales Agent");
+        comp4.setRoles(roles4);
+        comp4.setCompanyEmailDomain("gmail.com");
 
         companies.add(comp1);
         companies.add(comp2);

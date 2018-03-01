@@ -1,7 +1,10 @@
 package jjpartnership.hub.data_layer.data_models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import io.realm.RealmList;
 
 /**
  * Created by jbrannen on 2/23/18.
@@ -16,6 +19,7 @@ public class Company{
     private List<String> businessUnits;
     private List<String> roles;
     private List<Employee> employeeList;
+    private List<CustomerCompany> customers;
 
     public Company() {
     }
@@ -36,6 +40,18 @@ public class Company{
         this.businessUnits = realmCompany.getBusinessUnits();
         this.roles = realmCompany.getRoles();
         this.companyEmailDomain = realmCompany.getCompanyEmailDomain();
+        this.customers = createCustomerList(realmCompany.getCustomers());
+    }
+
+    private List<CustomerCompany> createCustomerList(RealmList<CustomerCompanyRealm> customers) {
+        RealmList<CustomerCompany> fbCustomers = new RealmList<>();
+        if(customers != null) {
+            for (CustomerCompanyRealm customer : customers) {
+                fbCustomers.add(new CustomerCompany(customer));
+            }
+            Collections.reverse(fbCustomers);
+        }
+        return fbCustomers;
     }
 
     private List<Employee> createEmployeeList(List<EmployeeRealm> employeeListRealm) {
@@ -43,7 +59,16 @@ public class Company{
         for(EmployeeRealm employeeRealm : employeeListRealm){
             employeeList.add(new Employee(employeeRealm));
         }
+        Collections.reverse(employeeList);
         return employeeList;
+    }
+
+    public List<CustomerCompany> getCustomers() {
+        return customers;
+    }
+
+    public void setCustomers(List<CustomerCompany> customers) {
+        this.customers = customers;
     }
 
     public String getCompanyEmailDomain() {
