@@ -31,23 +31,13 @@ public class UserPreferences {
         getSharedPreferences(context).edit().clear().commit();
     }
 
-    public String getAuthUID(){
-        return getSharedPreferences(context).getString(UserPreferenceConstants.USER_ID, "");
+    public String getEmail(){
+        return getSharedPreferences(context).getString(UserPreferenceConstants.USER_EMAIL, "");
     }
 
-    public void setAuthUID(String UID){
+    public void setEmail(String email){
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
-        editor.putString(UserPreferenceConstants.USER_ID, UID);
-        editor.commit();
-    }
-
-    public String getFirebaseUID(){
-        return getSharedPreferences(context).getString(UserPreferenceConstants.USER_ID_FIREBASE, "");
-    }
-
-    public void setFirebaseUID(String UID){
-        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
-        editor.putString(UserPreferenceConstants.USER_ID_FIREBASE, UID);
+        editor.putString(UserPreferenceConstants.USER_EMAIL, email);
         editor.commit();
     }
 }

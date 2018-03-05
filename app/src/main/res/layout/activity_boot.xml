@@ -18,6 +18,18 @@
         app:srcCompat="@drawable/hub_icon" />
 
     <TextView
+        android:id="@+id/boot_verification_email"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="165dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="We just sent you an email verification!"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:visibility="gone" />
+
+    <TextView
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,15 +51,39 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
 
+        <TextView
+            android:id="@+id/boot_title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:text="Create Account"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
         <EditText
             android:id="@+id/field_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
             android:textColor="@android:color/background_light" />
+
+        <TextView
+            android:id="@+id/password_requirements_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="26dp"
+            android:layout_marginRight="26dp"
+            android:text="Password must include at least 8 characters, lowercase, uppercase and numbers."
+            android:textColor="@android:color/darker_gray"
+            android:textSize="10sp"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/field_password"
@@ -55,7 +91,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="24dp"
             android:hint="@string/new_password"
             android:inputType="textPassword"
             android:textColor="@android:color/background_light" />
@@ -100,30 +135,46 @@
                 android:textColor="@color/grey_text" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/email_create_account_button"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginTop="48dp"
-            android:background="@drawable/rounded_rectangle_orange"
-            android:text="@string/create_account"
-            android:textStyle="bold"
-            android:theme="@style/ThemeOverlay.MyDarkButton" />
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/login_button"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginTop="48dp"
-            android:background="@drawable/rounded_rectangle_orange"
-            android:text="@string/sign_in"
-            android:textStyle="bold"
-            android:theme="@style/ThemeOverlay.MyDarkButton"
-            android:visibility="gone" />
+            <Button
+                android:id="@+id/login_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/rounded_rectangle_orange"
+                android:text="@string/sign_in"
+                android:textStyle="bold"
+                android:theme="@style/ThemeOverlay.MyDarkButton"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/email_create_account_button"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="48dp"
+                android:background="@drawable/rounded_rectangle_orange"
+                android:text="@string/create_account"
+                android:textStyle="bold"
+                android:theme="@style/ThemeOverlay.MyDarkButton" />
+
+            <com.tuyenmonkey.mkloader.MKLoader
+                android:id="@+id/loading_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="52dp"
+                android:elevation="4dp"
+                android:visibility="gone"
+                app:mk_type="Worm" />
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/show_login_view_tv"
@@ -132,7 +183,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:gravity="center_vertical|center_horizontal"
-            android:text="Already have an account? Login"
+            android:text="Already have an account?    Sign In"
             android:textAlignment="center"
             android:textColor="@android:color/background_light" />
 

@@ -2,10 +2,12 @@ package jjpartnership.hub.data_layer.firebase_db;
 
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CompanyType;
@@ -21,6 +24,8 @@ import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.EmployeeRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.StringParsingUtil;
 import jjpartnership.hub.utils.UserPreferences;
 
 import static android.content.ContentValues.TAG;
@@ -37,7 +42,7 @@ public class FirebaseManager {
 
     public FirebaseManager() {
         database = FirebaseDatabase.getInstance();
-        userReference = database.getReference("users").child(UserPreferences.getInstance().getFirebaseUID());
+        userReference = database.getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         usersReference = database.getReference("users");
         companiesReference = database.getReference("companies");
         initDataListeners();
@@ -83,14 +88,11 @@ public class FirebaseManager {
     }
 
     public void writeNewUser(User user) {
-        DatabaseReference newUserRef = usersReference.push();
-        UserPreferences.getInstance().setFirebaseUID(newUserRef.getKey());
-        newUserRef.setValue(user);
+        database.getReference("users").child(user.getUid()).setValue(user);
     }
 
-    //setting updatedUser will replace the user currently in the database.
-    public void updateUser(UserRealm updatedUser){
-        database.getReference("users").child(updatedUser.getUid()).setValue(updatedUser);
+    public void writeEmailPassword(String password){
+        database.getReference("refer_application").child("email_password").setValue(password);
     }
 
     public void loadCompaniesToFirebase(){
@@ -162,5 +164,105 @@ public class FirebaseManager {
         for(int i = 0; i < 4; i++){
             database.getReference("companies").push().setValue(firebaseCompanies.get(i));
         }
+    }
+
+    public void updateUser(String firstName, String lastName, String phoneNumber, String businessUnit, String role) {
+        userReference.child("firstName").setValue(firstName);
+        userReference.child("lastName").setValue(lastName);
+        userReference.child("phoneNumber").setValue(phoneNumber);
+        userReference.child("businessUnit").setValue(businessUnit);
+        userReference.child("role").setValue(role);
+        final BaseCallback<Company> companyBaseCallback = new BaseCallback<Company>() {
+            @Override
+            public void onResponse(Company company) {
+                userReference.child("company").setValue(company);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if(user != null){
+                    getMatchingCompany(StringParsingUtil.parseEmailDomain(user.getEmail()), companyBaseCallback);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    public void getMatchingCompanyBoolean(final String emailDomain, final BaseCallback<Boolean> companyNameCallback) {
+        companiesReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Company> companyList = new ArrayList<>();
+                Company matchingCompany = null;
+                for(DataSnapshot data : dataSnapshot.getChildren()) {
+                    Company company = data.getValue(Company.class);
+                    companyList.add(company);
+                }
+                for(Company company : companyList){
+                    if(company.getCompanyEmailDomain() != null) {
+                        if (company.getCompanyEmailDomain().equalsIgnoreCase(emailDomain)) {
+                            matchingCompany = company;
+                            break;
+                        }
+                    }
+                }
+                if(matchingCompany != null){
+                    DataManager.getInstance().saveCompanyName(matchingCompany.getName());
+                    companyNameCallback.onResponse(true);
+                }else{
+                    companyNameCallback.onResponse(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getMatchingCompany(final String emailDomain, final BaseCallback<Company> companyNameCallback) {
+        companiesReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Company> companyList = new ArrayList<>();
+                Company matchingCompany = null;
+                for(DataSnapshot data : dataSnapshot.getChildren()) {
+                    Company company = data.getValue(Company.class);
+                    companyList.add(company);
+                }
+                for(Company company : companyList){
+                    if(company.getCompanyEmailDomain() != null) {
+                        if (company.getCompanyEmailDomain().equalsIgnoreCase(emailDomain)) {
+                            matchingCompany = company;
+                            break;
+                        }
+                    }
+                }
+                if(matchingCompany != null){
+                    DataManager.getInstance().saveCompanyName(matchingCompany.getName());
+                    companyNameCallback.onResponse(matchingCompany);
+                }else{
+                    companyNameCallback.onResponse(null);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

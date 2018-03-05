@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.account_details_sales_activity;
+package jjpartnership.hub.view_layer.activities.unauthorized_user_activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,32 +7,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.Realm;
+import butterknife.OnClick;
 import jjpartnership.hub.R;
-import jjpartnership.hub.utils.UserPreferences;
-import jjpartnership.hub.view_layer.activities.main_activity.MainActivity;
+import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 
-public class AccountDetailsActivity extends AppCompatActivity {
-
+public class UnauthorizedUserActivity extends AppCompatActivity{
     private FirebaseAuth mAuth;
-    private boolean accountJustCreated;
-    private boolean salesAgentSelected;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_account_details);
+        setContentView(R.layout.activity_unauthorized_user);
         ButterKnife.bind(this);
         hideStatusBar();
         mAuth = FirebaseAuth.getInstance();
@@ -41,7 +31,23 @@ public class AccountDetailsActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        hideStatusBar();
+    }
+
+    @OnClick(R.id.sign_out_tv)
+    public void onSignOutClicked(){
+        signOut();
+        startActivity(new Intent(getApplicationContext(), BootActivity.class));
+    }
+
+    @Override
+    public void onBackPressed(){
+
     }
 
     private void hideStatusBar() {
@@ -54,16 +60,14 @@ public class AccountDetailsActivity extends AppCompatActivity {
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
     }
 
-    private void launchMainActivity(FirebaseUser user) {
-        if(user.isEmailVerified()) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-        }else{
-            if(!accountJustCreated) {
-                Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();
-            }
-        }
+    private void signOut() {
+        mAuth.signOut();
+        finish();
     }
 
-
+    @Override
+    public void finish(){
+        super.finish();
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
+    }
 }

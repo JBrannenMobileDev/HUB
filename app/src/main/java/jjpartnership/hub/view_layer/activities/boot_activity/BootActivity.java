@@ -2,6 +2,7 @@ package jjpartnership.hub.view_layer.activities.boot_activity;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.tuyenmonkey.mkloader.MKLoader;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,11 +34,13 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.data_models.UserType;
-import jjpartnership.hub.utils.DpUtil;
+import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.StringParsingUtil;
 import jjpartnership.hub.utils.StringValidationUtil;
 import jjpartnership.hub.utils.UserPreferences;
-import jjpartnership.hub.view_layer.activities.account_details_sales_activity.AccountDetailsActivity;
+import jjpartnership.hub.view_layer.activities.create_agent_account_activity.AccountDetailsActivity;
 import jjpartnership.hub.view_layer.activities.main_activity.MainActivity;
+import jjpartnership.hub.view_layer.activities.unauthorized_user_activity.UnauthorizedUserActivity;
 
 public class BootActivity extends AppCompatActivity {
 
@@ -52,10 +56,16 @@ public class BootActivity extends AppCompatActivity {
     @BindView(R.id.show_login_view_tv)TextView showLoginViewTv;
     @BindView(R.id.show_create_account_view_tv)TextView showCreateAccountTv;
     @BindView(R.id.account_type_tv)TextView accountTypeTitle;
+    @BindView(R.id.boot_verification_email)TextView verificationTv;
+    @BindView(R.id.loading_icon)MKLoader loadingIcon;
+    @BindView(R.id.password_requirements_tv)TextView passwrodRequirments;
+    @BindView(R.id.boot_title_tv)TextView bootTitle;
 
     private FirebaseAuth mAuth;
     private boolean accountJustCreated;
     private boolean salesAgentSelected;
+    private FirebaseUser currentUser;
+    private BaseCallback<Boolean> userComanyIsRegisteredCallback;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +76,16 @@ public class BootActivity extends AppCompatActivity {
         Realm.init(getApplicationContext());
         UserPreferences.getInstance().setContext(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
+        mPasswordField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(hasFocus){
+                    if(!showCreateAccountTv.isShown()) passwrodRequirments.setVisibility(View.VISIBLE);
+                }else{
+                    passwrodRequirments.setVisibility(View.GONE);
+                }
+            }
+        });
 //        DataManager.getInstance().initializeDbData();
     }
 
@@ -81,8 +101,44 @@ public class BootActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
+        currentUser = mAuth.getCurrentUser();
+        userComanyIsRegisteredCallback = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean isValid) {
+                hideLoadingState();
+                if(isValid) {
+                    if(currentUser.isEmailVerified()) {
+                        if (currentUser != null) {
+                            launchMainActivity(currentUser);
+                        }
+                    }else{
+                        sendEmailVerification();
+                    }
+                }else{
+                    startActivity(new Intent(getApplicationContext(), UnauthorizedUserActivity.class));
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                hideLoadingState();
+            }
+        };
+        if(currentUser != null) {
+            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
+        }
+    }
+
+    private void showLoadingState(){
+        createAccountBt.setText("");
+        loginBt.setText("");
+        loadingIcon.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoadingState(){
+        createAccountBt.setText("Create Account");
+        loginBt.setText("Sign In");
+        loadingIcon.setVisibility(View.GONE);
     }
 
     private void hideStatusBar() {
@@ -99,6 +155,7 @@ public class BootActivity extends AppCompatActivity {
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
         if (!validateForm()) {
+            hideLoadingState();
             return;
         }
 
@@ -111,17 +168,16 @@ public class BootActivity extends AppCompatActivity {
                             accountJustCreated = true;
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            UserPreferences.getInstance().setAuthUID(user.getUid());
-                            DataManager.getInstance().createNewUser(user.getUid(), user.getEmail(), UserType.getTypeId(salesAgentSelected));
-                            updateUI(user);
-                            sendEmailVerification();
+                            currentUser = mAuth.getCurrentUser();
+                            UserPreferences.getInstance().setEmail(currentUser.getEmail());
+                            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
+                            DataManager.getInstance().createNewUser(currentUser.getUid(), currentUser.getEmail(), UserType.getTypeId(salesAgentSelected));
                         } else {
+                            hideLoadingState();
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(BootActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                            updateUI(null);
+                            Toast.makeText(BootActivity.this, task.getException().getLocalizedMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -140,14 +196,15 @@ public class BootActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            currentUser = mAuth.getCurrentUser();
+                            UserPreferences.getInstance().setEmail(currentUser.getEmail());
+                            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
                         } else {
+                            hideLoadingState();
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(BootActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
                     }
                 });
@@ -155,7 +212,6 @@ public class BootActivity extends AppCompatActivity {
 
     private void signOut() {
         mAuth.signOut();
-        updateUI(null);
     }
 
     private void sendEmailVerification() {
@@ -167,19 +223,15 @@ public class BootActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(BootActivity.this,
-                                    "Verification email sent to " + user.getEmail(),
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
                             Log.e(TAG, "sendEmailVerification", task.getException());
+                            verificationTv.setVisibility(View.VISIBLE);
+                        } else {
                             Toast.makeText(BootActivity.this,
                                     "Failed to send verification email.",
                                     Toast.LENGTH_SHORT).show();
                         }
-                        // [END_EXCLUDE]
                     }
                 });
-        // [END send_email_verification]
     }
 
     private boolean validateForm() {
@@ -210,18 +262,12 @@ public class BootActivity extends AppCompatActivity {
         return valid;
     }
 
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            animateLoginView();
-            launchMainActivity(user);
-        }
-    }
-
     private void launchMainActivity(FirebaseUser user) {
         if(user.isEmailVerified()) {
             Intent intent;
-            RealmResults<UserRealm> realmUser = Realm.getDefaultInstance().where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getAuthUID()).findAll();
-            if(realmUser != null && realmUser.size() > 0 && realmUser.get(0).getUid().equals(UserPreferences.getInstance().getAuthUID())) {
+            currentUser = mAuth.getCurrentUser();
+            RealmResults<UserRealm> realmUser = Realm.getDefaultInstance().where(UserRealm.class).equalTo("uid", currentUser.getUid()).findAll();
+            if(realmUser != null && realmUser.size() > 0 && realmUser.get(0).getUid().equals(currentUser.getUid())) {
                 if (realmUser.get(0).getFirstName() != null && realmUser.get(0).getFirstName().isEmpty()) {
                     intent = new Intent(getApplicationContext(), AccountDetailsActivity.class);
                 } else {
@@ -236,22 +282,28 @@ public class BootActivity extends AppCompatActivity {
             if(!accountJustCreated) {
                 Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();
             }
+            verificationTv.setVisibility(View.VISIBLE);
 
         }
     }
 
     @OnClick(R.id.email_create_account_button)
     public void onCreateAccountCLicked(){
+        showLoadingState();
         createAccount(mEmailField.getText().toString(), mPasswordField.getText().toString());
+        verificationTv.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.login_button)
     public void onLoginCLicked(){
+        passwrodRequirments.setVisibility(View.GONE);
+        showLoadingState();
         signIn(mEmailField.getText().toString(), mPasswordField.getText().toString());
     }
 
     @OnClick(R.id.show_login_view_tv)
     public void onShowLoginClicked(){
+        passwrodRequirments.setVisibility(View.GONE);
         animateLoginView();
     }
 
@@ -275,26 +327,61 @@ public class BootActivity extends AppCompatActivity {
 
     @OnClick(R.id.show_create_account_view_tv)
     public void onShowAccountViewClicked(){
+        hideLoadingState();
         animateCreateAccountView();
     }
 
     private void animateLoginView(){
-        accountTypeLayout.animate().translationX(DpUtil.pxFromDp(this, 1000));
-        accountTypeTitle.animate().translationX(DpUtil.pxFromDp(this, 1000));
+        animateTitleTextChane("Sign In");
+        animateHideAccountType();
         createAccountBt.setVisibility(View.GONE);
         loginBt.setVisibility(View.VISIBLE);
         showLoginViewTv.setVisibility(View.GONE);
         showCreateAccountTv.setVisibility(View.VISIBLE);
         mPasswordField.setHint(getResources().getString(R.string.hint_password));
+        if(!UserPreferences.getInstance().getEmail().isEmpty()) {
+            mEmailField.setText(UserPreferences.getInstance().getEmail());
+        }
     }
 
     private void animateCreateAccountView(){
-        accountTypeLayout.animate().translationX(DpUtil.pxFromDp(this, 0));
-        accountTypeTitle.animate().translationX(DpUtil.pxFromDp(this, 0));
+        animateTitleTextChane("Create Account");
+        animateShowAccountType();
         createAccountBt.setVisibility(View.VISIBLE);
         loginBt.setVisibility(View.GONE);
         showLoginViewTv.setVisibility(View.VISIBLE);
         showCreateAccountTv.setVisibility(View.GONE);
         mPasswordField.setHint(getResources().getString(R.string.new_password));
+        mEmailField.setText("");
+    }
+
+    private void animateTitleTextChane(final String text){
+        bootTitle.animate().scaleX(.0f).setDuration(150);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                bootTitle.animate().scaleX(1f).setDuration(150);
+                bootTitle.setText(text);
+            }
+        }, 150);
+    }
+
+    private void animateHideAccountType(){
+        accountTypeLayout.animate().scaleX(0f).setDuration(250);
+        accountTypeTitle.animate().scaleX(0f).setDuration(250);
+        accountTypeLayout.animate().scaleY(0f).setDuration(250);
+        accountTypeTitle.animate().scaleY(0f).setDuration(250);
+        accountTypeLayout.animate().alpha(0f).setDuration(150);
+        accountTypeTitle.animate().alpha(0f).setDuration(150);
+    }
+
+    private void animateShowAccountType(){
+        accountTypeLayout.animate().scaleX(1f).setDuration(150);
+        accountTypeTitle.animate().scaleX(1f).setDuration(150);
+        accountTypeLayout.animate().scaleY(1f).setDuration(150);
+        accountTypeTitle.animate().scaleY(1f).setDuration(150);
+        accountTypeLayout.animate().alpha(1f).setDuration(150);
+        accountTypeTitle.animate().alpha(1f).setDuration(150);
     }
 }

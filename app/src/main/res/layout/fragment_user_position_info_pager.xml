@@ -1,0 +1,34 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="200dp"
+android:gravity="center_vertical"
+android:orientation="vertical"
+tools:context="jjpartnership.hub.view_layer.activities.create_agent_account_activity.UserPositionInfoPagerFragment">
+
+<!-- TODO: Update blank fragment layout -->
+
+    <EditText
+        android:id="@+id/field_role"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp"
+        android:hint="Role"
+        android:inputType="text"
+        android:textColor="@android:color/background_light" />
+
+    <EditText
+        android:id="@+id/field_business_unit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="5dp"
+        android:hint="Business Unit"
+        android:inputType="text"
+        android:textColor="@android:color/background_light" />
+</LinearLayout>
