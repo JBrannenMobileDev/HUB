@@ -36,8 +36,8 @@ public class DataManager {
         fbManager.loadCompaniesToFirebase();
     }
 
-    public void createNewUser(String uid, String email, String typeId){
-        fbManager.writeNewUser(new User(uid, email, typeId));
+    public void createNewUser(String uid, String email){
+
     }
 
     public void updateRealmUser(UserRealm user) {
@@ -49,7 +49,7 @@ public class DataManager {
     }
 
     public void updateUser(String firstName, String lastName, String phoneNumber, String businessUnit, String role) {
-        fbManager.updateUser(firstName, lastName, phoneNumber, businessUnit, role);
+
     }
 
     public void getCompany(String emailDomain, BaseCallback<Boolean> companyNameCallback) {
@@ -58,5 +58,9 @@ public class DataManager {
 
     public void saveCompanyName(String name) {
         realmManager.saveCompanyName(name);
+    }
+
+    public void populateDataBaseFakeData() {
+        fbManager.onBoardNewSalesCompany();
     }
 }

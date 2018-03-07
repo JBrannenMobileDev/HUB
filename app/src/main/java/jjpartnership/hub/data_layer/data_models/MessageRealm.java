@@ -8,17 +8,28 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class MessageRealm extends RealmObject{
-    @PrimaryKey private String messageId;
+    @PrimaryKey
+    private String messageId;
     private String uid;
+    private long createdDate;
     private String messageContent;
 
     public MessageRealm(Message message) {
         this.messageId = message.getMessageId();
-        this.uid = message.getUid();
+        this.uid = message.getCreatedByUid();
         this.messageContent = message.getMessageContent();
+        this.createdDate = message.getCreatedDate();
     }
 
     public MessageRealm() {
+    }
+
+    public long getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(long createdDate) {
+        this.createdDate = createdDate;
     }
 
     public String getMessageId() {

@@ -6,13 +6,23 @@ package jjpartnership.hub.data_layer.data_models;
 
 public class Message{
     private String messageId;
-    private String uid;
+    private String createdByUid;
+    private long createdDate;
     private String messageContent;
 
     public Message(MessageRealm realmMessage) {
         this.messageId = realmMessage.getMessageId();
-        this.uid = realmMessage.getUid();
+        this.createdByUid = realmMessage.getUid();
         this.messageContent = realmMessage.getMessageContent();
+        this.createdDate = realmMessage.getCreatedDate();
+    }
+
+    public long getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(long createdDate) {
+        this.createdDate = createdDate;
     }
 
     public String getMessageId() {
@@ -23,12 +33,12 @@ public class Message{
         this.messageId = messageId;
     }
 
-    public String getUid() {
-        return uid != null ? uid : "";
+    public String getCreatedByUid() {
+        return createdByUid != null ? createdByUid : "";
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setCreatedByUid(String createdByUid) {
+        this.createdByUid = createdByUid;
     }
 
     public String getMessageContent() {

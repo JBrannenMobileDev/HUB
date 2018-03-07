@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -15,44 +16,55 @@ import io.realm.annotations.PrimaryKey;
 public class CompanyRealm extends RealmObject{
     @PrimaryKey private String companyId;
     private String name;
-    private String location;
-    private String companyType;
+    private String address;
     private String companyEmailDomain;
-    private RealmList<String> businessUnits;
+    private boolean salesCompany;
+    private boolean buyerCompany;
     private RealmList<String> roles;
-    private RealmList<EmployeeRealm> employeeList;
-    private RealmList<CustomerCompanyRealm> customers;
+    private RealmList<String> businessUnits;
+    private RealmList<String> industryList;
+    private RealmList<String> employeeList;
+    private RealmList<String> accountList;
 
     public CompanyRealm() {
     }
 
-    public CompanyRealm(String name, String location, String companyType, RealmList<EmployeeRealm> employeeList) {
+    public CompanyRealm(String companyId, String name, String address, String companyEmailDomain,
+                        RealmList<String> roles, RealmList<String> businessUnits, RealmList<String> industryList,
+                        RealmList<String> employeeList, RealmList<String> accountList, boolean salesCompany, boolean buyerCompany) {
+        this.companyId = companyId;
         this.name = name;
-        this.location = location;
-        this.companyType = companyType;
+        this.address = address;
+        this.companyEmailDomain = companyEmailDomain;
+        this.roles = roles;
+        this.businessUnits = businessUnits;
+        this.industryList = industryList;
         this.employeeList = employeeList;
+        this.accountList = accountList;
+        this.salesCompany = salesCompany;
+        this.buyerCompany = buyerCompany;
     }
 
     public CompanyRealm(Company company) {
         this.name = company.getName();
-        this.location = company.getLocation();
-        this.companyType = company.getCompanyType();
-        this.employeeList = createEmployeeList(company.getEmployeeList());
+        this.address = company.getAddress();
         this.businessUnits = createBusinessUnits(company.getBusinessUnits());
         this.roles = createRoles(company.getRoles());
         this.companyEmailDomain = company.getCompanyEmailDomain();
-        this.customers = createCustomersList(company.getCustomers());
+        this.industryList = createIndustryList(company.getIndustryList());
+        this.employeeList = createEmployeeList(company.getEmployeeList());
+        this.accountList = createAccountList(company.getAccountList());
+        this.salesCompany = company.isSalesCompany();
+        this.buyerCompany = company.isBuyerCompany();
     }
 
-    private RealmList<CustomerCompanyRealm> createCustomersList(List<CustomerCompany> customers) {
-        RealmList<CustomerCompanyRealm> realmCustomers = new RealmList<>();
-        if(customers != null) {
-            for (CustomerCompany customer : customers) {
-                realmCustomers.add(new CustomerCompanyRealm(customer));
-            }
-            Collections.reverse(realmCustomers);
+    private RealmList<String> createIndustryList(List<String> industryList) {
+        RealmList<String> realmIndustries = new RealmList<>();
+        for(String industry : industryList){
+            realmIndustries.add(industry);
         }
-        return realmCustomers;
+        Collections.reverse(realmIndustries);
+        return realmIndustries;
     }
 
     private RealmList<String> createRoles(List<String> roles) {
@@ -77,23 +89,62 @@ public class CompanyRealm extends RealmObject{
         return realmBusinessUnits;
     }
 
-    private RealmList<EmployeeRealm> createEmployeeList(List<Employee> employeeList) {
-        RealmList<EmployeeRealm> employeeListRealm = new RealmList<>();
-        if(employeeList != null) {
-            for (Employee employee : employeeList) {
-                employeeListRealm.add(new EmployeeRealm(employee));
-            }
-            Collections.reverse(employeeListRealm);
+    private RealmList<String> createEmployeeList(List<String> employeeList) {
+        RealmList<String> realmEmployees = new RealmList<>();
+        for(String employee : employeeList){
+            realmEmployees.add(employee);
         }
-        return employeeListRealm;
+        Collections.reverse(realmEmployees);
+        return realmEmployees;
     }
 
-    public RealmList<CustomerCompanyRealm> getCustomers() {
-        return customers;
+    private RealmList<String> createAccountList(List<String> accountList) {
+        RealmList<String> realmAccounts = new RealmList<>();
+        for(String industry : accountList){
+            realmAccounts.add(industry);
+        }
+        Collections.reverse(realmAccounts);
+        return realmAccounts;
     }
 
-    public void setCustomers(RealmList<CustomerCompanyRealm> customers) {
-        this.customers = customers;
+    public boolean isSalesCompany() {
+        return salesCompany;
+    }
+
+    public void setSalesCompany(boolean salesCompany) {
+        this.salesCompany = salesCompany;
+    }
+
+    public boolean isBuyerCompany() {
+        return buyerCompany;
+    }
+
+    public void setBuyerCompany(boolean buyerCompany) {
+        this.buyerCompany = buyerCompany;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCompanyEmailDomain() {
@@ -104,14 +155,6 @@ public class CompanyRealm extends RealmObject{
         this.companyEmailDomain = companyEmailDomain;
     }
 
-    public RealmList<String> getBusinessUnits() {
-        return businessUnits;
-    }
-
-    public void setBusinessUnits(RealmList<String> businessUnits) {
-        this.businessUnits = businessUnits;
-    }
-
     public RealmList<String> getRoles() {
         return roles;
     }
@@ -120,43 +163,35 @@ public class CompanyRealm extends RealmObject{
         this.roles = roles;
     }
 
-    public String getCompanyType() {
-        return companyType != null ? companyType : "";
+    public RealmList<String> getBusinessUnits() {
+        return businessUnits;
     }
 
-    public void setCompanyType(String companyType) {
-        this.companyType = companyType;
+    public void setBusinessUnits(RealmList<String> businessUnits) {
+        this.businessUnits = businessUnits;
     }
 
-    public String getName() {
-        return name != null ? name : "";
+    public RealmList<String> getIndustryList() {
+        return industryList;
     }
 
-    public String getCompanyId() {
-        return companyId != null ? companyId : "";
+    public void setIndustryList(RealmList<String> industryList) {
+        this.industryList = industryList;
     }
 
-    public void setCompanyId(String companyId) {
-        this.companyId = companyId;
+    public RealmList<String> getEmployeeList() {
+        return employeeList;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEmployeeList(RealmList<String> employeeList) {
+        this.employeeList = employeeList;
     }
 
-    public String getLocation() {
-        return location != null ? location : "";
+    public RealmList<String> getAccountList() {
+        return accountList;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public List<EmployeeRealm> getEmployeeList() {
-        return employeeList != null ? employeeList : new ArrayList<EmployeeRealm>();
-    }
-
-    public void setEmployeeList(RealmList<EmployeeRealm> employeeIdList) {
-        this.employeeList = employeeIdList;
+    public void setAccountList(RealmList<String> accountList) {
+        this.accountList = accountList;
     }
 }

@@ -13,20 +13,30 @@ public class User{
     private String phoneNumber;
     private String firstName;
     private String lastName;
-    private Company company;
+    private String companyId;
     private String businessUnit;
     private String role;
-    private String type;
-    private List<Message> directChats;
-    private List<Message> groupChats;
+    private String userType;
+    private List<String> directChatIds;
+    private List<String> accountIds;
 
     public User() {
     }
 
-    public User(String uid, String email, String type) {
+    public User(String uid, String email, String phoneNumber, String firstName, String lastName,
+                String companyId, String businessUnit, String role, String userType,
+                List<String> directChatIds, List<String> accountIds) {
         this.uid = uid;
         this.email = email;
-        this.type = type;
+        this.phoneNumber = phoneNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.companyId = companyId;
+        this.businessUnit = businessUnit;
+        this.role = role;
+        this.userType = userType;
+        this.directChatIds = directChatIds;
+        this.accountIds = accountIds;
     }
 
     public User(UserRealm realmUser){
@@ -35,56 +45,23 @@ public class User{
         this.phoneNumber = realmUser.getPhoneNumber();
         this.firstName = realmUser.getFirstName();
         this.lastName = realmUser.getLastName();
-        this.company = new Company(realmUser.getCompany());
+        this.companyId = realmUser.getCompanyId();
         this.businessUnit = realmUser.getBusinessUnit();
         this.role = realmUser.getRole();
-        this.type = realmUser.getType();
-        this.directChats = createDirectChatsList(realmUser.getDirectChat());
-        this.groupChats = createGroupChatsList(realmUser.getGroupChat());
+        this.userType = realmUser.getUserType();
+        this.directChatIds = realmUser.getDirectChatIds();
+        this.accountIds = realmUser.getAccountIds();
     }
 
-    private List<Message> createGroupChatsList(List<MessageRealm> groupChatRealm) {
-        List<Message> groupChat = new ArrayList<>();
-        for(MessageRealm realmMessage : groupChatRealm){
-            groupChat.add(new Message(realmMessage));
+    public void addAccount(String accountId) {
+        if(accountIds == null){
+            accountIds = new ArrayList<>();
         }
-        return groupChat;
-    }
-
-    private List<Message> createDirectChatsList(List<MessageRealm> directChatRealm) {
-        List<Message> directChat = new ArrayList<>();
-        for(MessageRealm realmMessage : directChatRealm){
-            directChat.add(new Message(realmMessage));
-        }
-        return directChat;
-    }
-
-    public String getType() {
-        return type != null ? type : "";
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public List<Message> getDirectChat() {
-        return directChats != null ? directChats : new ArrayList<Message>();
-    }
-
-    public void setDirectChat(List<Message> directChatIds) {
-        this.directChats = directChatIds;
-    }
-
-    public List<Message> getGroupChat() {
-        return groupChats != null ? groupChats : new ArrayList<Message>();
-    }
-
-    public void setGroupChatIds(List<Message> groupChatIds) {
-        this.groupChats = groupChatIds;
+        accountIds.add(accountId);
     }
 
     public String getUid() {
-        return uid != null ? uid : "";
+        return uid;
     }
 
     public void setUid(String uid) {
@@ -92,7 +69,7 @@ public class User{
     }
 
     public String getEmail() {
-        return email != null ? email : "";
+        return email;
     }
 
     public void setEmail(String email) {
@@ -100,39 +77,39 @@ public class User{
     }
 
     public String getPhoneNumber() {
-        return phoneNumber != null ? phoneNumber : "";
+        return phoneNumber;
     }
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
     public String getLastName() {
-        return lastName != null ? lastName : "";
+        return lastName;
     }
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-    public String getFirstName() {
-        return firstName != null ? firstName : "";
+    public String getCompanyId() {
+        return companyId;
     }
 
-    public void setFirstName(String name) {
-        this.firstName = name;
-    }
-
-    public Company getCompany() {
-        return company != null ? company : new Company();
-    }
-
-    public void setCompany(Company company) {
-        this.company = company;
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
     }
 
     public String getBusinessUnit() {
-        return businessUnit != null ? businessUnit : "";
+        return businessUnit;
     }
 
     public void setBusinessUnit(String businessUnit) {
@@ -140,10 +117,34 @@ public class User{
     }
 
     public String getRole() {
-        return role != null ? role : "";
+        return role;
     }
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
+
+    public List<String> getDirectChatIds() {
+        return directChatIds;
+    }
+
+    public void setDirectChatIds(List<String> directChatIds) {
+        this.directChatIds = directChatIds;
+    }
+
+    public List<String> getAccountIds() {
+        return accountIds;
+    }
+
+    public void setAccountIds(List<String> accountIds) {
+        this.accountIds = accountIds;
     }
 }

@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.create_customer_account_activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -97,9 +98,9 @@ public class CustomerAccountDetailsActivity extends AppCompatActivity implements
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
         Window window = getWindow();
+        window.setStatusBarColor(Color.TRANSPARENT);
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
 
     private void initViewPager() {
@@ -129,6 +130,16 @@ public class CustomerAccountDetailsActivity extends AppCompatActivity implements
     @Override
     public void onPhoneNumberTextChanged(String phoneNumber) {
         presenter.onPhoneNumberUpdated(phoneNumber);
+    }
+
+    @Override
+    public void onEtTouched() {
+
+    }
+
+    @Override
+    public void onBackPressedFromEt() {
+
     }
 
     @Override

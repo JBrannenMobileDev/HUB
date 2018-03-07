@@ -8,7 +8,7 @@ tools:context="jjpartnership.hub.view_layer.activities.create_agent_account_acti
 
 <!-- TODO: Update blank fragment layout -->
 
-    <EditText
+    <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
         android:id="@+id/field_role"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +20,7 @@ tools:context="jjpartnership.hub.view_layer.activities.create_agent_account_acti
         android:inputType="text"
         android:textColor="@android:color/background_light" />
 
-    <EditText
+    <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
         android:id="@+id/field_business_unit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

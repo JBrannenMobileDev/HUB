@@ -40,4 +40,14 @@ public class UserPreferences {
         editor.putString(UserPreferenceConstants.USER_EMAIL, email);
         editor.commit();
     }
+
+    public boolean isVerificationEmailSent(){
+        return getSharedPreferences(context).getBoolean(UserPreferenceConstants.VERIFICATION_SENT, false);
+    }
+
+    public void setVerificationEmailSent(Boolean verificationSent){
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putBoolean(UserPreferenceConstants.VERIFICATION_SENT, verificationSent);
+        editor.commit();
+    }
 }

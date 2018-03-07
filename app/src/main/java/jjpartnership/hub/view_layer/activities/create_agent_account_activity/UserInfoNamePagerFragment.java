@@ -5,14 +5,19 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jjpartnership.hub.R;
+import jjpartnership.hub.view_layer.custom_views.BackAwareEditText;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,10 +25,10 @@ import jjpartnership.hub.R;
  * {@link UserInfoNamePagerFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class UserInfoNamePagerFragment extends Fragment {
-    @BindView(R.id.field_first_name)EditText firstNameEt;
-    @BindView(R.id.field_last_name)EditText lastNameEt;
-    @BindView(R.id.field_phone_number)EditText phoneNumberEt;
+public class UserInfoNamePagerFragment extends Fragment implements BackAwareEditText.BackPressedListener{
+    @BindView(R.id.field_first_name)BackAwareEditText firstNameEt;
+    @BindView(R.id.field_last_name)BackAwareEditText lastNameEt;
+    @BindView(R.id.field_phone_number)BackAwareEditText phoneNumberEt;
 
     private OnFragmentInteractionListener mListener;
 
@@ -38,11 +43,47 @@ public class UserInfoNamePagerFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_user_info_name_pager, container, false);
         ButterKnife.bind(this, v);
+        firstNameEt.setBackPressedListener(this);
+        lastNameEt.setBackPressedListener(this);
+        phoneNumberEt.setBackPressedListener(this);
         initListeners();
         return v;
     }
 
     private void initListeners() {
+        firstNameEt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mListener.onEtTouched();
+                return false;
+            }
+        });
+
+        lastNameEt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mListener.onEtTouched();
+                return false;
+            }
+        });
+
+        phoneNumberEt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                mListener.onEtTouched();
+                return false;
+            }
+        });
+
+        phoneNumberEt.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    mListener.onBackPressedFromEt();
+                }
+                return false;
+            }
+        });
         firstNameEt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -112,6 +153,11 @@ public class UserInfoNamePagerFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onImeBack(BackAwareEditText editText) {
+        mListener.onBackPressedFromEt();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -126,5 +172,7 @@ public class UserInfoNamePagerFragment extends Fragment {
         void onFirstNameTextChanged(String firstName);
         void onLastNameTextChanged(String lastName);
         void onPhoneNumberTextChanged(String phoneNumber);
+        void onEtTouched();
+        void onBackPressedFromEt();
     }
 }

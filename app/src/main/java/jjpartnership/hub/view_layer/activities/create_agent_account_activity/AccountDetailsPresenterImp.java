@@ -3,9 +3,7 @@ package jjpartnership.hub.view_layer.activities.create_agent_account_activity;
 import com.google.firebase.auth.FirebaseAuth;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import jjpartnership.hub.data_layer.DataManager;
-import jjpartnership.hub.data_layer.data_models.UserCompanyName;
 import jjpartnership.hub.utils.StringValidationUtil;
 
 /**
@@ -34,14 +32,14 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     }
 
     private void fetchCompanyName() {
-        UserCompanyName companyName = Realm.getDefaultInstance().where(UserCompanyName.class).findFirst();
-        companyName.addChangeListener(new RealmChangeListener<UserCompanyName>() {
-            @Override
-            public void onChange(UserCompanyName name) {
-                activity.setCompanyName(name.getUserCompanyName());
-            }
-        });
-        activity.setCompanyName(companyName.getUserCompanyName());
+//        UserCompanyName companyName = Realm.getDefaultInstance().where(UserCompanyName.class).findFirst();
+//        companyName.addChangeListener(new RealmChangeListener<UserCompanyName>() {
+//            @Override
+//            public void onChange(UserCompanyName name) {
+//                activity.setCompanyName(name.getUserCompanyName());
+//            }
+//        });
+//        activity.setCompanyName(companyName.getUserCompanyName());
     }
 
     @Override

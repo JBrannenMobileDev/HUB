@@ -1,19 +1,21 @@
 package jjpartnership.hub.view_layer.activities.boot_activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,21 +35,22 @@ import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
-import jjpartnership.hub.data_layer.data_models.UserType;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.StringParsingUtil;
 import jjpartnership.hub.utils.StringValidationUtil;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.create_agent_account_activity.AccountDetailsActivity;
 import jjpartnership.hub.view_layer.activities.main_activity.MainActivity;
 import jjpartnership.hub.view_layer.activities.unauthorized_user_activity.UnauthorizedUserActivity;
+import jjpartnership.hub.view_layer.custom_views.BackAwareEditText;
 
-public class BootActivity extends AppCompatActivity {
+public class BootActivity extends AppCompatActivity implements BackAwareEditText.BackPressedListener{
 
     private static final String TAG = "EmailPassword";
 
-    @BindView(R.id.field_email)EditText mEmailField;
-    @BindView(R.id.field_password)EditText mPasswordField;
+    @BindView(R.id.field_email)BackAwareEditText mEmailField;
+    @BindView(R.id.field_password)BackAwareEditText mPasswordField;
     @BindView(R.id.sales_agent_tv) TextView salesAgentTv;
     @BindView(R.id.customer_tv) TextView customerTv;
     @BindView(R.id.account_type_layout)LinearLayout accountTypeLayout;
@@ -60,6 +63,10 @@ public class BootActivity extends AppCompatActivity {
     @BindView(R.id.loading_icon)MKLoader loadingIcon;
     @BindView(R.id.password_requirements_tv)TextView passwrodRequirments;
     @BindView(R.id.boot_title_tv)TextView bootTitle;
+    @BindView(R.id.loading_frame_layout)FrameLayout bootLoadingLayout;
+    @BindView(R.id.hub_logo)ImageView hubLogo;
+    @BindView(R.id.hub_title)TextView hubTitle;
+    @BindView(R.id.email_password_fields)LinearLayout inputView;
 
     private FirebaseAuth mAuth;
     private boolean accountJustCreated;
@@ -86,6 +93,35 @@ public class BootActivity extends AppCompatActivity {
                 }
             }
         });
+
+        mPasswordField.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                animateTitleShrink();
+                return false;
+            }
+        });
+
+        mPasswordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    animateTitleExpand();
+                }
+                return false;
+            }
+        });
+
+        mEmailField.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                animateTitleShrink();
+                return false;
+            }
+        });
+
+        mEmailField.setBackPressedListener(this);
+        mPasswordField.setBackPressedListener(this);
 //        DataManager.getInstance().initializeDbData();
     }
 
@@ -93,6 +129,11 @@ public class BootActivity extends AppCompatActivity {
     public void onResume(){
         super.onResume();
         hideStatusBar();
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+        if(currentUser != null && currentUser.isEmailVerified()){
+            verificationTv.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -109,10 +150,15 @@ public class BootActivity extends AppCompatActivity {
                 if(isValid) {
                     if(currentUser.isEmailVerified()) {
                         if (currentUser != null) {
-                            launchMainActivity(currentUser);
+                            launchNextActivity(currentUser);
+                        }else {
+                            bootLoadingLayout.setVisibility(View.GONE);
                         }
                     }else{
-                        sendEmailVerification();
+                        bootLoadingLayout.setVisibility(View.GONE);
+                        if(!UserPreferences.getInstance().isVerificationEmailSent()) {
+                            sendEmailVerification();
+                        }
                     }
                 }else{
                     startActivity(new Intent(getApplicationContext(), UnauthorizedUserActivity.class));
@@ -124,9 +170,33 @@ public class BootActivity extends AppCompatActivity {
                 hideLoadingState();
             }
         };
-        if(currentUser != null) {
-            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
-        }
+//        if(currentUser != null) {
+//            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
+//        }else{
+//            bootLoadingLayout.setVisibility(View.GONE);
+//        }
+        DataManager.getInstance().populateDataBaseFakeData();
+    }
+
+    private void animateTitleShrink(){
+        verificationTv.setVisibility(View.GONE);
+        inputView.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-100f));
+        hubLogo.animate().scaleX(.5f);
+        hubLogo.animate().scaleY(.5f);
+        hubLogo.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-50f));
+        hubTitle.animate().scaleY(.5f);
+        hubTitle.animate().scaleX(.5f);
+        hubTitle.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-50f));
+    }
+
+    private void animateTitleExpand(){
+        inputView.animate().translationY(0f);
+        hubLogo.animate().scaleX(1f);
+        hubLogo.animate().scaleY(1f);
+        hubLogo.animate().translationY(0f);
+        hubTitle.animate().scaleY(1f);
+        hubTitle.animate().scaleX(1f);
+        hubTitle.animate().translationY(0f);
     }
 
     private void showLoadingState(){
@@ -146,10 +216,9 @@ public class BootActivity extends AppCompatActivity {
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
         Window window = getWindow();
-        window.setStatusBarColor(Color.TRANSPARENT);
+        window.setStatusBarColor(getResources().getColor(R.color.colorPrimary));
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     }
 
     private void createAccount(String email, String password) {
@@ -171,7 +240,7 @@ public class BootActivity extends AppCompatActivity {
                             currentUser = mAuth.getCurrentUser();
                             UserPreferences.getInstance().setEmail(currentUser.getEmail());
                             DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
-                            DataManager.getInstance().createNewUser(currentUser.getUid(), currentUser.getEmail(), UserType.getTypeId(salesAgentSelected));
+                            DataManager.getInstance().createNewUser(currentUser.getUid(), currentUser.getEmail());
                         } else {
                             hideLoadingState();
                             // If sign in fails, display a message to the user.
@@ -223,6 +292,7 @@ public class BootActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
+                            UserPreferences.getInstance().setVerificationEmailSent(true);
                             Log.e(TAG, "sendEmailVerification", task.getException());
                             verificationTv.setVisibility(View.VISIBLE);
                         } else {
@@ -262,7 +332,7 @@ public class BootActivity extends AppCompatActivity {
         return valid;
     }
 
-    private void launchMainActivity(FirebaseUser user) {
+    private void launchNextActivity(FirebaseUser user) {
         if(user.isEmailVerified()) {
             Intent intent;
             currentUser = mAuth.getCurrentUser();
@@ -383,5 +453,11 @@ public class BootActivity extends AppCompatActivity {
         accountTypeTitle.animate().scaleY(1f).setDuration(150);
         accountTypeLayout.animate().alpha(1f).setDuration(150);
         accountTypeTitle.animate().alpha(1f).setDuration(150);
+    }
+
+    @Override
+    public void onImeBack(BackAwareEditText editText) {
+        hideStatusBar();
+        animateTitleExpand();
     }
 }

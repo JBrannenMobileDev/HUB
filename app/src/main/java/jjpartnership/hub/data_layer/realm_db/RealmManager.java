@@ -4,7 +4,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
-import jjpartnership.hub.data_layer.data_models.UserCompanyName;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 
 /**
@@ -40,12 +39,12 @@ public class RealmManager {
     }
 
     public void saveCompanyName(final String companyName) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm bgRealm) {
-                bgRealm.copyToRealmOrUpdate(new UserCompanyName(companyName));
-            }
-        });
+//        Realm realm = Realm.getDefaultInstance();
+//        realm.executeTransaction(new Realm.Transaction() {
+//            @Override
+//            public void execute(Realm bgRealm) {
+//                bgRealm.copyToRealmOrUpdate(new UserCompanyName(companyName));
+//            }
+//        });
     }
 }

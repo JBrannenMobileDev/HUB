@@ -1,202 +1,111 @@
 package jjpartnership.hub.data_layer.firebase_db;
 
-import android.util.Log;
-
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmList;
-import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.Company;
-import jjpartnership.hub.data_layer.data_models.CompanyType;
-import jjpartnership.hub.data_layer.data_models.CustomerCompany;
+import jjpartnership.hub.data_layer.data_models.CompanyBasic;
+import jjpartnership.hub.data_layer.data_models.DirectChat;
+import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.User;
-import jjpartnership.hub.data_layer.data_models.CompanyRealm;
-import jjpartnership.hub.data_layer.data_models.EmployeeRealm;
-import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
-import jjpartnership.hub.utils.StringParsingUtil;
-import jjpartnership.hub.utils.UserPreferences;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * Created by jbrannen on 2/24/18.
  */
 
 public class FirebaseManager {
-    private DatabaseReference userReference;
+    private DatabaseReference thisUserReference;
     private DatabaseReference usersReference;
     private DatabaseReference companiesReference;
+    private DatabaseReference accountsReference;
+    private DatabaseReference directChatsReference;
+    private DatabaseReference groupChatsReference;
+    private DatabaseReference companiesBasicReference;
+    private DatabaseReference industriesReference;
+
     private FirebaseDatabase database;
 
     public FirebaseManager() {
         database = FirebaseDatabase.getInstance();
-        userReference = database.getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//        thisUserReference = database.getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         usersReference = database.getReference("users");
         companiesReference = database.getReference("companies");
+        accountsReference = database.getReference("accounts");
+        directChatsReference = database.getReference("direct_chats");
+        groupChatsReference = database.getReference("group_chats");
+        companiesBasicReference = database.getReference("companies_basic");
+        industriesReference = database.getReference("industries");
         initDataListeners();
     }
 
     private void initDataListeners() {
-        ValueEventListener userListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if(user != null) {
-                    DataManager.getInstance().updateRealmUser(new UserRealm(user));
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-            }
-        };
-        userReference.addValueEventListener(userListener);
-
-        ValueEventListener companiesListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<CompanyRealm> companies = new ArrayList<>();
-                for(DataSnapshot company : dataSnapshot.getChildren()){
-                    if(company.getValue(Company.class) != null) {
-                        companies.add(new CompanyRealm(company.getValue(Company.class)));
-                    }
-                }
-                if(companies.size() > 0) {
-                    DataManager.getInstance().updateRealmCompanies(companies);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-            }
-        };
-        companiesReference.addValueEventListener(companiesListener);
+//        ValueEventListener userListener = new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                User user = dataSnapshot.getValue(User.class);
+//                if(user != null) {
+//                    DataManager.getInstance().updateRealmUser(new UserRealm(user));
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
+//            }
+//        };
+//        thisUserReference.addValueEventListener(userListener);
     }
 
     public void writeNewUser(User user) {
-        database.getReference("users").child(user.getUid()).setValue(user);
+        usersReference.child(user.getUid()).setValue(user);
     }
 
-    public void writeEmailPassword(String password){
-        database.getReference("refer_application").child("email_password").setValue(password);
+    public void writeNewCompany(Company company){
+        DatabaseReference newCompanyRef = companiesReference.push();
+        company.setCompanyId(newCompanyRef.getKey());
+        companiesReference.child(company.getCompanyId()).setValue(company);
     }
 
-    public void loadCompaniesToFirebase(){
-        RealmList<CompanyRealm> companies = new RealmList<>();
-
-        RealmList<EmployeeRealm> comp1Employees = new RealmList<>();
-        comp1Employees.add(new EmployeeRealm("Adam", "Smith", "aSmith@gmail.com"));
-        comp1Employees.add(new EmployeeRealm("Ryan", "Canty", "rcanty@gmail.com"));
-        comp1Employees.add(new EmployeeRealm("John", "churt", "jchurt@gmail.com"));
-        CompanyRealm comp1 = new CompanyRealm("Staples", "Murrieta CA", CompanyType.CUSTOMER_COMPANY, comp1Employees);
-
-        RealmList<EmployeeRealm> comp2Employees = new RealmList<>();
-        comp2Employees.add(new EmployeeRealm("Stemp", "Smith", "sSmith@gmail.com"));
-        comp2Employees.add(new EmployeeRealm("tremp", "currn", "tcurrn@gmail.com"));
-        comp2Employees.add(new EmployeeRealm("brent", "child", "bchild@gmail.com"));
-        CompanyRealm comp2 = new CompanyRealm("Staples", "Temecula CA", CompanyType.CUSTOMER_COMPANY, comp2Employees);
-
-        RealmList<EmployeeRealm> comp3Employees = new RealmList<>();
-        comp3Employees.add(new EmployeeRealm("hint", "trup", "htrup@nationalmerchants.com"));
-        comp3Employees.add(new EmployeeRealm("lint", "tnil", "ltnil@nationalmerchants.com"));
-        comp3Employees.add(new EmployeeRealm("Jonathan", "Brannen", "jbrannen@nationalmerchants.com"));
-        CompanyRealm comp3 = new CompanyRealm("National Merchants Association", "Temecula CA", CompanyType.CUSTOMER_COMPANY, comp3Employees);
-        RealmList<String> businessUnits = new RealmList<>();
-        businessUnits.add("Marketing");
-        businessUnits.add("Inside Sales");
-        businessUnits.add("Outside Sales");
-        businessUnits.add("Engineering");
-        comp3.setBusinessUnits(businessUnits);
-        RealmList<String> roles = new RealmList<>();
-        roles.add("VP");
-        roles.add("CEO");
-        roles.add("CTO");
-        roles.add("Android Developer");
-        comp3.setRoles(roles);
-        comp3.setCompanyEmailDomain("nationalmerchants.com");
-        CustomerCompany customer3 = new CustomerCompany();
-
-        RealmList<EmployeeRealm> comp4Employees = new RealmList<>();
-        comp4Employees.add(new EmployeeRealm("John", "Childers", "johnraychlder@gmail.com"));
-        comp4Employees.add(new EmployeeRealm("Jonathan", "Brannen", "jbinvestments15@gmail.com"));
-        comp4Employees.add(new EmployeeRealm("Shawna", "Brannen", "shawnaMccollom@yahoo.com"));
-        CompanyRealm comp4 = new CompanyRealm("Thermo Fisher", "Los Angeles CA", CompanyType.SALES_COMPANY, comp4Employees);
-        RealmList<String> businessUnits4 = new RealmList<>();
-        businessUnits4.add("Marketing");
-        businessUnits4.add("Sales");
-        businessUnits4.add("Engineering");
-        businessUnits4.add("ChemicalWeapons");
-        comp4.setBusinessUnits(businessUnits4);
-        RealmList<String> roles4 = new RealmList<>();
-        roles4.add("VP");
-        roles4.add("CEO");
-        roles4.add("CTO");
-        roles4.add("Manager");
-        roles4.add("Sales Agent");
-        comp4.setRoles(roles4);
-        comp4.setCompanyEmailDomain("gmail.com");
-
-        companies.add(comp1);
-        companies.add(comp2);
-        companies.add(comp3);
-        companies.add(comp4);
-
-        List<Company> firebaseCompanies = new ArrayList<>();
-
-        for(int i = 0; i < 4; i++){
-            firebaseCompanies.add(new Company(companies.get(i)));
-        }
-
-        for(int i = 0; i < 4; i++){
-            database.getReference("companies").push().setValue(firebaseCompanies.get(i));
-        }
+    public void writeNewAccount(Account account){
+        DatabaseReference newAccountRef = accountsReference.push();
+        account.setAccountIdFire(newAccountRef.getKey());
+        accountsReference.child(account.getAccountIdFire()).setValue(account);
     }
 
-    public void updateUser(String firstName, String lastName, String phoneNumber, String businessUnit, String role) {
-        userReference.child("firstName").setValue(firstName);
-        userReference.child("lastName").setValue(lastName);
-        userReference.child("phoneNumber").setValue(phoneNumber);
-        userReference.child("businessUnit").setValue(businessUnit);
-        userReference.child("role").setValue(role);
-        final BaseCallback<Company> companyBaseCallback = new BaseCallback<Company>() {
-            @Override
-            public void onResponse(Company company) {
-                userReference.child("company").setValue(company);
-            }
+    public void writeNewDirectChat(DirectChat chat) {
+        DatabaseReference newChatRef = directChatsReference.push();
+        chat.setChatId(newChatRef.getKey());
+        directChatsReference.child(chat.getChatId()).setValue(chat);
+    }
 
-            @Override
-            public void onFailure(Exception e) {
 
-            }
-        };
-        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                if(user != null){
-                    getMatchingCompany(StringParsingUtil.parseEmailDomain(user.getEmail()), companyBaseCallback);
-                }
-            }
+    public void writeNewGroupChat(GroupChat chat){
+        DatabaseReference newChatRef = groupChatsReference.push();
+        chat.setChatId(newChatRef.getKey());
+        groupChatsReference.child(chat.getChatId()).setValue(chat);
+    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+    public void writeNewCompanyBasic(CompanyBasic companyBasic) {
+        DatabaseReference newBasicRef = companiesBasicReference.push();
+        companyBasic.setCompanyBasicId(newBasicRef.getKey());
+        companiesBasicReference.child(companyBasic.getCompanyBasicId()).setValue(companyBasic);
+    }
 
-            }
-        });
+    public void addNewIndustry(String industry){
+        industriesReference.push().setValue(industry);
+    }
+
+    public void updateUserInfo(String firstName, String lastName, String phoneNumber, String businessUnit, String role) {
 
     }
 
@@ -264,5 +173,320 @@ public class FirebaseManager {
 
             }
         });
+    }
+
+    public void onBoardNewSalesCompany(){
+        DatabaseReference newCompRef = companiesReference.push();
+        Company salesCompany = new Company();
+        salesCompany.setName("Thermo Fisher");
+        salesCompany.setAddress("39329 Via Zaragoza, Murrieta California 92563");
+        salesCompany.setCompanyEmailDomain("@gmail.com");
+        salesCompany.setCompanyId(newCompRef.getKey());
+        salesCompany.addIndustry("Academia, Sciences and Education");
+        salesCompany.addIndustry("Testing Labs and Health Institutes");
+        salesCompany.addIndustry("Pharma and Biotechnology");
+        salesCompany.addIndustry("Chemical");
+        salesCompany.setSalesCompany(true);
+
+        DatabaseReference newCompARef = companiesReference.push();
+        Company customerCompanyA = new Company();
+        customerCompanyA.setName("103rd WMD CST");
+        customerCompanyA.setAddress("5005 Raspberry Rd, Anchorage Alaska 99502");
+        customerCompanyA.setCompanyEmailDomain("@gmail.com");
+        customerCompanyA.setCompanyId(newCompARef.getKey());
+        customerCompanyA.setSalesCompany(false);
+        customerCompanyA.addIndustry("Academia, Sciences and Education");
+        industriesReference.push().setValue("Academia, Sciences and Education");
+        Account accountA = createNewAccount(salesCompany, customerCompanyA, "700023611");
+        addAllCustomer1Employees(customerCompanyA, accountA.getAccountIdFire());
+
+        DatabaseReference newCompBRef = companiesReference.push();
+        Company customerCompanyB = new Company();
+        customerCompanyB.setName("Abbott Chemicals In");
+        customerCompanyB.setAddress("1360 S Loop Rd, Alameda California 94502");
+        customerCompanyB.setCompanyEmailDomain("@gmail.com");
+        customerCompanyB.setCompanyId(newCompBRef.getKey());
+        customerCompanyB.setSalesCompany(false);
+        customerCompanyB.addIndustry("Testing Labs and Health Institutes");
+        industriesReference.push().setValue("Testing Labs and Health Institutes");
+        Account accountB = createNewAccount(salesCompany, customerCompanyB, "700031434");
+        addAllCustomer2Employees(customerCompanyB, accountB.getAccountIdFire());
+
+        DatabaseReference newCompCRef = companiesReference.push();
+        Company customerCompanyC = new Company();
+        customerCompanyC.setName("Abcam Inc");
+        customerCompanyC.setAddress("1 Kendall Sq, Cambridge Massachusetts 2139");
+        customerCompanyC.setCompanyEmailDomain("@gmail.com");
+        customerCompanyC.setCompanyId(newCompCRef.getKey());
+        customerCompanyC.setSalesCompany(false);
+        customerCompanyC.addIndustry("Pharma and Biotechnology");
+        industriesReference.push().setValue("Pharma and Biotechnology");
+        Account accountC = createNewAccount(salesCompany, customerCompanyC, "700019967");
+        addAllCustomer3Employees(customerCompanyC, accountC.getAccountIdFire());
+
+        DatabaseReference newCompDRef = companiesReference.push();
+        Company customerCompanyD = new Company();
+        customerCompanyD.setName("Abengoa Bioenergy Corp");
+        customerCompanyD.setAddress("1827 S Industrial Dr, Portales New Mexico 88130");
+        customerCompanyD.setCompanyEmailDomain("@gmail.com");
+        customerCompanyD.setCompanyId(newCompDRef.getKey());
+        customerCompanyD.setSalesCompany(false);
+        customerCompanyD.addIndustry("Chemical");
+        industriesReference.push().setValue("Chemical");
+        Account accountD = createNewAccount(salesCompany, customerCompanyD, "700010532");
+        addAllCustomer4Employees(customerCompanyD, accountD.getAccountIdFire());
+
+        salesCompany.addAccount(accountA.getAccountIdFire());
+        salesCompany.addAccount(accountB.getAccountIdFire());
+        salesCompany.addAccount(accountC.getAccountIdFire());
+        salesCompany.addAccount(accountD.getAccountIdFire());
+
+        addAllSalesEmployees(salesCompany, accountA, accountB, accountC, accountD);
+
+        companiesReference.child(salesCompany.getCompanyId()).setValue(salesCompany);
+        companiesReference.child(customerCompanyA.getCompanyId()).setValue(customerCompanyA);
+        companiesReference.child(customerCompanyB.getCompanyId()).setValue(customerCompanyB);
+        companiesReference.child(customerCompanyC.getCompanyId()).setValue(customerCompanyC);
+        companiesReference.child(customerCompanyD.getCompanyId()).setValue(customerCompanyD);
+
+        DatabaseReference basic1Ref = companiesBasicReference.push();
+        CompanyBasic basic1 = new CompanyBasic();
+        basic1.setCompanyBasicId(basic1Ref.getKey());
+        basic1.setAddress(salesCompany.getAddress());
+        basic1.setBuyerCompany(salesCompany.isBuyerCompany());
+        basic1.setBuyerCompany(salesCompany.isBuyerCompany());
+        basic1.setCompanyId(salesCompany.getCompanyId());
+        basic1.setEmailDomain(salesCompany.getCompanyEmailDomain());
+        basic1.setIndustryIdList(salesCompany.getIndustryList());
+        basic1.setName(salesCompany.getName());
+
+        DatabaseReference basic2Ref = companiesBasicReference.push();
+        CompanyBasic basic2 = new CompanyBasic();
+        basic2.setCompanyBasicId(basic2Ref.getKey());
+        basic2.setAddress(customerCompanyA.getAddress());
+        basic2.setBuyerCompany(customerCompanyA.isBuyerCompany());
+        basic2.setBuyerCompany(customerCompanyA.isBuyerCompany());
+        basic2.setCompanyId(customerCompanyA.getCompanyId());
+        basic2.setEmailDomain(customerCompanyA.getCompanyEmailDomain());
+        basic2.setIndustryIdList(customerCompanyA.getIndustryList());
+        basic2.setName(customerCompanyA.getName());
+
+        DatabaseReference basic3Ref = companiesBasicReference.push();
+        CompanyBasic basic3 = new CompanyBasic();
+        basic3.setCompanyBasicId(basic3Ref.getKey());
+        basic3.setAddress(customerCompanyB.getAddress());
+        basic3.setBuyerCompany(customerCompanyB.isBuyerCompany());
+        basic3.setBuyerCompany(customerCompanyB.isBuyerCompany());
+        basic3.setCompanyId(customerCompanyB.getCompanyId());
+        basic3.setEmailDomain(customerCompanyB.getCompanyEmailDomain());
+        basic3.setIndustryIdList(customerCompanyB.getIndustryList());
+        basic3.setName(customerCompanyB.getName());
+
+        DatabaseReference basic4Ref = companiesBasicReference.push();
+        CompanyBasic basic4 = new CompanyBasic();
+        basic4.setCompanyBasicId(basic4Ref.getKey());
+        basic4.setAddress(customerCompanyC.getAddress());
+        basic4.setBuyerCompany(customerCompanyC.isBuyerCompany());
+        basic4.setBuyerCompany(customerCompanyC.isBuyerCompany());
+        basic4.setCompanyId(customerCompanyC.getCompanyId());
+        basic4.setEmailDomain(customerCompanyC.getCompanyEmailDomain());
+        basic4.setIndustryIdList(customerCompanyC.getIndustryList());
+        basic4.setName(customerCompanyC.getName());
+
+        DatabaseReference basic5Ref = companiesBasicReference.push();
+        CompanyBasic basic5 = new CompanyBasic();
+        basic5.setCompanyBasicId(basic5Ref.getKey());
+        basic5.setAddress(customerCompanyD.getAddress());
+        basic5.setBuyerCompany(customerCompanyD.isBuyerCompany());
+        basic5.setBuyerCompany(customerCompanyD.isBuyerCompany());
+        basic5.setCompanyId(customerCompanyD.getCompanyId());
+        basic5.setEmailDomain(customerCompanyD.getCompanyEmailDomain());
+        basic5.setIndustryIdList(customerCompanyD.getIndustryList());
+        basic5.setName(customerCompanyD.getName());
+
+        companiesBasicReference.child(basic1.getCompanyBasicId()).setValue(basic1);
+        companiesBasicReference.child(basic2.getCompanyBasicId()).setValue(basic2);
+        companiesBasicReference.child(basic3.getCompanyBasicId()).setValue(basic3);
+        companiesBasicReference.child(basic4.getCompanyBasicId()).setValue(basic4);
+        companiesBasicReference.child(basic5.getCompanyBasicId()).setValue(basic5);
+    }
+
+    private void addAllCustomer4Employees(Company customerCompanyD, String accountId) {
+        DatabaseReference newUser1Ref = usersReference.push();
+        User salesUser1 = new User();
+        salesUser1.setUid(newUser1Ref.getKey());
+        salesUser1.setCompanyId(customerCompanyD.getCompanyId());
+        salesUser1.setEmail("HTrent@gmail.com");
+        salesUser1.setFirstName("Hent");
+        salesUser1.setLastName("Trent");
+        salesUser1.setPhoneNumber("3467950355");
+        salesUser1.setUserType("account_rep");
+        salesUser1.setRole("replvl1");
+        salesUser1.addAccount(accountId);
+        usersReference.child(salesUser1.getUid()).setValue(salesUser1);
+        customerCompanyD.addNewEmployee(salesUser1.getUid());
+    }
+
+    private void addAllCustomer3Employees(Company customerCompanyC, String accountId) {
+        DatabaseReference newUser1Ref = usersReference.push();
+        User salesUser1 = new User();
+        salesUser1.setUid(newUser1Ref.getKey());
+        salesUser1.setCompanyId(customerCompanyC.getCompanyId());
+        salesUser1.setEmail("jTout@gmail.com");
+        salesUser1.setFirstName("Jimmy");
+        salesUser1.setLastName("Trout");
+        salesUser1.setPhoneNumber("3345950355");
+        salesUser1.setUserType("account_rep");
+        salesUser1.setRole("replvl1");
+        salesUser1.addAccount(accountId);
+        usersReference.child(salesUser1.getUid()).setValue(salesUser1);
+        customerCompanyC.addNewEmployee(salesUser1.getUid());
+    }
+
+    private void addAllCustomer2Employees(Company customerCompanyB, String accountId) {
+        DatabaseReference newUser1Ref = usersReference.push();
+        User salesUser1 = new User();
+        salesUser1.setUid(newUser1Ref.getKey());
+        salesUser1.setCompanyId(customerCompanyB.getCompanyId());
+        salesUser1.setEmail("kTrent@gmail.com");
+        salesUser1.setFirstName("Kay");
+        salesUser1.setLastName("Trent");
+        salesUser1.setPhoneNumber("3432950355");
+        salesUser1.setUserType("account_rep");
+        salesUser1.setRole("replvl1");
+        salesUser1.addAccount(accountId);
+        usersReference.child(salesUser1.getUid()).setValue(salesUser1);
+        customerCompanyB.addNewEmployee(salesUser1.getUid());
+    }
+
+    private void addAllCustomer1Employees(Company customerCompany, String accountId) {
+        DatabaseReference newUser1Ref = usersReference.push();
+        User salesUser1 = new User();
+        salesUser1.setUid(newUser1Ref.getKey());
+        salesUser1.setCompanyId(customerCompany.getCompanyId());
+        salesUser1.setEmail("jjbrent@gmail.com");
+        salesUser1.setFirstName("Jay");
+        salesUser1.setLastName("Brent");
+        salesUser1.setPhoneNumber("9512950355");
+        salesUser1.setUserType("account_rep");
+        salesUser1.setRole("rep1");
+        salesUser1.addAccount(accountId);
+        usersReference.child(salesUser1.getUid()).setValue(salesUser1);
+        customerCompany.addNewEmployee(salesUser1.getUid());
+    }
+
+    private void addAllSalesEmployees(Company salesCompany, Account accountA, Account accountB, Account accountC, Account accountD) {
+        DatabaseReference newUser1Ref = usersReference.push();
+        User salesUser1 = new User();
+        salesUser1.setUid(newUser1Ref.getKey());
+        salesUser1.setCompanyId(salesCompany.getCompanyId());
+        salesUser1.setEmail("jbinvestments15@gmail.com");
+        salesUser1.setFirstName("Jonathan");
+        salesUser1.setLastName("Brannen");
+        salesUser1.setPhoneNumber("9512950348");
+        salesUser1.setUserType("sales_agent");
+        salesUser1.setRole("CTO");
+        salesUser1.addAccount(accountA.getAccountIdFire());
+        salesUser1.addAccount(accountB.getAccountIdFire());
+        salesUser1.addAccount(accountC.getAccountIdFire());
+        salesUser1.addAccount(accountD.getAccountIdFire());
+        usersReference.child(salesUser1.getUid()).setValue(salesUser1);
+        salesCompany.addNewEmployee(salesUser1.getUid());
+
+        DatabaseReference newUser2Ref = usersReference.push();
+        User salesUser2 = new User();
+        salesUser2.setUid(newUser2Ref.getKey());
+        salesUser2.setCompanyId(salesCompany.getCompanyId());
+        salesUser2.setEmail("johnraychilders@gmail.com");
+        salesUser2.setFirstName("John");
+        salesUser2.setLastName("Childers");
+        salesUser2.setPhoneNumber("7072808918");
+        salesUser2.setUserType("sales_agent");
+        salesUser2.setRole("CEO");
+        salesUser2.addAccount(accountA.getAccountIdFire());
+        salesUser2.addAccount(accountB.getAccountIdFire());
+        usersReference.child(salesUser2.getUid()).setValue(salesUser2);
+        salesCompany.addNewEmployee(salesUser2.getUid());
+
+        DatabaseReference newUser3Ref = usersReference.push();
+        User salesUser3 = new User();
+        salesUser3.setUid(newUser3Ref.getKey());
+        salesUser3.setCompanyId(salesCompany.getCompanyId());
+        salesUser3.setEmail("adamSmith@gmail.com");
+        salesUser3.setFirstName("Adam");
+        salesUser3.setLastName("Smith");
+        salesUser3.setPhoneNumber("9566950348");
+        salesUser3.setUserType("sales_agent");
+        salesUser3.setRole("sales_lvl_1");
+        salesUser3.addAccount(accountC.getAccountIdFire());
+        salesUser3.addAccount(accountD.getAccountIdFire());
+        usersReference.child(salesUser3.getUid()).setValue(salesUser3);
+        salesCompany.addNewEmployee(salesUser3.getUid());
+
+        DatabaseReference newUser4Ref = usersReference.push();
+        User salesUser4 = new User();
+        salesUser4.setUid(newUser4Ref.getKey());
+        salesUser4.setCompanyId(salesCompany.getCompanyId());
+        salesUser4.setEmail("hPeters@gmail.com");
+        salesUser4.setFirstName("Harrald");
+        salesUser4.setLastName("Peters");
+        salesUser4.setPhoneNumber("8879897765");
+        salesUser4.setUserType("sales_agent");
+        salesUser4.setRole("sales_lvl_2");
+        salesUser4.addAccount(accountA.getAccountIdFire());
+        salesUser4.addAccount(accountD.getAccountIdFire());
+        salesUser4.addAccount(accountB.getAccountIdFire());
+        usersReference.child(salesUser4.getUid()).setValue(salesUser4);
+        salesCompany.addNewEmployee(salesUser4.getUid());
+
+        DatabaseReference newUser5Ref = usersReference.push();
+        User salesUser5 = new User();
+        salesUser5.setUid(newUser5Ref.getKey());
+        salesUser5.setCompanyId(salesCompany.getCompanyId());
+        salesUser5.setEmail("APowers@gmail.com");
+        salesUser5.setFirstName("Austin");
+        salesUser5.setLastName("Powers");
+        salesUser5.setPhoneNumber("4543342409");
+        salesUser5.setUserType("sales_agent");
+        salesUser5.setRole("sales_lvl_1");
+        salesUser5.addAccount(accountB.getAccountIdFire());
+        salesUser5.addAccount(accountC.getAccountIdFire());
+        salesUser5.addAccount(accountA.getAccountIdFire());
+        usersReference.child(salesUser5.getUid()).setValue(salesUser5);
+        salesCompany.addNewEmployee(salesUser5.getUid());
+    }
+
+    private Account createNewAccount(Company salesCompany, Company customerCompany, String accountId){
+        DatabaseReference newAccountRef = accountsReference.push();
+        Account account = new Account();
+        account.setAccountIdFire(newAccountRef.getKey());
+        account.setAccountId(accountId);
+        account.setCompanyIdA(salesCompany.getCompanyId());
+        account.setCompanyIdB(customerCompany.getCompanyId());
+
+        DatabaseReference newGroupChatRef = groupChatsReference.push();
+        GroupChat groupChat = new GroupChat();
+        groupChat.setChatId(newGroupChatRef.getKey());
+        groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
+
+        account.setGroupChatId(groupChat.getChatId());
+        accountsReference.child(account.getAccountIdFire()).setValue(account);
+
+        List<String> accountIdList = new ArrayList<>();
+        accountIdList.add(account.getAccountIdFire());
+
+        salesCompany.setAccountList(accountIdList);
+        customerCompany.setAccountList(accountIdList);
+
+        return account;
+    }
+
+    //For sending emails to agent companies when new customer users sign up.
+    public void writeEmailPassword(String password){
+        database.getReference("refer_application").child("email_password").setValue(password);
+    }
+
+    public void loadCompaniesToFirebase(){
+
     }
 }

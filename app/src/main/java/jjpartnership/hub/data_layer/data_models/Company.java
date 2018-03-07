@@ -13,62 +13,108 @@ import io.realm.RealmList;
 public class Company{
     private String companyId;
     private String name;
-    private String location;
-    private String companyType;
+    private String address;
     private String companyEmailDomain;
-    private List<String> businessUnits;
+    private boolean salesCompany;
+    private boolean buyerCompany;
     private List<String> roles;
-    private List<Employee> employeeList;
-    private List<CustomerCompany> customers;
+    private List<String> businessUnits;
+    private List<String> industryList;
+    private List<String> employeeList;
+    private List<String> accountList;
 
     public Company() {
     }
 
-    public Company(String name, String location, String companyType, List<Employee> employeeList) {
+    public Company(String companyId, String name, String address, String companyEmailDomain,
+                   List<String> roles, List<String> businessUnits, List<String> industryList,
+                   List<String> employeeList, List<String> accountList, boolean salesCompany, boolean buyerCompany) {
+        this.companyId = companyId;
         this.name = name;
-        this.location = location;
-        this.companyType = companyType;
+        this.address = address;
+        this.companyEmailDomain = companyEmailDomain;
+        this.roles = roles;
+        this.businessUnits = businessUnits;
+        this.industryList = industryList;
         this.employeeList = employeeList;
+        this.accountList = accountList;
+        this.salesCompany = salesCompany;
+        this.buyerCompany = buyerCompany;
     }
 
     public Company(CompanyRealm realmCompany) {
         this.companyId = realmCompany.getCompanyId();
         this.name = realmCompany.getName();
-        this.location = realmCompany.getLocation();
-        this.companyType = realmCompany.getCompanyType();
-        this.employeeList = createEmployeeList(realmCompany.getEmployeeList());
+        this.address = realmCompany.getAddress();
         this.businessUnits = realmCompany.getBusinessUnits();
         this.roles = realmCompany.getRoles();
         this.companyEmailDomain = realmCompany.getCompanyEmailDomain();
-        this.customers = createCustomerList(realmCompany.getCustomers());
+        this.industryList = realmCompany.getIndustryList();
+        this.employeeList = realmCompany.getEmployeeList();
+        this.accountList = realmCompany.getAccountList();
+        this.salesCompany = realmCompany.isSalesCompany();
+        this.buyerCompany = realmCompany.isBuyerCompany();
     }
 
-    private List<CustomerCompany> createCustomerList(RealmList<CustomerCompanyRealm> customers) {
-        RealmList<CustomerCompany> fbCustomers = new RealmList<>();
-        if(customers != null) {
-            for (CustomerCompanyRealm customer : customers) {
-                fbCustomers.add(new CustomerCompany(customer));
-            }
-            Collections.reverse(fbCustomers);
+    public void addNewEmployee(String userId){
+        if(employeeList == null){
+            employeeList = new ArrayList<>();
         }
-        return fbCustomers;
+        employeeList.add(userId);
     }
 
-    private List<Employee> createEmployeeList(List<EmployeeRealm> employeeListRealm) {
-        List<Employee> employeeList = new ArrayList<>();
-        for(EmployeeRealm employeeRealm : employeeListRealm){
-            employeeList.add(new Employee(employeeRealm));
+    public void addIndustry(String industry){
+        if(industryList == null){
+            industryList = new ArrayList<>();
         }
-        Collections.reverse(employeeList);
-        return employeeList;
+        industryList.add(industry);
     }
 
-    public List<CustomerCompany> getCustomers() {
-        return customers;
+    public void addAccount(String accountId) {
+        if(accountList == null){
+            accountList = new ArrayList<>();
+        }
+        accountList.add(accountId);
     }
 
-    public void setCustomers(List<CustomerCompany> customers) {
-        this.customers = customers;
+    public boolean isSalesCompany() {
+        return salesCompany;
+    }
+
+    public void setSalesCompany(boolean salesCompany) {
+        this.salesCompany = salesCompany;
+    }
+
+    public boolean isBuyerCompany() {
+        return buyerCompany;
+    }
+
+    public void setBuyerCompany(boolean buyerCompany) {
+        this.buyerCompany = buyerCompany;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(String companyId) {
+        this.companyId = companyId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getCompanyEmailDomain() {
@@ -79,14 +125,6 @@ public class Company{
         this.companyEmailDomain = companyEmailDomain;
     }
 
-    public List<String> getBusinessUnits() {
-        return businessUnits;
-    }
-
-    public void setBusinessUnits(List<String> businessUnits) {
-        this.businessUnits = businessUnits;
-    }
-
     public List<String> getRoles() {
         return roles;
     }
@@ -95,43 +133,35 @@ public class Company{
         this.roles = roles;
     }
 
-    public String getCompanyType() {
-        return companyType != null ? companyType : "";
+    public List<String> getBusinessUnits() {
+        return businessUnits;
     }
 
-    public void setCompanyType(String companyType) {
-        this.companyType = companyType;
+    public void setBusinessUnits(List<String> businessUnits) {
+        this.businessUnits = businessUnits;
     }
 
-    public String getName() {
-        return name != null ? name : "";
+    public List<String> getIndustryList() {
+        return industryList;
     }
 
-    public String getCompanyId() {
-        return companyId != null ? companyId : "";
+    public void setIndustryList(List<String> industryList) {
+        this.industryList = industryList;
     }
 
-    public void setCompanyId(String companyId) {
-        this.companyId = companyId;
+    public List<String> getEmployeeList() {
+        return employeeList;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setEmployeeList(List<String> employeeList) {
+        this.employeeList = employeeList;
     }
 
-    public String getLocation() {
-        return location != null ? location : "";
+    public List<String> getAccountList() {
+        return accountList;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public List<Employee> getEmployeeList() {
-        return employeeList != null ? employeeList : new ArrayList<Employee>();
-    }
-
-    public void setEmployeeList(List<Employee> employeeIdList) {
-        this.employeeList = employeeIdList;
+    public void setAccountList(List<String> accountList) {
+        this.accountList = accountList;
     }
 }

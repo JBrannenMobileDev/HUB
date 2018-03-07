@@ -1,6 +1,8 @@
 package jjpartnership.hub.view_layer.activities.create_agent_account_activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +10,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +21,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
+import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.activities.main_activity.MainActivity;
 import jjpartnership.hub.view_layer.custom_views.NonSwipeableViewPager;
@@ -28,6 +33,9 @@ public class AccountDetailsActivity extends AppCompatActivity implements UserInf
     @BindView(R.id.next_button)Button nextBt;
     @BindView(R.id.input_error_tv)TextView errorTv;
     @BindView(R.id.user_company_tv)TextView companyName;
+    @BindView(R.id.account_details_title)TextView title;
+    @BindView(R.id.logo)ImageView logo;
+    @BindView(R.id.input_frame_layout)FrameLayout inputLayout;
 
     private AccountDetailsPagerAdapter adapter;
     private FirebaseAuth mAuth;
@@ -65,6 +73,7 @@ public class AccountDetailsActivity extends AppCompatActivity implements UserInf
     public void onResume(){
         super.onResume();
         hideStatusBar();
+
     }
 
     @Override
@@ -91,9 +100,7 @@ public class AccountDetailsActivity extends AppCompatActivity implements UserInf
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
         decorView.setSystemUiVisibility(uiOptions);
         Window window = getWindow();
-        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        window.setStatusBarColor(Color.TRANSPARENT);
     }
 
     private void initViewPager() {
@@ -109,6 +116,27 @@ public class AccountDetailsActivity extends AppCompatActivity implements UserInf
         }
     }
 
+    private void animateHeaderShrink() {
+        title.animate().scaleY(.5f);
+        title.animate().scaleX(.5f);
+        title.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -50));
+        logo.animate().scaleY(.5f);
+        logo.animate().scaleX(.5f);
+        logo.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -50));
+        companyName.setVisibility(View.GONE);
+        inputLayout.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -100));
+    }
+
+    private void animateHeaderExpand() {
+        title.animate().scaleY(1f);
+        title.animate().scaleX(1f);
+        title.animate().translationY(0);
+        logo.animate().scaleY(1f);
+        logo.animate().scaleX(1f);
+        logo.animate().translationY(0);
+        companyName.setVisibility(View.VISIBLE);
+        inputLayout.animate().translationY(0);
+    }
 
     @Override
     public void onFirstNameTextChanged(String firstName) {
@@ -123,6 +151,17 @@ public class AccountDetailsActivity extends AppCompatActivity implements UserInf
     @Override
     public void onPhoneNumberTextChanged(String phoneNumber) {
         presenter.onPhoneNumberUpdated(phoneNumber);
+    }
+
+    @Override
+    public void onEtTouched() {
+        animateHeaderShrink();
+    }
+
+
+    @Override
+    public void onBackPressedFromEt() {
+        animateHeaderExpand();
     }
 
     @Override
