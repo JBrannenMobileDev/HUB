@@ -1,5 +1,6 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -45,6 +46,7 @@ public class UserRealm extends RealmObject{
 
     public UserRealm(User user) {
         this.uid = user.getUid();
+        this.email = user.getEmail();
         this.phoneNumber = user.getPhoneNumber();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
@@ -57,19 +59,27 @@ public class UserRealm extends RealmObject{
     }
 
     private RealmList<String> createAccountIdList(List<String> accountIds) {
-        RealmList<String> accountIdsRealm = new RealmList<>();
-        for(String accountId : accountIds){
-            accountIdsRealm.add(accountId);
+        if(accountIds != null) {
+            RealmList<String> accountIdsRealm = new RealmList<>();
+            for (String accountId : accountIds) {
+                accountIdsRealm.add(accountId);
+            }
+            return accountIdsRealm;
+        }else{
+            return new RealmList<>();
         }
-        return accountIdsRealm;
     }
 
     private RealmList<String> createDirectChats(List<String> directChatIds) {
-        RealmList<String> directChatIdsRealm = new RealmList<>();
-        for(String directChatId : directChatIds){
-            directChatIdsRealm.add(directChatId);
+        if(directChatIds != null) {
+            RealmList<String> directChatIdsRealm = new RealmList<>();
+            for (String directChatId : directChatIds) {
+                directChatIdsRealm.add(directChatId);
+            }
+            return directChatIdsRealm;
+        }else{
+            return new RealmList<>();
         }
-        return directChatIdsRealm;
     }
 
     public String getUid() {

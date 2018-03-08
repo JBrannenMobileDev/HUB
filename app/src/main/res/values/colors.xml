@@ -8,4 +8,5 @@
     <color name="white">#ffffff</color>
     <color name="grey_text">#aaaaaa</color>
     <color name="hub_logo_color">#363636</color>
+    <color name="colorMainBg">#f4f4f4</color>
 </resources>

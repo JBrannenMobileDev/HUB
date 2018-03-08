@@ -59,52 +59,72 @@ public class CompanyRealm extends RealmObject{
     }
 
     private RealmList<String> createIndustryList(List<String> industryList) {
-        RealmList<String> realmIndustries = new RealmList<>();
-        for(String industry : industryList){
-            realmIndustries.add(industry);
+        if(industryList != null) {
+            RealmList<String> realmIndustries = new RealmList<>();
+            for (String industry : industryList) {
+                realmIndustries.add(industry);
+            }
+            Collections.reverse(realmIndustries);
+            return realmIndustries;
+        }else{
+            return new RealmList<>();
         }
-        Collections.reverse(realmIndustries);
-        return realmIndustries;
     }
 
     private RealmList<String> createRoles(List<String> roles) {
-        RealmList<String> realmRoles = new RealmList<>();
         if(roles != null) {
-            for (String role : roles) {
-                realmRoles.add(role);
+            RealmList<String> realmRoles = new RealmList<>();
+            if (roles != null) {
+                for (String role : roles) {
+                    realmRoles.add(role);
+                }
+                Collections.reverse(realmRoles);
             }
-            Collections.reverse(realmRoles);
+            return realmRoles;
+        }else{
+            return new RealmList<>();
         }
-        return realmRoles;
     }
 
     private RealmList<String> createBusinessUnits(List<String> businessUnits) {
-        RealmList<String> realmBusinessUnits = new RealmList<>();
         if(businessUnits != null) {
-            for (String unit : businessUnits) {
-                realmBusinessUnits.add(unit);
+            RealmList<String> realmBusinessUnits = new RealmList<>();
+            if (businessUnits != null) {
+                for (String unit : businessUnits) {
+                    realmBusinessUnits.add(unit);
+                }
+                Collections.reverse(realmBusinessUnits);
             }
-            Collections.reverse(realmBusinessUnits);
+            return realmBusinessUnits;
+        }else{
+            return new RealmList<>();
         }
-        return realmBusinessUnits;
     }
 
     private RealmList<String> createEmployeeList(List<String> employeeList) {
-        RealmList<String> realmEmployees = new RealmList<>();
-        for(String employee : employeeList){
-            realmEmployees.add(employee);
+        if(employeeList != null) {
+            RealmList<String> realmEmployees = new RealmList<>();
+            for (String employee : employeeList) {
+                realmEmployees.add(employee);
+            }
+            Collections.reverse(realmEmployees);
+            return realmEmployees;
+        }else{
+            return new RealmList<>();
         }
-        Collections.reverse(realmEmployees);
-        return realmEmployees;
     }
 
     private RealmList<String> createAccountList(List<String> accountList) {
-        RealmList<String> realmAccounts = new RealmList<>();
-        for(String industry : accountList){
-            realmAccounts.add(industry);
+        if(accountList != null) {
+            RealmList<String> realmAccounts = new RealmList<>();
+            for (String industry : accountList) {
+                realmAccounts.add(industry);
+            }
+            Collections.reverse(realmAccounts);
+            return realmAccounts;
+        }else{
+            return new RealmList<>();
         }
-        Collections.reverse(realmAccounts);
-        return realmAccounts;
     }
 
     public boolean isSalesCompany() {

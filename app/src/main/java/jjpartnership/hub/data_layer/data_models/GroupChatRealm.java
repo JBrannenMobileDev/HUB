@@ -33,21 +33,29 @@ public class GroupChatRealm extends RealmObject{
     }
 
     private RealmList<MessageRealm> createMessageList(List<Message> messages) {
-        RealmList<MessageRealm> messagesRealm = new RealmList<>();
-        for(Message message : messages){
-            messagesRealm.add(new MessageRealm(message));
+        if(messages != null) {
+            RealmList<MessageRealm> messagesRealm = new RealmList<>();
+            for (Message message : messages) {
+                messagesRealm.add(new MessageRealm(message));
+            }
+            Collections.reverse(messagesRealm);
+            return messagesRealm;
+        }else{
+            return new RealmList<>();
         }
-        Collections.reverse(messagesRealm);
-        return messagesRealm;
     }
 
     private RealmList<String> createUserIdList(List<String> userIds) {
-        RealmList<String> userIdsRealm = new RealmList<>();
-        for(String userId : userIds){
-            userIdsRealm.add(userId);
+        if(userIds != null) {
+            RealmList<String> userIdsRealm = new RealmList<>();
+            for (String userId : userIds) {
+                userIdsRealm.add(userId);
+            }
+            Collections.reverse(userIdsRealm);
+            return userIdsRealm;
+        }else{
+            return new RealmList<>();
         }
-        Collections.reverse(userIdsRealm);
-        return userIdsRealm;
     }
 
     public String getChatId() {

@@ -36,12 +36,16 @@ public class DirectChatRealm extends RealmObject{
     }
 
     private RealmList<MessageRealm> createMessageList(List<Message> messages) {
-        RealmList<MessageRealm> messagesRealm = new RealmList<>();
-        for(Message message : messages){
-            messagesRealm.add(new MessageRealm(message));
+        if(messages != null) {
+            RealmList<MessageRealm> messagesRealm = new RealmList<>();
+            for (Message message : messages) {
+                messagesRealm.add(new MessageRealm(message));
+            }
+            Collections.reverse(messagesRealm);
+            return messagesRealm;
+        }else{
+            return new RealmList<>();
         }
-        Collections.reverse(messagesRealm);
-        return messagesRealm;
     }
 
     public String getChatId() {

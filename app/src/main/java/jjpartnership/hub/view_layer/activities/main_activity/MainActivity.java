@@ -32,7 +32,6 @@ import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.search_selected_overlay)ImageView overlayImage;
     @BindView(R.id.search_results_layout)LinearLayout searchResultsLayout;
-    @BindView(R.id.search_results_recycler)RecyclerView serachResultsRecycler;
     @BindView(R.id.search_results_pager)ViewPager searchResultsPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
 

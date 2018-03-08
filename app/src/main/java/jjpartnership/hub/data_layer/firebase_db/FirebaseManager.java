@@ -1,9 +1,13 @@
 package jjpartnership.hub.data_layer.firebase_db;
 
+import android.util.Log;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 
@@ -17,7 +21,11 @@ import jjpartnership.hub.data_layer.data_models.CompanyBasic;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.User;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.UserPreferences;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by jbrannen on 2/24/18.
@@ -37,7 +45,7 @@ public class FirebaseManager {
 
     public FirebaseManager() {
         database = FirebaseDatabase.getInstance();
-//        thisUserReference = database.getReference("users").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        thisUserReference = database.getReference("users").child(UserPreferences.getInstance().getUid());
         usersReference = database.getReference("users");
         companiesReference = database.getReference("companies");
         accountsReference = database.getReference("accounts");
@@ -49,21 +57,21 @@ public class FirebaseManager {
     }
 
     private void initDataListeners() {
-//        ValueEventListener userListener = new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                User user = dataSnapshot.getValue(User.class);
-//                if(user != null) {
-//                    DataManager.getInstance().updateRealmUser(new UserRealm(user));
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-//            }
-//        };
-//        thisUserReference.addValueEventListener(userListener);
+        ValueEventListener userListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if(user != null) {
+                    DataManager.getInstance().updateRealmUser(new UserRealm(user));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
+            }
+        };
+        thisUserReference.addValueEventListener(userListener);
     }
 
     public void writeNewUser(User user) {
@@ -488,5 +496,28 @@ public class FirebaseManager {
 
     public void loadCompaniesToFirebase(){
 
+    }
+
+    public void verifyUserAccountExists(final String email, final BaseCallback<String> userAccountExistsCallback) {
+        Query query = usersReference.orderByChild("email").equalTo(email);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    if(dataSnapshot.getChildren().iterator().hasNext()){
+                        userAccountExistsCallback.onResponse(dataSnapshot.getChildren().iterator().next().getValue(User.class).getUid());
+                    }else{
+                        userAccountExistsCallback.onFailure(new Exception("User account does not exist."));
+                    }
+                }else{
+                    userAccountExistsCallback.onFailure(new Exception("User account does not exist."));
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 }

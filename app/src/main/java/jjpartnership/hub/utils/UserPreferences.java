@@ -50,4 +50,14 @@ public class UserPreferences {
         editor.putBoolean(UserPreferenceConstants.VERIFICATION_SENT, verificationSent);
         editor.commit();
     }
+
+    public void setUid(String uid) {
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putString(UserPreferenceConstants.UID, uid);
+        editor.commit();
+    }
+
+    public String getUid(){
+        return getSharedPreferences(context).getString(UserPreferenceConstants.UID, "");
+    }
 }

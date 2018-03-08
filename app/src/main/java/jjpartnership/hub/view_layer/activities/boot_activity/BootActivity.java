@@ -37,10 +37,9 @@ import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
-import jjpartnership.hub.utils.StringParsingUtil;
 import jjpartnership.hub.utils.StringValidationUtil;
 import jjpartnership.hub.utils.UserPreferences;
-import jjpartnership.hub.view_layer.activities.create_agent_account_activity.AccountDetailsActivity;
+import jjpartnership.hub.view_layer.activities.create_customer_account_activity.CustomerAccountDetailsActivity;
 import jjpartnership.hub.view_layer.activities.main_activity.MainActivity;
 import jjpartnership.hub.view_layer.activities.unauthorized_user_activity.UnauthorizedUserActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareEditText;
@@ -72,7 +71,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     private boolean accountJustCreated;
     private boolean salesAgentSelected;
     private FirebaseUser currentUser;
-    private BaseCallback<Boolean> userComanyIsRegisteredCallback;
+    private BaseCallback<String> userAccountExistsCallback;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -143,25 +142,24 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     public void onStart() {
         super.onStart();
         currentUser = mAuth.getCurrentUser();
-        userComanyIsRegisteredCallback = new BaseCallback<Boolean>() {
+        userAccountExistsCallback = new BaseCallback<String>() {
             @Override
-            public void onResponse(Boolean isValid) {
+            public void onResponse(String uid) {
                 hideLoadingState();
-                if(isValid) {
+                if(uid != null) {
                     if(currentUser.isEmailVerified()) {
-                        if (currentUser != null) {
-                            launchNextActivity(currentUser);
-                        }else {
-                            bootLoadingLayout.setVisibility(View.GONE);
-                        }
+                        UserPreferences.getInstance().setUid(uid);
+                        launchNextActivity(currentUser);
                     }else{
                         bootLoadingLayout.setVisibility(View.GONE);
                         if(!UserPreferences.getInstance().isVerificationEmailSent()) {
                             sendEmailVerification();
                         }
                     }
-                }else{
+                }else if(salesAgentSelected){
                     startActivity(new Intent(getApplicationContext(), UnauthorizedUserActivity.class));
+                }else{
+                    startActivity(new Intent(getApplicationContext(), CustomerAccountDetailsActivity.class));
                 }
             }
 
@@ -170,12 +168,21 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                 hideLoadingState();
             }
         };
-//        if(currentUser != null) {
-//            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
-//        }else{
-//            bootLoadingLayout.setVisibility(View.GONE);
-//        }
-        DataManager.getInstance().populateDataBaseFakeData();
+        if(currentUser != null) {
+            DataManager.getInstance().verifyUserAccountExists(currentUser.getEmail(), userAccountExistsCallback);
+        }else{
+            bootLoadingLayout.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick(R.id.sales_agent_tv)
+    public void onAccountTypeSalesClicked(){
+        salesAgentSelected = true;
+    }
+
+    @OnClick(R.id.customer_tv)
+    public void onAccointTypeCustomerClicked(){
+        salesAgentSelected = false;
     }
 
     private void animateTitleShrink(){
@@ -239,11 +246,9 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                             Log.d(TAG, "createUserWithEmail:success");
                             currentUser = mAuth.getCurrentUser();
                             UserPreferences.getInstance().setEmail(currentUser.getEmail());
-                            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
-                            DataManager.getInstance().createNewUser(currentUser.getUid(), currentUser.getEmail());
+                            DataManager.getInstance().verifyUserAccountExists(currentUser.getEmail(), userAccountExistsCallback);
                         } else {
                             hideLoadingState();
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
                             Toast.makeText(BootActivity.this, task.getException().getLocalizedMessage(),
                                     Toast.LENGTH_LONG).show();
@@ -267,7 +272,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                             Log.d(TAG, "signInWithEmail:success");
                             currentUser = mAuth.getCurrentUser();
                             UserPreferences.getInstance().setEmail(currentUser.getEmail());
-                            DataManager.getInstance().getCompany(StringParsingUtil.parseEmailDomain(currentUser.getEmail()), userComanyIsRegisteredCallback);
+                            DataManager.getInstance().verifyUserAccountExists(currentUser.getEmail(), userAccountExistsCallback);
                         } else {
                             hideLoadingState();
                             // If sign in fails, display a message to the user.
@@ -295,6 +300,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                             UserPreferences.getInstance().setVerificationEmailSent(true);
                             Log.e(TAG, "sendEmailVerification", task.getException());
                             verificationTv.setVisibility(View.VISIBLE);
+                            animateLoginView();
                         } else {
                             Toast.makeText(BootActivity.this,
                                     "Failed to send verification email.",
@@ -334,17 +340,13 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
 
     private void launchNextActivity(FirebaseUser user) {
         if(user.isEmailVerified()) {
-            Intent intent;
             currentUser = mAuth.getCurrentUser();
-            RealmResults<UserRealm> realmUser = Realm.getDefaultInstance().where(UserRealm.class).equalTo("uid", currentUser.getUid()).findAll();
-            if(realmUser != null && realmUser.size() > 0 && realmUser.get(0).getUid().equals(currentUser.getUid())) {
-                if (realmUser.get(0).getFirstName() != null && realmUser.get(0).getFirstName().isEmpty()) {
-                    intent = new Intent(getApplicationContext(), AccountDetailsActivity.class);
-                } else {
-                    intent = new Intent(getApplicationContext(), MainActivity.class);
-                }
-                startActivity(intent);
+            RealmResults<UserRealm> realmUser = Realm.getDefaultInstance().where(UserRealm.class).equalTo("email", currentUser.getEmail()).findAll();
+            if(realmUser != null && realmUser.size() > 0 && realmUser.get(0).getEmail().equals(currentUser.getEmail())) {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }else{
+                animateLoginView();
+                bootLoadingLayout.setVisibility(View.GONE);
                 mEmailField.setText(user.getEmail());
                 Toast.makeText(this, "Oops! Something went wrong. Check internet connection and try again.", Toast.LENGTH_LONG).show();
             }
@@ -353,7 +355,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                 Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();
             }
             verificationTv.setVisibility(View.VISIBLE);
-
         }
     }
 

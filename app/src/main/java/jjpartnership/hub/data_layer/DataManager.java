@@ -63,4 +63,8 @@ public class DataManager {
     public void populateDataBaseFakeData() {
         fbManager.onBoardNewSalesCompany();
     }
+
+    public void verifyUserAccountExists(String email, BaseCallback<String> userAccountExistsCallback) {
+        fbManager.verifyUserAccountExists(email, userAccountExistsCallback);
+    }
 }
