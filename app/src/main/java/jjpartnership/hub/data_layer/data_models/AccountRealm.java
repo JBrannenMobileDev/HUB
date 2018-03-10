@@ -10,8 +10,8 @@ import io.realm.annotations.PrimaryKey;
 public class AccountRealm extends RealmObject{
     @PrimaryKey
     private String accountIdFire;
-    private String companyIdA;
-    private String companyIdB;
+    private String companySalesId;
+    private String companyCustomerId;
     private String groupChatId;
     private String accountId;
 
@@ -20,16 +20,16 @@ public class AccountRealm extends RealmObject{
 
     public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId, String accountId) {
         this.accountIdFire = accountIdFire;
-        this.companyIdA = companyIdA;
-        this.companyIdB = companyIdB;
+        this.companySalesId = companyIdA;
+        this.companyCustomerId = companyIdB;
         this.groupChatId = groupChatId;
         this.accountId = accountId;
     }
 
     public AccountRealm(Account account){
         this.accountIdFire = account.getAccountIdFire();
-        this.companyIdA = account.getCompanyIdA();
-        this.companyIdB = account.getCompanyIdB();
+        this.companySalesId = account.getCompanySalesId();
+        this.companyCustomerId = account.getCompanyCustomerId();
         this.groupChatId = account.getGroupChatId();
         this.accountId = account.getAccountId();
     }
@@ -42,20 +42,20 @@ public class AccountRealm extends RealmObject{
         this.accountIdFire = accountId;
     }
 
-    public String getCompanyIdA() {
-        return companyIdA;
+    public String getCompanySalesId() {
+        return companySalesId;
     }
 
-    public void setCompanyIdA(String companyIdA) {
-        this.companyIdA = companyIdA;
+    public void setCompanySalesId(String companySalesId) {
+        this.companySalesId = companySalesId;
     }
 
-    public String getCompanyIdB() {
-        return companyIdB;
+    public String getCompanyCustomerId() {
+        return companyCustomerId;
     }
 
-    public void setCompanyIdB(String companyIdB) {
-        this.companyIdB = companyIdB;
+    public void setCompanyCustomerId(String companyCustomerId) {
+        this.companyCustomerId = companyCustomerId;
     }
 
     public String getGroupChatId() {

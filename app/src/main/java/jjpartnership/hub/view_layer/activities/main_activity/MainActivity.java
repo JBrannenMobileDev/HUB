@@ -23,22 +23,32 @@ import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmResults;
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.data_models.AccountRealm;
+import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
+import jjpartnership.hub.view_layer.custom_views.WrapContentListView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.search_selected_overlay)ImageView overlayImage;
     @BindView(R.id.search_results_layout)LinearLayout searchResultsLayout;
     @BindView(R.id.search_results_pager)ViewPager searchResultsPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
-
+    @BindView(R.id.recent_list_view)WrapContentListView recentListView;
+    @BindView(R.id.accounts_list_view)WrapContentListView accountsListView;
+    @BindView(R.id.direct_messages_list_view)WrapContentListView directMessagesListView;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
+    private AccountListAdapter accountsAdapter;
+    private BaseCallback<AccountRealm> accountSelectedCallback;
 
 
     @Override
@@ -60,6 +70,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         presenter = new MainPresenterImp(this);
         initAnimations();
+        initAdapters();
+    }
+
+    private void initAdapters() {
+        accountSelectedCallback = new BaseCallback<AccountRealm>() {
+            @Override
+            public void onResponse(AccountRealm object) {
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+        accountsAdapter = new AccountListAdapter(getApplicationContext(), new ArrayList<AccountRealm>(), accountSelectedCallback);
+        accountsListView.setAdapter(accountsAdapter);
     }
 
     @Override
@@ -205,5 +232,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onReceivedAccounts(RealmResults<AccountRealm> accountRealms) {
+        if(accountsAdapter == null){
+            accountsAdapter = new AccountListAdapter(getApplicationContext(), accountRealms, accountSelectedCallback);
+        }
+        accountsAdapter.OnDataSetChanged(accountRealms);
+        accountsAdapter.notifyDataSetChanged();
     }
 }

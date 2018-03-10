@@ -121,7 +121,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
 
         mEmailField.setBackPressedListener(this);
         mPasswordField.setBackPressedListener(this);
-//        DataManager.getInstance().initializeDbData();
+//        DataManager.getInstance().populateDataBaseFakeData();
     }
 
     @Override
@@ -316,9 +316,11 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
         String email = mEmailField.getText().toString();
         if (TextUtils.isEmpty(email)) {
             mEmailField.setError("Required");
+            hideLoadingState();
             valid = false;
         } else if(!StringValidationUtil.isValidEmailAddress(email)){
             mEmailField.setError("Not a valid email.");
+            hideLoadingState();
             valid = false;
         } else{
             mEmailField.setError(null);
@@ -327,9 +329,11 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
         String password = mPasswordField.getText().toString();
         if (TextUtils.isEmpty(password)) {
             mPasswordField.setError("Required");
+            hideLoadingState();
             valid = false;
         } else if(StringValidationUtil.isValidPassword(password)){
             mPasswordField.setError("Not a valid password.");
+            hideLoadingState();
             valid = false;
         } else{
             mPasswordField.setError(null);
@@ -341,15 +345,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     private void launchNextActivity(FirebaseUser user) {
         if(user.isEmailVerified()) {
             currentUser = mAuth.getCurrentUser();
-            RealmResults<UserRealm> realmUser = Realm.getDefaultInstance().where(UserRealm.class).equalTo("email", currentUser.getEmail()).findAll();
-            if(realmUser != null && realmUser.size() > 0 && realmUser.get(0).getEmail().equals(currentUser.getEmail())) {
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
-            }else{
-                animateLoginView();
-                bootLoadingLayout.setVisibility(View.GONE);
-                mEmailField.setText(user.getEmail());
-                Toast.makeText(this, "Oops! Something went wrong. Check internet connection and try again.", Toast.LENGTH_LONG).show();
-            }
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }else{
             if(!accountJustCreated) {
                 Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();

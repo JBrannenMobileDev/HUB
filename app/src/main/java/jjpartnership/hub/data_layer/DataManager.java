@@ -2,7 +2,11 @@ package jjpartnership.hub.data_layer;
 
 import java.util.List;
 
+import jjpartnership.hub.data_layer.data_models.Account;
+import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
+import jjpartnership.hub.data_layer.data_models.DirectChat;
+import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
@@ -66,5 +70,21 @@ public class DataManager {
 
     public void verifyUserAccountExists(String email, BaseCallback<String> userAccountExistsCallback) {
         fbManager.verifyUserAccountExists(email, userAccountExistsCallback);
+    }
+
+    public void updateRealmAccount(Account account) {
+        realmManager.updateAccount(account);
+    }
+
+    public void updateRealmDirectChat(DirectChat chat) {
+        realmManager.updateDirectChat(chat);
+    }
+
+    public void updateRealmGroupChat(GroupChat gChat) {
+        realmManager.updateGroupChat(gChat);
+    }
+
+    public void updateRealmCompany(Company company) {
+        realmManager.updateCompany(company);
     }
 }

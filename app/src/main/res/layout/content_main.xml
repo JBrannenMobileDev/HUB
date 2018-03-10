@@ -18,8 +18,9 @@
             android:id="@+id/recent_title_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Recent"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -30,21 +31,23 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
             android:background="@drawable/rounded_rectangle_white_tile_bg"
             android:elevation="2dp">
 
             <jjpartnership.hub.view_layer.custom_views.WrapContentListView
+                android:id="@+id/recent_list_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:divider="@null"/>
         </FrameLayout>
 
         <TextView
             android:id="@+id/accounts_title_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Accounts"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -55,21 +58,23 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
             android:background="@drawable/rounded_rectangle_white_tile_bg"
             android:elevation="2dp">
 
             <jjpartnership.hub.view_layer.custom_views.WrapContentListView
+                android:id="@+id/accounts_list_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"/>
         </FrameLayout>
 
         <TextView
             android:id="@+id/direct_messages_title_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:text="Direct Messages"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -80,13 +85,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
             android:background="@drawable/rounded_rectangle_white_tile_bg"
             android:elevation="2dp">
 
             <jjpartnership.hub.view_layer.custom_views.WrapContentListView
+                android:id="@+id/direct_messages_list_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:divider="@null"/>
         </FrameLayout>
     </LinearLayout>
 

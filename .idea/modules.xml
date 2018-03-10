@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Hub.iml" filepath="$PROJECT_DIR$/Hub.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ClickField.iml" filepath="$PROJECT_DIR$/ClickField.iml" />
+      <module fileurl="file://C:\Users\Jonathan\AndroidStudioProjects\ClickField\Hub.iml" filepath="C:\Users\Jonathan\AndroidStudioProjects\ClickField\Hub.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\Jonathan\AndroidStudioProjects\ClickField\app\app.iml" filepath="C:\Users\Jonathan\AndroidStudioProjects\ClickField\app\app.iml" />
     </modules>
   </component>
 </project>

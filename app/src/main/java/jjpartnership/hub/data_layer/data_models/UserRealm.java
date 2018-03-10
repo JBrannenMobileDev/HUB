@@ -12,6 +12,9 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class UserRealm extends RealmObject{
+    public static final String TYPE_SALES = "sales_agent";
+    public static final String TYPE_CUSTOMER = "account_rep";
+
     @PrimaryKey
     private String uid;
     private String email;

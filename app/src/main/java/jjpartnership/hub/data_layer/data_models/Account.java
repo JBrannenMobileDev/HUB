@@ -7,8 +7,8 @@ package jjpartnership.hub.data_layer.data_models;
 public class Account {
     private String accountIdFire;
     private String accountId;
-    private String companyIdA;
-    private String companyIdB;
+    private String companySalesId;
+    private String companyCustomerId;
     private String groupChatId;
 
     public Account() {
@@ -16,16 +16,16 @@ public class Account {
 
     public Account(String accountIdFire, String companyIdA, String companyIdB, String groupChatId, String accountId) {
         this.accountIdFire = accountIdFire;
-        this.companyIdA = companyIdA;
-        this.companyIdB = companyIdB;
+        this.companySalesId = companyIdA;
+        this.companyCustomerId = companyIdB;
         this.groupChatId = groupChatId;
         this.accountId = accountId;
     }
 
     public Account(AccountRealm accountRealm){
         this.accountIdFire = accountRealm.getAccountIdFire();
-        this.companyIdA = accountRealm.getCompanyIdA();
-        this.companyIdB = accountRealm.getCompanyIdB();
+        this.companySalesId = accountRealm.getCompanySalesId();
+        this.companyCustomerId = accountRealm.getCompanyCustomerId();
         this.groupChatId = accountRealm.getGroupChatId();
         this.accountId = accountRealm.getAccountId();
     }
@@ -46,20 +46,20 @@ public class Account {
         this.accountIdFire = accountIdFire;
     }
 
-    public String getCompanyIdA() {
-        return companyIdA;
+    public String getCompanySalesId() {
+        return companySalesId;
     }
 
-    public void setCompanyIdA(String companyIdA) {
-        this.companyIdA = companyIdA;
+    public void setCompanySalesId(String companySalesId) {
+        this.companySalesId = companySalesId;
     }
 
-    public String getCompanyIdB() {
-        return companyIdB;
+    public String getCompanyCustomerId() {
+        return companyCustomerId;
     }
 
-    public void setCompanyIdB(String companyIdB) {
-        this.companyIdB = companyIdB;
+    public void setCompanyCustomerId(String companyCustomerId) {
+        this.companyCustomerId = companyCustomerId;
     }
 
     public String getGroupChatId() {

@@ -11,6 +11,7 @@ public class UserPreferences {
     private static final String APP_SETTINGS = "APP_SETTINGS";
     private static final UserPreferences ourInstance = new UserPreferences();
     public Context context;
+    private Object userType;
 
     public static UserPreferences getInstance() {
         return ourInstance;
@@ -59,5 +60,15 @@ public class UserPreferences {
 
     public String getUid(){
         return getSharedPreferences(context).getString(UserPreferenceConstants.UID, "");
+    }
+
+    public void setUserType(String userType) {
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putString(UserPreferenceConstants.USER_TYPE, userType);
+        editor.commit();
+    }
+
+    public String getUserType() {
+        return getSharedPreferences(context).getString(UserPreferenceConstants.USER_TYPE, "");
     }
 }
