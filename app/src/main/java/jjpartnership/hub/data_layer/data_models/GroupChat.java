@@ -1,10 +1,6 @@
 package jjpartnership.hub.data_layer.data_models;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import io.realm.RealmList;
 
 /**
  * Created by jbrannen on 3/6/18.
@@ -13,30 +9,32 @@ import io.realm.RealmList;
 public class GroupChat {
     private String chatId;
     private List<String> userIds;
-    private List<Message> messages;
+    private Message mostRecentMessage;
+    private long messageCreatedTime;
 
     public GroupChat() {
     }
 
-    public GroupChat(String chatId, List<String> userIds, List<Message> messages) {
+    public GroupChat(String chatId, List<String> userIds, Message messages, long messageCreatedTime) {
         this.chatId = chatId;
         this.userIds = userIds;
-        this.messages = messages;
+        this.mostRecentMessage = messages;
+        this.messageCreatedTime = messageCreatedTime;
     }
 
     public GroupChat(GroupChatRealm realm){
         this.chatId = realm.getChatId();
         this.userIds = realm.getUserIds();
-        this.messages = createMessageList(realm.getMessages());
+        this.mostRecentMessage = new Message(realm.getMostRecentMessage());
+        this.messageCreatedTime = realm.getMessageCreatedTime();
     }
 
-    private List<Message> createMessageList(RealmList<MessageRealm> messagesRealm) {
-        List<Message> messageList = new ArrayList<>();
-        for(MessageRealm messageRealm : messagesRealm){
-            messageList.add(new Message(messageRealm));
-        }
-        Collections.reverse(messageList);
-        return messageList;
+    public long getMessageCreatedTime() {
+        return messageCreatedTime;
+    }
+
+    public void setMessageCreatedTime(long messageCreatedTime) {
+        this.messageCreatedTime = messageCreatedTime;
     }
 
     public String getChatId() {
@@ -55,11 +53,11 @@ public class GroupChat {
         this.userIds = userIds;
     }
 
-    public List<Message> getMessages() {
-        return messages;
+    public Message getMostRecentMessage() {
+        return mostRecentMessage;
     }
 
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
+    public void setMostRecentMessage(Message mostRecentMessage) {
+        this.mostRecentMessage = mostRecentMessage;
     }
 }

@@ -58,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:text="Jonathan Brannen"
-            android:textColor="@color/color_green_customer"
+            android:textColor="@color/colorPrimaryLight"
             android:textStyle="bold" />
 
         <TextView

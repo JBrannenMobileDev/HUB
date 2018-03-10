@@ -238,8 +238,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onReceivedAccounts(RealmResults<AccountRealm> accountRealms) {
         if(accountsAdapter == null){
             accountsAdapter = new AccountListAdapter(getApplicationContext(), accountRealms, accountSelectedCallback);
+        }else {
+            accountsAdapter.OnDataSetChanged(accountRealms);
         }
-        accountsAdapter.OnDataSetChanged(accountRealms);
         accountsAdapter.notifyDataSetChanged();
     }
 }

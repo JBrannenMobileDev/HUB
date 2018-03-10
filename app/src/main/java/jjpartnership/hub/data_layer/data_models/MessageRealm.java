@@ -10,6 +10,7 @@ import io.realm.annotations.PrimaryKey;
 public class MessageRealm extends RealmObject{
     @PrimaryKey
     private String messageId;
+    private String chatId;
     private String uid;
     private long createdDate;
     private String messageContent;
@@ -19,9 +20,18 @@ public class MessageRealm extends RealmObject{
         this.uid = message.getCreatedByUid();
         this.messageContent = message.getMessageContent();
         this.createdDate = message.getCreatedDate();
+        this.chatId = message.getChatId();
     }
 
     public MessageRealm() {
+    }
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 
     public long getCreatedDate() {

@@ -7,6 +7,8 @@ import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
@@ -44,12 +46,8 @@ public class DataManager {
 
     }
 
-    public void updateRealmUser(UserRealm user) {
+    public void updateRealmUser(User user) {
         realmManager.insertOrUpdateUser(user);
-    }
-
-    public void updateRealmCompanies(List<CompanyRealm> companies) {
-        realmManager.insertOrUpdateCompanies(companies);
     }
 
     public void updateUser(String firstName, String lastName, String phoneNumber, String businessUnit, String role) {
@@ -60,10 +58,6 @@ public class DataManager {
         fbManager.getMatchingCompanyBoolean(emailDomain, companyNameCallback);
     }
 
-    public void saveCompanyName(String name) {
-        realmManager.saveCompanyName(name);
-    }
-
     public void populateDataBaseFakeData() {
         fbManager.onBoardNewSalesCompany();
     }
@@ -72,19 +66,27 @@ public class DataManager {
         fbManager.verifyUserAccountExists(email, userAccountExistsCallback);
     }
 
-    public void updateRealmAccount(Account account) {
+    public void updateRealmAccounts(List<Account> account) {
         realmManager.updateAccount(account);
     }
 
-    public void updateRealmDirectChat(DirectChat chat) {
+    public void updateRealmDirectChats(List<DirectChat> chat) {
         realmManager.updateDirectChat(chat);
     }
 
-    public void updateRealmGroupChat(GroupChat gChat) {
+    public void updateRealmGroupChats(List<GroupChat> gChat) {
         realmManager.updateGroupChat(gChat);
     }
 
-    public void updateRealmCompany(Company company) {
+    public void updateRealmCompanys(List<Company> company) {
         realmManager.updateCompany(company);
+    }
+
+    public void updateRealmMessages(List<Message> messages) {
+        realmManager.updateRealmMessages(messages);
+    }
+
+    public void updateRealmMainAccountsModel(MainAccountsModel accountsModel) {
+        realmManager.updateMainAccountsModel(accountsModel);
     }
 }

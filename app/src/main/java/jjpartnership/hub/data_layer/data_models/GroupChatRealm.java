@@ -15,34 +15,24 @@ public class GroupChatRealm extends RealmObject{
     @PrimaryKey
     private String chatId;
     private RealmList<String> userIds;
-    private RealmList<MessageRealm> messages;
+    private MessageRealm mostRecentMessage;
+    private long messageCreatedTime;
 
     public GroupChatRealm() {
     }
 
-    public GroupChatRealm(String chatId, List<String> userIds, List<Message> messages) {
+    public GroupChatRealm(String chatId, List<String> userIds, Message messages, long messageCreatedTime) {
         this.chatId = chatId;
         this.userIds = createUserIdList(userIds);
-        this.messages = createMessageList(messages);
+        this.mostRecentMessage = new MessageRealm(messages);
+        this.messageCreatedTime = messageCreatedTime;
     }
 
     public GroupChatRealm(GroupChat chat){
         this.chatId = chat.getChatId();
         this.userIds = createUserIdList(chat.getUserIds());
-        this.messages = createMessageList(chat.getMessages());
-    }
-
-    private RealmList<MessageRealm> createMessageList(List<Message> messages) {
-        if(messages != null) {
-            RealmList<MessageRealm> messagesRealm = new RealmList<>();
-            for (Message message : messages) {
-                messagesRealm.add(new MessageRealm(message));
-            }
-            Collections.reverse(messagesRealm);
-            return messagesRealm;
-        }else{
-            return new RealmList<>();
-        }
+        this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
+        this.messageCreatedTime = chat.getMessageCreatedTime();
     }
 
     private RealmList<String> createUserIdList(List<String> userIds) {
@@ -56,6 +46,14 @@ public class GroupChatRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public long getMessageCreatedTime() {
+        return messageCreatedTime;
+    }
+
+    public void setMessageCreatedTime(long messageCreatedTime) {
+        this.messageCreatedTime = messageCreatedTime;
     }
 
     public String getChatId() {
@@ -74,11 +72,11 @@ public class GroupChatRealm extends RealmObject{
         this.userIds = userIds;
     }
 
-    public RealmList<MessageRealm> getMessages() {
-        return messages;
+    public MessageRealm getMostRecentMessage() {
+        return mostRecentMessage;
     }
 
-    public void setMessages(RealmList<MessageRealm> messages) {
-        this.messages = messages;
+    public void setMostRecentMessage(MessageRealm mostRecentMessage) {
+        this.mostRecentMessage = mostRecentMessage;
     }
 }

@@ -6,6 +6,7 @@ package jjpartnership.hub.data_layer.data_models;
 
 public class Message{
     private String messageId;
+    private String chatId;
     private String createdByUid;
     private long createdDate;
     private String messageContent;
@@ -15,6 +16,15 @@ public class Message{
         this.createdByUid = realmMessage.getUid();
         this.messageContent = realmMessage.getMessageContent();
         this.createdDate = realmMessage.getCreatedDate();
+        this.chatId = realmMessage.getChatId();
+    }
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
     }
 
     public long getCreatedDate() {

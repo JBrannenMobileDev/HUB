@@ -11,14 +11,21 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.Company;
-import jjpartnership.hub.data_layer.data_models.CompanyBasic;
+import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
+import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.Message;
+import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
@@ -39,34 +46,59 @@ public class FirebaseManager {
     private DatabaseReference accountsReference;
     private DatabaseReference directChatsReference;
     private DatabaseReference groupChatsReference;
-    private DatabaseReference companiesBasicReference;
     private DatabaseReference industriesReference;
+    private DatabaseReference userMessagesReference;
 
     private FirebaseDatabase database;
 
+    private User currentUser;
+    private List<Account> accounts;
+    private List<GroupChat> groupChats;
+    private List<DirectChat> directChats;
+    private List<Company> companies;
+    private List<Message> messages;
+    private DataManager dataManager;
+
     public FirebaseManager() {
+        dataManager = DataManager.getInstance();
         database = FirebaseDatabase.getInstance();
         thisUserReference = database.getReference("users").child(UserPreferences.getInstance().getUid());
         thisUserAccountsReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("accountIds");
         thisUserDirectMessagesReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("directChatIds");
         usersReference = database.getReference("users");
+        userMessagesReference = database.getReference("messages").child(UserPreferences.getInstance().getUid());
         companiesReference = database.getReference("companies");
         accountsReference = database.getReference("accounts");
         directChatsReference = database.getReference("direct_chats");
         groupChatsReference = database.getReference("group_chats");
-        companiesBasicReference = database.getReference("companies_basic");
         industriesReference = database.getReference("industries");
         initDataListeners();
     }
 
     private void initDataListeners() {
+        final ValueEventListener userAccountsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> accountIds = (List<String>)dataSnapshot.getValue();
+                if(accountIds != null && accountIds.size() > 0 ){
+                    fetchAccounts(accountIds);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
         ValueEventListener userListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 if(user != null) {
-                    DataManager.getInstance().updateRealmUser(new UserRealm(user));
+                    currentUser = user;
                     UserPreferences.getInstance().setUserType(user.getUserType());
+                    thisUserAccountsReference.addValueEventListener(userAccountsListener);
                 }
             }
 
@@ -89,35 +121,21 @@ public class FirebaseManager {
 
             }
         };
-        ValueEventListener userAccountsListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> accountIds = (List<String>)dataSnapshot.getValue();
-                if(accountIds != null && accountIds.size() > 0 ){
-                    fetchAccounts(accountIds);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
         thisUserReference.addValueEventListener(userListener);
-        thisUserAccountsReference.addValueEventListener(userAccountsListener);
         thisUserDirectMessagesReference.addValueEventListener(directChatsListener);
     }
 
-    private void fetchAccounts(List<String> accountIds) {
+    private void fetchAccounts(final List<String> accountIds) {
         for(String accountId : accountIds){
             ValueEventListener accountListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Account account = dataSnapshot.getValue(Account.class);
                     if(account != null){
-                        DataManager.getInstance().updateRealmAccount(account);
-                        getCustomerIds(account);
-                        getGroupChat(account);
+                        accounts.add(account);
+                    }
+                    if(accounts.size() == accountIds.size()){
+                        getCustomerIds(accounts);
                     }
                 }
 
@@ -128,49 +146,60 @@ public class FirebaseManager {
             };
             accountsReference.child(accountId).addListenerForSingleValueEvent(accountListener);
         }
+
     }
 
-    private void getCustomerIds(Account account) {
-        String companyId;
-        if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
-            companyId = account.getCompanyCustomerId();
-        }else{
-            companyId = account.getCompanySalesId();
+    private void getCustomerIds(List<Account> accountList) {
+        for(Account account : accountList) {
+            String companyId;
+            if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
+                companyId = account.getCompanyCustomerId();
+            } else {
+                companyId = account.getCompanySalesId();
+            }
+
+            ValueEventListener companyListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Company company = dataSnapshot.getValue(Company.class);
+                    if (company != null) {
+                        companies.add(company);
+                    }
+                    if(companies.size() == accounts.size()){
+                        getGroupChat(accounts);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+            companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
         }
-
-        ValueEventListener companyListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Company company = dataSnapshot.getValue(Company.class);
-                if(company != null){
-                    DataManager.getInstance().updateRealmCompany(company);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
     }
 
-    private void getGroupChat(Account account) {
-        ValueEventListener groupChatListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                GroupChat gChat = dataSnapshot.getValue(GroupChat.class);
-                if(gChat != null){
-                    DataManager.getInstance().updateRealmGroupChat(gChat);
+    private void getGroupChat(List<Account> accountList) {
+        for(Account account : accountList) {
+            ValueEventListener groupChatListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    GroupChat gChat = dataSnapshot.getValue(GroupChat.class);
+                    if (gChat != null) {
+                        groupChats.add(gChat);
+                    }
+                    if(groupChats.size() == accounts.size()){
+                        fetchDirectChats(currentUser.getDirectChatIds());
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        };
-        groupChatsReference.child(account.getGroupChatId()).addListenerForSingleValueEvent(groupChatListener);
+                }
+            };
+            groupChatsReference.child(account.getGroupChatId()).addListenerForSingleValueEvent(groupChatListener);
+        }
     }
 
     private void fetchDirectChats(List<String> directChatIds){
@@ -180,7 +209,10 @@ public class FirebaseManager {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     DirectChat chat = dataSnapshot.getValue(DirectChat.class);
                     if(chat != null){
-                        DataManager.getInstance().updateRealmDirectChat(chat);
+                        directChats.add(chat);
+                    }
+                    if(directChats.size() == currentUser.getDirectChatIds().size()){
+                        fetchMessages();
                     }
                 }
 
@@ -191,6 +223,74 @@ public class FirebaseManager {
             };
             directChatsReference.child(chatIds).addListenerForSingleValueEvent(chatListener);
         }
+    }
+
+    private void fetchMessages() {
+        ValueEventListener messagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Message> allMessages = (List<Message>) dataSnapshot.getValue();
+                if(allMessages != null && allMessages.size() > 0){
+                    messages = allMessages;
+                    saveAllNodesToRealm();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        userMessagesReference.addListenerForSingleValueEvent(messagesListener);
+    }
+
+    private void saveAllNodesToRealm() {
+        dataManager.updateRealmUser(currentUser);
+        dataManager.updateRealmAccounts(accounts);
+        dataManager.updateRealmGroupChats(groupChats);
+        dataManager.updateRealmDirectChats(directChats);
+        dataManager.updateRealmCompanys(companies);
+        dataManager.updateRealmMessages(messages);
+        buildUiModels();
+    }
+
+    private void buildUiModels() {
+        MainAccountsModel accountsModel = new MainAccountsModel();
+        RealmList<RowItem> rowItems = new RealmList<>();
+
+        for(int i = 0; i < accounts.size(); i++){
+            rowItems.add(new RowItem());
+            Company company = getAccountCompany(accounts.get(i));
+            GroupChat groupChat = getGroupChat(accounts.get(i).getGroupChatId());
+            User messageUser = getMessageUser(groupChat.getMostRecentMessage().getCreatedByUid());
+
+            rowItems.get(i).setAccountName(company.getName());
+            rowItems.get(i).setAccountId(accounts.get(i).getAccountId());
+            rowItems.get(i).setMessageContent(groupChat.getMostRecentMessage().getMessageContent());
+            rowItems.get(i).setMessageCreatedAtTime(groupChat.getMostRecentMessage().getCreatedDate());
+            rowItems.get(i).setMessageOwnerName(messageUser.getFirstName() + " " + messageUser.getLastName());
+        }
+        Collections.sort(rowItems);
+        accountsModel.setRowItems(rowItems);
+        dataManager.updateRealmMainAccountsModel(accountsModel);
+    }
+
+    private User getMessageUser(String createdByUid) {
+        return new User(Realm.getDefaultInstance().where(UserRealm.class).equalTo("uid", createdByUid).findFirst());
+    }
+
+    private GroupChat getGroupChat(String groupChatId) {
+        return new  GroupChat(Realm.getDefaultInstance().where(GroupChatRealm.class).equalTo("chatId", groupChatId).findFirst());
+    }
+
+    private Company getAccountCompany(Account account) {
+        Company company;
+        if(UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)){
+            company = new Company(Realm.getDefaultInstance().where(CompanyRealm.class).equalTo("companyId", account.getCompanyCustomerId()).findFirst());
+        }else{
+            company = new Company(Realm.getDefaultInstance().where(CompanyRealm.class).equalTo("companyId", account.getCompanySalesId()).findFirst());
+        }
+        return company;
     }
 
     public void writeNewUser(User user) {
@@ -222,12 +322,6 @@ public class FirebaseManager {
         groupChatsReference.child(chat.getChatId()).setValue(chat);
     }
 
-    public void writeNewCompanyBasic(CompanyBasic companyBasic) {
-        DatabaseReference newBasicRef = companiesBasicReference.push();
-        companyBasic.setCompanyBasicId(newBasicRef.getKey());
-        companiesBasicReference.child(companyBasic.getCompanyBasicId()).setValue(companyBasic);
-    }
-
     public void addNewIndustry(String industry){
         industriesReference.push().setValue(industry);
     }
@@ -255,7 +349,6 @@ public class FirebaseManager {
                     }
                 }
                 if(matchingCompany != null){
-                    DataManager.getInstance().saveCompanyName(matchingCompany.getName());
                     companyNameCallback.onResponse(true);
                 }else{
                     companyNameCallback.onResponse(false);
@@ -288,7 +381,6 @@ public class FirebaseManager {
                     }
                 }
                 if(matchingCompany != null){
-                    DataManager.getInstance().saveCompanyName(matchingCompany.getName());
                     companyNameCallback.onResponse(matchingCompany);
                 }else{
                     companyNameCallback.onResponse(null);
@@ -375,67 +467,6 @@ public class FirebaseManager {
         companiesReference.child(customerCompanyB.getCompanyId()).setValue(customerCompanyB);
         companiesReference.child(customerCompanyC.getCompanyId()).setValue(customerCompanyC);
         companiesReference.child(customerCompanyD.getCompanyId()).setValue(customerCompanyD);
-
-        DatabaseReference basic1Ref = companiesBasicReference.push();
-        CompanyBasic basic1 = new CompanyBasic();
-        basic1.setCompanyBasicId(basic1Ref.getKey());
-        basic1.setAddress(salesCompany.getAddress());
-        basic1.setBuyerCompany(salesCompany.isBuyerCompany());
-        basic1.setBuyerCompany(salesCompany.isBuyerCompany());
-        basic1.setCompanyId(salesCompany.getCompanyId());
-        basic1.setEmailDomain(salesCompany.getCompanyEmailDomain());
-        basic1.setIndustryIdList(salesCompany.getIndustryList());
-        basic1.setName(salesCompany.getName());
-
-        DatabaseReference basic2Ref = companiesBasicReference.push();
-        CompanyBasic basic2 = new CompanyBasic();
-        basic2.setCompanyBasicId(basic2Ref.getKey());
-        basic2.setAddress(customerCompanyA.getAddress());
-        basic2.setBuyerCompany(customerCompanyA.isBuyerCompany());
-        basic2.setBuyerCompany(customerCompanyA.isBuyerCompany());
-        basic2.setCompanyId(customerCompanyA.getCompanyId());
-        basic2.setEmailDomain(customerCompanyA.getCompanyEmailDomain());
-        basic2.setIndustryIdList(customerCompanyA.getIndustryList());
-        basic2.setName(customerCompanyA.getName());
-
-        DatabaseReference basic3Ref = companiesBasicReference.push();
-        CompanyBasic basic3 = new CompanyBasic();
-        basic3.setCompanyBasicId(basic3Ref.getKey());
-        basic3.setAddress(customerCompanyB.getAddress());
-        basic3.setBuyerCompany(customerCompanyB.isBuyerCompany());
-        basic3.setBuyerCompany(customerCompanyB.isBuyerCompany());
-        basic3.setCompanyId(customerCompanyB.getCompanyId());
-        basic3.setEmailDomain(customerCompanyB.getCompanyEmailDomain());
-        basic3.setIndustryIdList(customerCompanyB.getIndustryList());
-        basic3.setName(customerCompanyB.getName());
-
-        DatabaseReference basic4Ref = companiesBasicReference.push();
-        CompanyBasic basic4 = new CompanyBasic();
-        basic4.setCompanyBasicId(basic4Ref.getKey());
-        basic4.setAddress(customerCompanyC.getAddress());
-        basic4.setBuyerCompany(customerCompanyC.isBuyerCompany());
-        basic4.setBuyerCompany(customerCompanyC.isBuyerCompany());
-        basic4.setCompanyId(customerCompanyC.getCompanyId());
-        basic4.setEmailDomain(customerCompanyC.getCompanyEmailDomain());
-        basic4.setIndustryIdList(customerCompanyC.getIndustryList());
-        basic4.setName(customerCompanyC.getName());
-
-        DatabaseReference basic5Ref = companiesBasicReference.push();
-        CompanyBasic basic5 = new CompanyBasic();
-        basic5.setCompanyBasicId(basic5Ref.getKey());
-        basic5.setAddress(customerCompanyD.getAddress());
-        basic5.setBuyerCompany(customerCompanyD.isBuyerCompany());
-        basic5.setBuyerCompany(customerCompanyD.isBuyerCompany());
-        basic5.setCompanyId(customerCompanyD.getCompanyId());
-        basic5.setEmailDomain(customerCompanyD.getCompanyEmailDomain());
-        basic5.setIndustryIdList(customerCompanyD.getIndustryList());
-        basic5.setName(customerCompanyD.getName());
-
-        companiesBasicReference.child(basic1.getCompanyBasicId()).setValue(basic1);
-        companiesBasicReference.child(basic2.getCompanyBasicId()).setValue(basic2);
-        companiesBasicReference.child(basic3.getCompanyBasicId()).setValue(basic3);
-        companiesBasicReference.child(basic4.getCompanyBasicId()).setValue(basic4);
-        companiesBasicReference.child(basic5.getCompanyBasicId()).setValue(basic5);
     }
 
     private void addAllCustomer4Employees(Company customerCompanyD, String accountId) {

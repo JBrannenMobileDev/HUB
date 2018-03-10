@@ -22,6 +22,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:text="Recent"
+            android:textColor="@color/colorPrimaryLight"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -49,6 +50,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:text="Accounts"
+            android:textColor="@color/colorPrimaryLight"
             android:textSize="14sp"
             android:textStyle="bold" />
 
@@ -76,6 +78,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:text="Direct Messages"
+            android:textColor="@color/colorPrimaryLight"
             android:textSize="14sp"
             android:textStyle="bold" />
 
