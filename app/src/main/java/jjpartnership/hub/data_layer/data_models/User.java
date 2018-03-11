@@ -40,17 +40,19 @@ public class User{
     }
 
     public User(UserRealm realmUser){
-        this.uid = realmUser.getUid();
-        this.email = realmUser.getEmail();
-        this.phoneNumber = realmUser.getPhoneNumber();
-        this.firstName = realmUser.getFirstName();
-        this.lastName = realmUser.getLastName();
-        this.companyId = realmUser.getCompanyId();
-        this.businessUnit = realmUser.getBusinessUnit();
-        this.role = realmUser.getRole();
-        this.userType = realmUser.getUserType();
-        this.directChatIds = realmUser.getDirectChatIds();
-        this.accountIds = realmUser.getAccountIds();
+        if(realmUser != null) {
+            this.uid = realmUser.getUid();
+            this.email = realmUser.getEmail();
+            this.phoneNumber = realmUser.getPhoneNumber();
+            this.firstName = realmUser.getFirstName();
+            this.lastName = realmUser.getLastName();
+            this.companyId = realmUser.getCompanyId();
+            this.businessUnit = realmUser.getBusinessUnit();
+            this.role = realmUser.getRole();
+            this.userType = realmUser.getUserType();
+            this.directChatIds = realmUser.getDirectChatIds();
+            this.accountIds = realmUser.getAccountIds();
+        }
     }
 
     public void addAccount(String accountId) {

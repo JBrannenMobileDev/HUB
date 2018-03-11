@@ -14,16 +14,28 @@ public class MessageRealm extends RealmObject{
     private String uid;
     private long createdDate;
     private String messageContent;
+    private String messageOwnerName;
 
     public MessageRealm(Message message) {
-        this.messageId = message.getMessageId();
-        this.uid = message.getCreatedByUid();
-        this.messageContent = message.getMessageContent();
-        this.createdDate = message.getCreatedDate();
-        this.chatId = message.getChatId();
+        if(message != null) {
+            this.messageId = message.getMessageId();
+            this.uid = message.getCreatedByUid();
+            this.messageContent = message.getMessageContent();
+            this.createdDate = message.getCreatedDate();
+            this.chatId = message.getChatId();
+            this.messageOwnerName = message.getMessageOwnerName();
+        }
     }
 
     public MessageRealm() {
+    }
+
+    public String getMessageOwnerName() {
+        return messageOwnerName;
+    }
+
+    public void setMessageOwnerName(String messageOwnerName) {
+        this.messageOwnerName = messageOwnerName;
     }
 
     public String getChatId() {

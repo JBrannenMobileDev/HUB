@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -23,32 +24,31 @@ import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.realm.RealmResults;
+import io.realm.RealmList;
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.AccountRealm;
+import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
-import jjpartnership.hub.view_layer.custom_views.WrapContentListView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.search_selected_overlay)ImageView overlayImage;
     @BindView(R.id.search_results_layout)LinearLayout searchResultsLayout;
     @BindView(R.id.search_results_pager)ViewPager searchResultsPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
-    @BindView(R.id.recent_list_view)WrapContentListView recentListView;
-    @BindView(R.id.accounts_list_view)WrapContentListView accountsListView;
-    @BindView(R.id.direct_messages_list_view)WrapContentListView directMessagesListView;
+    @BindView(R.id.recent_list_view)RecyclerView recentListView;
+    @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
+    @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesListView;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
-    private AccountListAdapter accountsAdapter;
-    private BaseCallback<AccountRealm> accountSelectedCallback;
+    private AccountRecyclerAdapter accountsAdapter;
+    private BaseCallback<String> accountSelectedCallback;
+    private RecyclerView.LayoutManager layoutManager;
 
 
     @Override
@@ -67,16 +67,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        layoutManager = new LinearLayoutManager(getApplicationContext());
+        accountsRecyclerView.setLayoutManager(layoutManager);
         presenter = new MainPresenterImp(this);
         initAnimations();
         initAdapters();
     }
 
     private void initAdapters() {
-        accountSelectedCallback = new BaseCallback<AccountRealm>() {
+        accountSelectedCallback = new BaseCallback<String>() {
             @Override
-            public void onResponse(AccountRealm object) {
+            public void onResponse(String accouintId) {
 
             }
 
@@ -85,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         };
-        accountsAdapter = new AccountListAdapter(getApplicationContext(), new ArrayList<AccountRealm>(), accountSelectedCallback);
-        accountsListView.setAdapter(accountsAdapter);
+        accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<RowItem>()), accountSelectedCallback);
+        accountsRecyclerView.setAdapter(accountsAdapter);
     }
 
     @Override
@@ -234,12 +235,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+
+
     @Override
-    public void onReceivedAccounts(RealmResults<AccountRealm> accountRealms) {
+    public void onModelReceived(MainAccountsModel dataModel) {
         if(accountsAdapter == null){
-            accountsAdapter = new AccountListAdapter(getApplicationContext(), accountRealms, accountSelectedCallback);
+            accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
+            accountsRecyclerView.setAdapter(accountsAdapter);
         }else {
-            accountsAdapter.OnDataSetChanged(accountRealms);
+            accountsAdapter.OnDataSetChanged(dataModel);
         }
         accountsAdapter.notifyDataSetChanged();
     }

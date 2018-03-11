@@ -33,7 +33,7 @@ public class RowItem extends RealmObject implements Comparable{
     }
 
     public void setAccountName(String accountName) {
-        accountName = accountName;
+        this.accountName = accountName;
     }
 
     public String getMessageOwnerName() {

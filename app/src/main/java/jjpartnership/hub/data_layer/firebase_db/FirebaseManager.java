@@ -16,6 +16,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.Company;
@@ -57,10 +58,13 @@ public class FirebaseManager {
     private List<DirectChat> directChats;
     private List<Company> companies;
     private List<Message> messages;
-    private DataManager dataManager;
 
     public FirebaseManager() {
-        dataManager = DataManager.getInstance();
+        accounts = new ArrayList<>();
+        groupChats = new ArrayList<>();
+        directChats = new ArrayList<>();
+        companies = new ArrayList<>();
+        messages = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
         thisUserReference = database.getReference("users").child(UserPreferences.getInstance().getUid());
         thisUserAccountsReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("accountIds");
@@ -99,6 +103,7 @@ public class FirebaseManager {
                     currentUser = user;
                     UserPreferences.getInstance().setUserType(user.getUserType());
                     thisUserAccountsReference.addValueEventListener(userAccountsListener);
+                    DataManager.getInstance().updateRealmUser(currentUser);
                 }
             }
 
@@ -107,22 +112,7 @@ public class FirebaseManager {
                 Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
             }
         };
-        ValueEventListener directChatsListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> directChatIds = (List<String>)dataSnapshot.getValue();
-                if(directChatIds != null && directChatIds.size() > 0){
-                    fetchDirectChats(directChatIds);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
         thisUserReference.addValueEventListener(userListener);
-        thisUserDirectMessagesReference.addValueEventListener(directChatsListener);
     }
 
     private void fetchAccounts(final List<String> accountIds) {
@@ -135,6 +125,7 @@ public class FirebaseManager {
                         accounts.add(account);
                     }
                     if(accounts.size() == accountIds.size()){
+                        DataManager.getInstance().updateRealmAccounts(accounts);
                         getCustomerIds(accounts);
                     }
                 }
@@ -166,6 +157,7 @@ public class FirebaseManager {
                         companies.add(company);
                     }
                     if(companies.size() == accounts.size()){
+                        DataManager.getInstance().updateRealmCompanys(companies);
                         getGroupChat(accounts);
                     }
                 }
@@ -189,6 +181,7 @@ public class FirebaseManager {
                         groupChats.add(gChat);
                     }
                     if(groupChats.size() == accounts.size()){
+                        DataManager.getInstance().updateRealmGroupChats(groupChats);
                         fetchDirectChats(currentUser.getDirectChatIds());
                     }
                 }
@@ -203,25 +196,31 @@ public class FirebaseManager {
     }
 
     private void fetchDirectChats(List<String> directChatIds){
-        for(String chatIds : directChatIds){
-            ValueEventListener chatListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    DirectChat chat = dataSnapshot.getValue(DirectChat.class);
-                    if(chat != null){
-                        directChats.add(chat);
+        if(directChatIds != null && directChatIds.size() > 0) {
+            for (String chatIds : directChatIds) {
+                ValueEventListener chatListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        DirectChat chat = dataSnapshot.getValue(DirectChat.class);
+                        if (chat != null) {
+                            directChats.add(chat);
+                        }
+                        if (directChats.size() == currentUser.getDirectChatIds().size()) {
+                            DataManager.getInstance().updateRealmDirectChats(directChats);
+                            fetchMessages();
+                        }
                     }
-                    if(directChats.size() == currentUser.getDirectChatIds().size()){
-                        fetchMessages();
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
-            directChatsReference.child(chatIds).addListenerForSingleValueEvent(chatListener);
+                };
+                directChatsReference.child(chatIds).addListenerForSingleValueEvent(chatListener);
+            }
+        }else{
+            fetchMessages();
+            //TODO delete all directChats from realm
         }
     }
 
@@ -232,8 +231,9 @@ public class FirebaseManager {
                 List<Message> allMessages = (List<Message>) dataSnapshot.getValue();
                 if(allMessages != null && allMessages.size() > 0){
                     messages = allMessages;
-                    saveAllNodesToRealm();
+                    DataManager.getInstance().updateRealmMessages(messages);
                 }
+                buildUiModels();
             }
 
             @Override
@@ -244,51 +244,57 @@ public class FirebaseManager {
         userMessagesReference.addListenerForSingleValueEvent(messagesListener);
     }
 
-    private void saveAllNodesToRealm() {
-        dataManager.updateRealmUser(currentUser);
-        dataManager.updateRealmAccounts(accounts);
-        dataManager.updateRealmGroupChats(groupChats);
-        dataManager.updateRealmDirectChats(directChats);
-        dataManager.updateRealmCompanys(companies);
-        dataManager.updateRealmMessages(messages);
-        buildUiModels();
-    }
-
     private void buildUiModels() {
         MainAccountsModel accountsModel = new MainAccountsModel();
+        Company company;
+        GroupChat groupChat;
         RealmList<RowItem> rowItems = new RealmList<>();
-
         for(int i = 0; i < accounts.size(); i++){
             rowItems.add(new RowItem());
-            Company company = getAccountCompany(accounts.get(i));
-            GroupChat groupChat = getGroupChat(accounts.get(i).getGroupChatId());
-            User messageUser = getMessageUser(groupChat.getMostRecentMessage().getCreatedByUid());
+        }
+
+        for(int i = 0; i < accounts.size(); i++){
+            company = getAccountCompany(accounts.get(i));
+            groupChat = getGroupChat(accounts.get(i).getGroupChatId());
 
             rowItems.get(i).setAccountName(company.getName());
             rowItems.get(i).setAccountId(accounts.get(i).getAccountId());
-            rowItems.get(i).setMessageContent(groupChat.getMostRecentMessage().getMessageContent());
-            rowItems.get(i).setMessageCreatedAtTime(groupChat.getMostRecentMessage().getCreatedDate());
-            rowItems.get(i).setMessageOwnerName(messageUser.getFirstName() + " " + messageUser.getLastName());
+            if(groupChat.getMostRecentMessage() != null) {
+                rowItems.get(i).setMessageContent(groupChat.getMostRecentMessage().getMessageContent());
+                rowItems.get(i).setMessageCreatedAtTime(groupChat.getMostRecentMessage().getCreatedDate());
+                rowItems.get(i).setMessageOwnerName(groupChat.getMostRecentMessage().getMessageOwnerName());
+            }
         }
         Collections.sort(rowItems);
         accountsModel.setRowItems(rowItems);
-        dataManager.updateRealmMainAccountsModel(accountsModel);
-    }
-
-    private User getMessageUser(String createdByUid) {
-        return new User(Realm.getDefaultInstance().where(UserRealm.class).equalTo("uid", createdByUid).findFirst());
+        DataManager.getInstance().updateRealmMainAccountsModel(accountsModel);
     }
 
     private GroupChat getGroupChat(String groupChatId) {
-        return new  GroupChat(Realm.getDefaultInstance().where(GroupChatRealm.class).equalTo("chatId", groupChatId).findFirst());
+        for(GroupChat chat : groupChats){
+            if(chat.getChatId().equalsIgnoreCase(groupChatId)){
+                return chat;
+            }
+        }
+        return null;
     }
 
     private Company getAccountCompany(Account account) {
-        Company company;
+        Company company = null;
         if(UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)){
-            company = new Company(Realm.getDefaultInstance().where(CompanyRealm.class).equalTo("companyId", account.getCompanyCustomerId()).findFirst());
+            for(Company companyLoop : companies){
+                if(companyLoop.getCompanyId().equalsIgnoreCase(account.getCompanyCustomerId())){
+                    company = companyLoop;
+                    break;
+                }
+            }
         }else{
-            company = new Company(Realm.getDefaultInstance().where(CompanyRealm.class).equalTo("companyId", account.getCompanySalesId()).findFirst());
+            for(Company companyLoop : companies){
+                if(companyLoop.getCompanyId().equalsIgnoreCase(account.getCompanySalesId())){
+                    company = companyLoop;
+                    break;
+                }
+            }
         }
         return company;
     }

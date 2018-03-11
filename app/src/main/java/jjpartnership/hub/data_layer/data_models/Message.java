@@ -10,6 +10,7 @@ public class Message{
     private String createdByUid;
     private long createdDate;
     private String messageContent;
+    private String messageOwnerName;
 
     public Message(MessageRealm realmMessage) {
         this.messageId = realmMessage.getMessageId();
@@ -17,10 +18,19 @@ public class Message{
         this.messageContent = realmMessage.getMessageContent();
         this.createdDate = realmMessage.getCreatedDate();
         this.chatId = realmMessage.getChatId();
+        this.messageOwnerName = realmMessage.getMessageOwnerName();
     }
 
     public String getChatId() {
         return chatId;
+    }
+
+    public String getMessageOwnerName() {
+        return messageOwnerName;
+    }
+
+    public void setMessageOwnerName(String messageOwnerName) {
+        this.messageOwnerName = messageOwnerName;
     }
 
     public void setChatId(String chatId) {

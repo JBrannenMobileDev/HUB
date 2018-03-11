@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.Company;
@@ -39,7 +40,7 @@ public class RealmManager {
     }
 
     public void updateAccount(final List<Account> accounts) {
-        final List<AccountRealm> realmAccounts = new ArrayList<>();
+        final RealmList<AccountRealm> realmAccounts = new RealmList<>();
         for(Account account : accounts){
             realmAccounts.add(new AccountRealm(account));
         }
@@ -54,7 +55,7 @@ public class RealmManager {
     }
 
     public void updateDirectChat(final List<DirectChat> chats) {
-        final List<DirectChatRealm> realmChats = new ArrayList<>();
+        final RealmList<DirectChatRealm> realmChats = new RealmList<>();
         for(DirectChat chat : chats){
             realmChats.add(new DirectChatRealm(chat));
         }
@@ -69,7 +70,7 @@ public class RealmManager {
     }
 
     public void updateGroupChat(final List<GroupChat> gChats) {
-        final List<GroupChatRealm> realmChats = new ArrayList<>();
+        final RealmList<GroupChatRealm> realmChats = new RealmList<>();
         for(GroupChat chat : gChats){
             realmChats.add(new GroupChatRealm(chat));
         }
@@ -85,7 +86,7 @@ public class RealmManager {
     }
 
     public void updateCompany(final List<Company> companies) {
-        final List<CompanyRealm> realmCompanies = new ArrayList<>();
+        final RealmList<CompanyRealm> realmCompanies = new RealmList<>();
         for(Company company : companies){
             realmCompanies.add(new CompanyRealm(company));
         }
@@ -101,7 +102,7 @@ public class RealmManager {
     }
 
     public void updateRealmMessages(List<Message> messages) {
-        final List<MessageRealm> realmMessages = new ArrayList<>();
+        final RealmList<MessageRealm> realmMessages = new RealmList<>();
         for(Message message : messages){
             realmMessages.add(new MessageRealm(message));
         }
@@ -116,7 +117,14 @@ public class RealmManager {
         realm.close();
     }
 
-    public void updateMainAccountsModel(MainAccountsModel accountsModel) {
-
+    public void updateMainAccountsModel(final MainAccountsModel accountsModel) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(accountsModel);
+            }
+        });
+        realm.close();
     }
 }

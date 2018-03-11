@@ -9,95 +9,103 @@
     tools:context="jjpartnership.hub.view_layer.activities.main_activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/recent_title_tv"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Recent"
-            android:textColor="@color/colorPrimaryLight"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <FrameLayout
-            android:id="@+id/recent_frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/rounded_rectangle_white_tile_bg"
-            android:elevation="2dp">
-
-            <jjpartnership.hub.view_layer.custom_views.WrapContentListView
-                android:id="@+id/recent_list_view"
+            <TextView
+                android:id="@+id/recent_title_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@null"/>
-        </FrameLayout>
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Recent"
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/accounts_title_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Accounts"
-            android:textColor="@color/colorPrimaryLight"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <FrameLayout
-            android:id="@+id/accounts_frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/rounded_rectangle_white_tile_bg"
-            android:elevation="2dp">
-
-            <jjpartnership.hub.view_layer.custom_views.WrapContentListView
-                android:id="@+id/accounts_list_view"
+            <FrameLayout
+                android:id="@+id/recent_frame_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@android:color/transparent"/>
-        </FrameLayout>
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/rounded_rectangle_white_tile_bg"
+                android:elevation="2dp">
 
-        <TextView
-            android:id="@+id/direct_messages_title_tv"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Direct Messages"
-            android:textColor="@color/colorPrimaryLight"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recent_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
 
-        <FrameLayout
-            android:id="@+id/direct_messages_frame_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:background="@drawable/rounded_rectangle_white_tile_bg"
-            android:elevation="2dp">
+            </FrameLayout>
 
-            <jjpartnership.hub.view_layer.custom_views.WrapContentListView
-                android:id="@+id/direct_messages_list_view"
+            <TextView
+                android:id="@+id/accounts_title_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@null"/>
-        </FrameLayout>
-    </LinearLayout>
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Accounts"
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:id="@+id/accounts_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/rounded_rectangle_white_tile_bg"
+                android:elevation="2dp">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/accounts_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/direct_messages_title_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Direct Messages"
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:id="@+id/direct_messages_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/rounded_rectangle_white_tile_bg"
+                android:elevation="2dp">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/direct_messages_list_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="800dp"
+                    android:nestedScrollingEnabled="false" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/search_results_layout"

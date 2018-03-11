@@ -43,17 +43,19 @@ public class Company{
     }
 
     public Company(CompanyRealm realmCompany) {
-        this.companyId = realmCompany.getCompanyId();
-        this.name = realmCompany.getName();
-        this.address = realmCompany.getAddress();
-        this.businessUnits = realmCompany.getBusinessUnits();
-        this.roles = realmCompany.getRoles();
-        this.companyEmailDomain = realmCompany.getCompanyEmailDomain();
-        this.industryList = realmCompany.getIndustryList();
-        this.employeeList = realmCompany.getEmployeeList();
-        this.accountList = realmCompany.getAccountList();
-        this.salesCompany = realmCompany.isSalesCompany();
-        this.buyerCompany = realmCompany.isBuyerCompany();
+        if(realmCompany != null) {
+            this.companyId = realmCompany.getCompanyId();
+            this.name = realmCompany.getName();
+            this.address = realmCompany.getAddress();
+            this.businessUnits = realmCompany.getBusinessUnits();
+            this.roles = realmCompany.getRoles();
+            this.companyEmailDomain = realmCompany.getCompanyEmailDomain();
+            this.industryList = realmCompany.getIndustryList();
+            this.employeeList = realmCompany.getEmployeeList();
+            this.accountList = realmCompany.getAccountList();
+            this.salesCompany = realmCompany.isSalesCompany();
+            this.buyerCompany = realmCompany.isBuyerCompany();
+        }
     }
 
     public void addNewEmployee(String userId){
