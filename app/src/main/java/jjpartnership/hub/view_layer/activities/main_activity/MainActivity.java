@@ -21,6 +21,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -28,8 +29,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.RowItem;
+import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
+import jjpartnership.hub.data_layer.data_models.MainRecentModel;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
@@ -40,8 +44,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.search_results_pager)ViewPager searchResultsPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
     @BindView(R.id.recent_list_view)RecyclerView recentListView;
+    @BindView(R.id.recent_title_tv)TextView recentTitle;
     @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
     @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesListView;
+    @BindView(R.id.welcome_linear_layout)LinearLayout welcomeLayout;
+    @BindView(R.id.welcome_message_tv)TextView welcomeMessage;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
@@ -236,15 +243,49 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    @Override
+    public void onRecentModelREceived(MainRecentModel recentModel) {
+        if(recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0){
+            welcomeLayout.setVisibility(View.GONE);
+            recentTitle.setVisibility(View.VISIBLE);
+            //TODO initialize recent adapter
+        }
+    }
 
     @Override
-    public void onModelReceived(MainAccountsModel dataModel) {
-        if(accountsAdapter == null){
-            accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
-            accountsRecyclerView.setAdapter(accountsAdapter);
-        }else {
-            accountsAdapter.OnDataSetChanged(dataModel);
+    public void onAccountModelReceived(MainAccountsModel dataModel) {
+//        if(dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
+            if (accountsAdapter == null) {
+                accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
+                accountsRecyclerView.setAdapter(accountsAdapter);
+            } else {
+                accountsAdapter.OnDataSetChanged(dataModel);
+            }
+            accountsAdapter.notifyDataSetChanged();
+//        }else{
+//            //TODO show no accounts view
+//        }
+    }
+
+    @Override
+    public void onDirectMessagesModelReceived(MainDirectMessagesModel directModel) {
+
+    }
+
+    @Override
+    public void setWelcomeMessage(String typeCustomer) {
+        switch(typeCustomer){
+            case UserRealm.TYPE_SALES:
+                welcomeMessage.setText(getResources().getString(R.string.sales_agent_welcome_message));
+                break;
+            case UserRealm.TYPE_CUSTOMER:
+                welcomeMessage.setText(getResources().getString(R.string.customer_welcome_message));
+                break;
         }
-        accountsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void setPageTitle(String title) {
+
     }
 }

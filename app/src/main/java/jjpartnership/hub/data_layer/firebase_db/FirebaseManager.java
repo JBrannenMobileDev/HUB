@@ -14,19 +14,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmList;
 
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
+import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
-import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
-import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.Message;
-import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;

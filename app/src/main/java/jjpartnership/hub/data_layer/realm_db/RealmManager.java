@@ -1,6 +1,5 @@
 package jjpartnership.hub.data_layer.realm_db;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
@@ -30,7 +29,7 @@ public class RealmManager {
 
     public void insertOrUpdateUser(final User user) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(new UserRealm(user));
@@ -45,7 +44,7 @@ public class RealmManager {
             realmAccounts.add(new AccountRealm(account));
         }
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmAccounts);
@@ -60,7 +59,7 @@ public class RealmManager {
             realmChats.add(new DirectChatRealm(chat));
         }
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmChats);
@@ -76,7 +75,7 @@ public class RealmManager {
         }
 
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmChats);
@@ -92,7 +91,7 @@ public class RealmManager {
         }
 
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmCompanies);
@@ -108,7 +107,7 @@ public class RealmManager {
         }
 
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmMessages);
@@ -119,7 +118,7 @@ public class RealmManager {
 
     public void updateMainAccountsModel(final MainAccountsModel accountsModel) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(accountsModel);

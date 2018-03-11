@@ -284,10 +284,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                 });
     }
 
-    private void signOut() {
-        mAuth.signOut();
-    }
-
     private void sendEmailVerification() {
         // Send verification email
         // [START send_email_verification]

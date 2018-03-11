@@ -8,26 +8,26 @@ import io.realm.annotations.PrimaryKey;
  * Created by Jonathan on 3/10/2018.
  */
 
-public class MainAccountsModel extends RealmObject{
-    public static final String PERM_ID = "main_account_model";
+public class MainRecentModel extends RealmObject{
+    public static final String PERM_ID = "main_recent_model";
     @PrimaryKey
     private String permanentId;
-    private RealmList<RowItem> rowItems;
+    private RealmList<RecentRowItem> rowItems;
 
-    public MainAccountsModel() {
+    public MainRecentModel() {
         permanentId = PERM_ID;
     }
 
-    public MainAccountsModel(RealmList<RowItem> rowItems) {
+    public MainRecentModel(RealmList<RecentRowItem> rowItems) {
         this.rowItems = rowItems;
         permanentId = PERM_ID;
     }
 
-    public RealmList<RowItem> getRowItems() {
+    public RealmList<RecentRowItem> getRowItems() {
         return rowItems;
     }
 
-    public void setRowItems(RealmList<RowItem> rowItems) {
+    public void setRowItems(RealmList<RecentRowItem> rowItems) {
         this.rowItems = rowItems;
     }
 }
