@@ -28,7 +28,7 @@
         <android.support.v4.view.ViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1" />
 
         <FrameLayout
@@ -50,15 +50,27 @@
                 android:tint="@color/colorPrimaryVeryLight" />
 
             <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
-                android:id="@+id/multiAutoCompleteTextView"
+                android:id="@+id/user_message_sales_team_et"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="45dp"
                 android:backgroundTint="@android:color/transparent"
-                android:hint="Message"
+                android:hint="Message (Sales Team)"
                 android:paddingLeft="16dp"
                 android:textColorHint="@color/colorPrimaryLight" />
+
+            <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
+                android:id="@+id/user_message_customer_et"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="45dp"
+                android:backgroundTint="@android:color/transparent"
+                android:hint="Message (Account)"
+                android:paddingLeft="16dp"
+                android:textColorHint="@color/colorPrimaryLight"
+                android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
 
