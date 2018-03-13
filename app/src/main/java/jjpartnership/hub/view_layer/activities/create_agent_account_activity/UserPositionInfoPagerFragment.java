@@ -116,7 +116,7 @@ public class UserPositionInfoPagerFragment extends Fragment implements BackAware
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnSalesChatFragmentInteractionListener");
         }
     }
 

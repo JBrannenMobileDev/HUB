@@ -13,4 +13,6 @@
     <color name="hub_logo_color">#363636</color>
     <color name="colorMainBg">#f4f4f4</color>
     <color name="color_green_customer">#07ae01</color>
+    <color name="colorPrimaryVeryLight">#ececec</color>
+    <color name="chat_bg">#e0e0e0</color>
 </resources>

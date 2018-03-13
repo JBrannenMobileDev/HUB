@@ -24,9 +24,9 @@ import jjpartnership.hub.utils.BaseCallback;
 public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecyclerAdapter.ViewHolder> {
     private Context context;
     private MainAccountsModel dataModel;
-    private BaseCallback<String> rowSelectedCallback;
+    private BaseCallback<RowItem> rowSelectedCallback;
 
-    public AccountRecyclerAdapter(@NonNull Context context, MainAccountsModel dataModel, BaseCallback<String> rowSelectedCallback) {
+    public AccountRecyclerAdapter(@NonNull Context context, MainAccountsModel dataModel, BaseCallback<RowItem> rowSelectedCallback) {
         this.context = context;
         this.dataModel = dataModel;
         this.rowSelectedCallback = rowSelectedCallback;
@@ -47,6 +47,13 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
             messageOwnerName = v.findViewById(R.id.message_owner_name_tv);
             messageContent = v.findViewById(R.id.message_content_tv);
             accountIcon = v.findViewById(R.id.account_icon_tv);
+
+            root.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    rowSelectedCallback.onResponse(dataModel.getRowItems().get(getLayoutPosition()));
+                }
+            });
         }
     }
 

@@ -63,7 +63,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     @BindView(R.id.password_requirements_tv)TextView passwrodRequirments;
     @BindView(R.id.boot_title_tv)TextView bootTitle;
     @BindView(R.id.loading_frame_layout)FrameLayout bootLoadingLayout;
-    @BindView(R.id.hub_logo)ImageView hubLogo;
     @BindView(R.id.hub_title)TextView hubTitle;
     @BindView(R.id.email_password_fields)LinearLayout inputView;
 
@@ -188,9 +187,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     private void animateTitleShrink(){
         verificationTv.setVisibility(View.GONE);
         inputView.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-100f));
-        hubLogo.animate().scaleX(.5f);
-        hubLogo.animate().scaleY(.5f);
-        hubLogo.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-50f));
         hubTitle.animate().scaleY(.5f);
         hubTitle.animate().scaleX(.5f);
         hubTitle.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-50f));
@@ -198,9 +194,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
 
     private void animateTitleExpand(){
         inputView.animate().translationY(0f);
-        hubLogo.animate().scaleX(1f);
-        hubLogo.animate().scaleY(1f);
-        hubLogo.animate().translationY(0f);
         hubTitle.animate().scaleY(1f);
         hubTitle.animate().scaleX(1f);
         hubTitle.animate().translationY(0f);

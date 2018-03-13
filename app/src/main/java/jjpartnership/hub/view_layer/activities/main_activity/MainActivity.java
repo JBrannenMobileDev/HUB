@@ -35,6 +35,7 @@ import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
     private AccountRecyclerAdapter accountsAdapter;
-    private BaseCallback<String> accountSelectedCallback;
+    private BaseCallback<RowItem> accountSelectedCallback;
     private RecyclerView.LayoutManager layoutManager;
 
 
@@ -82,10 +83,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initAdapters() {
-        accountSelectedCallback = new BaseCallback<String>() {
+        accountSelectedCallback = new BaseCallback<RowItem>() {
             @Override
-            public void onResponse(String accouintId) {
-
+            public void onResponse(RowItem rowItem) {
+                Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
+                accountChatIntent.putExtra("account_id", rowItem.getAccountId());
+                accountChatIntent.putExtra("account_name", rowItem.getAccountName());
+                startActivity(accountChatIntent);
             }
 
             @Override

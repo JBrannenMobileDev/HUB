@@ -143,7 +143,7 @@ public class UserInfoNamePagerFragment extends Fragment implements BackAwareEdit
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnSalesChatFragmentInteractionListener");
         }
     }
 
