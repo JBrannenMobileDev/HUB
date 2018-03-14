@@ -1,5 +1,7 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import java.util.List;
+
 /**
  * Created by jbrannen on 2/23/18.
  */
@@ -9,8 +11,13 @@ public class Message{
     private String chatId;
     private String createdByUid;
     private long createdDate;
+    private boolean savedToFirebase;
     private String messageContent;
     private String messageOwnerName;
+    private List<String> readByUids;
+
+    public Message() {
+    }
 
     public Message(MessageRealm realmMessage) {
         this.messageId = realmMessage.getMessageId();
@@ -19,6 +26,24 @@ public class Message{
         this.createdDate = realmMessage.getCreatedDate();
         this.chatId = realmMessage.getChatId();
         this.messageOwnerName = realmMessage.getMessageOwnerName();
+        this.readByUids = realmMessage.getReadByUids();
+        this.savedToFirebase = realmMessage.isSavedToFirebase();
+    }
+
+    public boolean isSavedToFirebase() {
+        return savedToFirebase;
+    }
+
+    public void setSavedToFirebase(boolean savedToFirebase) {
+        this.savedToFirebase = savedToFirebase;
+    }
+
+    public List<String> getReadByUids() {
+        return readByUids;
+    }
+
+    public void setReadByUids(List<String> readByUids) {
+        this.readByUids = readByUids;
     }
 
     public String getChatId() {

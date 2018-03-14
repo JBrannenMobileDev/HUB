@@ -22,11 +22,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import jjpartnership.hub.R;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.cutomer_chat_fragment.CustomerChatFragment;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        CustomerChatActivity.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener{
+        CustomerChatFragment.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
     @BindView(R.id.send_image_view)ImageView sendImage;
@@ -37,6 +40,8 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     private String accountId;
     private int colorOrange;
     private int colorGrey;
+    private SalesAgentsFragment salesAgentFragment;
+    private CustomerChatFragment customerChatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,13 +52,25 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         getSupportActionBar().setElevation(0);
         setTitle(getIntent().getStringExtra("account_name"));
         accountId = getIntent().getStringExtra("account_id");
-        adapter.addFragment(new SalesAgentsFragment(), "Sales Team");
-        adapter.addFragment(new CustomerChatActivity(), "Account");
+        salesAgentFragment = new SalesAgentsFragment();
+        customerChatFragment = new CustomerChatFragment();
+        adapter.addFragment(salesAgentFragment, "Sales Team");
+        adapter.addFragment(customerChatFragment, "Account");
         pager.setAdapter(adapter);
         tabLayout.setupWithViewPager(pager);
         colorOrange = ContextCompat.getColor(getApplicationContext(), R.color.colorOrange);
         colorGrey = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryVeryLight);
         initListeners();
+    }
+
+    @OnClick(R.id.send_image_view)
+    public void onSendClicked(){
+        if(userInputSalesTeam.isShown()){
+            salesAgentFragment.onSendMessageClicked();
+        }
+        if(userInputCustomer.isShown()){
+//            customerChatFragment.onSendMessageClicked();
+        }
     }
 
     private void initListeners() {
@@ -75,10 +92,10 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(charSequence.length() > 0){
                     setSendImageColor(colorOrange);
-
                 }else{
                     setSendImageColor(colorGrey);
                 }
+                salesAgentFragment.onUserInputChanged(charSequence);
             }
 
             @Override
@@ -211,6 +228,10 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         public void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+        }
+
+        public List<Fragment> getFragmentList(){
+            return mFragmentList;
         }
 
         @Override

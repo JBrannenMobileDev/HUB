@@ -1,5 +1,8 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import java.util.List;
+
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -13,8 +16,10 @@ public class MessageRealm extends RealmObject{
     private String chatId;
     private String uid;
     private long createdDate;
+    private boolean savedToFirebase;
     private String messageContent;
     private String messageOwnerName;
+    private RealmList<String> readByUids;
 
     public MessageRealm(Message message) {
         if(message != null) {
@@ -24,10 +29,36 @@ public class MessageRealm extends RealmObject{
             this.createdDate = message.getCreatedDate();
             this.chatId = message.getChatId();
             this.messageOwnerName = message.getMessageOwnerName();
+            this.readByUids = createReadByUidList(message.getReadByUids());
+            this.savedToFirebase = message.isSavedToFirebase();
         }
     }
 
+    private RealmList<String> createReadByUidList(List<String> readByUids) {
+        RealmList<String> realmReadByUids = new RealmList<>();
+        for(String uid : readByUids){
+            realmReadByUids.add(uid);
+        }
+        return realmReadByUids;
+    }
+
     public MessageRealm() {
+    }
+
+    public boolean isSavedToFirebase() {
+        return savedToFirebase;
+    }
+
+    public void setSavedToFirebase(boolean savedToFirebase) {
+        this.savedToFirebase = savedToFirebase;
+    }
+
+    public RealmList<String> getReadByUids() {
+        return readByUids;
+    }
+
+    public void setReadByUids(RealmList<String> readByUids) {
+        this.readByUids = readByUids;
     }
 
     public String getMessageOwnerName() {

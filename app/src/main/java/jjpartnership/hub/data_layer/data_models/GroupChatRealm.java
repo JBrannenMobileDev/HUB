@@ -17,15 +17,17 @@ public class GroupChatRealm extends RealmObject{
     private RealmList<String> userIds;
     private MessageRealm mostRecentMessage;
     private long messageCreatedTime;
+    private RealmList<String> currentlyTypingUserNames;
 
     public GroupChatRealm() {
     }
 
-    public GroupChatRealm(String chatId, List<String> userIds, Message messages, long messageCreatedTime) {
+    public GroupChatRealm(String chatId, List<String> userIds, Message messages, long messageCreatedTime, List<String> currentlyTypingUserNames) {
         this.chatId = chatId;
         this.userIds = createUserIdList(userIds);
         this.mostRecentMessage = new MessageRealm(messages);
         this.messageCreatedTime = messageCreatedTime;
+        this.currentlyTypingUserNames = createCurrentlyTypingList(currentlyTypingUserNames);
     }
 
     public GroupChatRealm(GroupChat chat){
@@ -33,6 +35,19 @@ public class GroupChatRealm extends RealmObject{
         this.userIds = createUserIdList(chat.getUserIds());
         this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
         this.messageCreatedTime = chat.getMessageCreatedTime();
+        this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());
+    }
+
+    private RealmList<String> createCurrentlyTypingList(List<String> currentlyTypingUserNames) {
+        if(currentlyTypingUserNames != null) {
+            RealmList<String> realmCurrentlyTypingList = new RealmList<>();
+            for (String userName : currentlyTypingUserNames) {
+                realmCurrentlyTypingList.add(userName);
+            }
+            return realmCurrentlyTypingList;
+        }else{
+            return new RealmList<>();
+        }
     }
 
     private RealmList<String> createUserIdList(List<String> userIds) {
@@ -46,6 +61,14 @@ public class GroupChatRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public RealmList<String> getCurrentlyTypingUserNames() {
+        return currentlyTypingUserNames;
+    }
+
+    public void setCurrentlyTypingUserNames(RealmList<String> currentlyTypingUserNames) {
+        this.currentlyTypingUserNames = currentlyTypingUserNames;
     }
 
     public long getMessageCreatedTime() {

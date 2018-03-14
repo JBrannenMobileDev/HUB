@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.account_chat_activity;
+package jjpartnership.hub.view_layer.activities.account_chat_activity.cutomer_chat_fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,14 +12,14 @@ import jjpartnership.hub.R;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OnSalesChatFragmentInteractionListener} interface
+ * {@link CustomerChatFragment.OnCustomerChatInteractionListener} interface
  * to handle interaction events.
  */
-public class SalesAgentsFragment extends Fragment {
+public class CustomerChatFragment extends Fragment {
 
-    private OnSalesChatFragmentInteractionListener mListener;
+    private OnCustomerChatInteractionListener mListener;
 
-    public SalesAgentsFragment() {
+    public CustomerChatFragment() {
         // Required empty public constructor
     }
 
@@ -34,8 +34,8 @@ public class SalesAgentsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnSalesChatFragmentInteractionListener) {
-            mListener = (OnSalesChatFragmentInteractionListener) context;
+        if (context instanceof OnCustomerChatInteractionListener) {
+            mListener = (OnCustomerChatInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnSalesChatFragmentInteractionListener");
@@ -58,7 +58,7 @@ public class SalesAgentsFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnSalesChatFragmentInteractionListener {
+    public interface OnCustomerChatInteractionListener {
 
     }
 }
