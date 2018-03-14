@@ -29,7 +29,7 @@ import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        CustomerChatFragment.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener{
+        CustomerChatFragment.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener, AccountChatView{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
     @BindView(R.id.send_image_view)ImageView sendImage;
@@ -52,8 +52,13 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         getSupportActionBar().setElevation(0);
         setTitle(getIntent().getStringExtra("account_name"));
         accountId = getIntent().getStringExtra("account_id");
+        Bundle bundle = new Bundle();
+        bundle.putString("account_name", getIntent().getStringExtra("account_name"));
+        bundle.putString("account_id", getIntent().getStringExtra("account_id"));
         salesAgentFragment = new SalesAgentsFragment();
         customerChatFragment = new CustomerChatFragment();
+        salesAgentFragment.setArguments(bundle);
+        customerChatFragment.setArguments(bundle);
         adapter.addFragment(salesAgentFragment, "Sales Team");
         adapter.addFragment(customerChatFragment, "Account");
         pager.setAdapter(adapter);
@@ -207,6 +212,11 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
     }
 
+    @Override
+    public void resetUserInputSales() {
+        userInputSalesTeam.setText("");
+    }
+
     class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
@@ -228,10 +238,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         public void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
-        }
-
-        public List<Fragment> getFragmentList(){
-            return mFragmentList;
         }
 
         @Override

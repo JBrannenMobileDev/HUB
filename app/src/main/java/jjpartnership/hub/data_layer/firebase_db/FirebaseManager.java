@@ -18,6 +18,7 @@ import io.realm.RealmList;
 
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
+import jjpartnership.hub.data_layer.data_models.ChatMessages;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
@@ -45,7 +46,7 @@ public class FirebaseManager {
     private DatabaseReference directChatsReference;
     private DatabaseReference groupChatsReference;
     private DatabaseReference industriesReference;
-    private DatabaseReference userMessagesReference;
+    private DatabaseReference chatMessagesReference;
 
     private FirebaseDatabase database;
 
@@ -67,7 +68,7 @@ public class FirebaseManager {
         thisUserAccountsReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("accountIds");
         thisUserDirectMessagesReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("directChatIds");
         usersReference = database.getReference("users");
-        userMessagesReference = database.getReference("messages").child(UserPreferences.getInstance().getUid());
+        chatMessagesReference = database.getReference("chat_messages");
         companiesReference = database.getReference("companies");
         accountsReference = database.getReference("accounts");
         directChatsReference = database.getReference("direct_chats");
@@ -77,6 +78,7 @@ public class FirebaseManager {
     }
 
     private void initDataListeners() {
+        initChatMessagesListener();
         final ValueEventListener userAccountsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -204,7 +206,7 @@ public class FirebaseManager {
                         }
                         if (directChats.size() == currentUser.getDirectChatIds().size()) {
                             DataManager.getInstance().updateRealmDirectChats(directChats);
-                            fetchMessages();
+                            buildUiModels();
                         }
                     }
 
@@ -216,29 +218,9 @@ public class FirebaseManager {
                 directChatsReference.child(chatIds).addListenerForSingleValueEvent(chatListener);
             }
         }else{
-            fetchMessages();
+            buildUiModels();
             //TODO delete all directChats from realm
         }
-    }
-
-    private void fetchMessages() {
-        ValueEventListener messagesListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Message> allMessages = (List<Message>) dataSnapshot.getValue();
-                if(allMessages != null && allMessages.size() > 0){
-                    messages = allMessages;
-                    DataManager.getInstance().updateRealmMessages(messages);
-                }
-                buildUiModels();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        userMessagesReference.addListenerForSingleValueEvent(messagesListener);
     }
 
     private void buildUiModels() {
@@ -298,6 +280,34 @@ public class FirebaseManager {
 
     public void writeNewUser(User user) {
         usersReference.child(user.getUid()).setValue(user);
+    }
+
+    public void initChatMessagesListener(){
+        ValueEventListener messagesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+//                List<ChatMessages> chatMessages = (List<ChatMessages>) dataSnapshot.getValue();
+//                if(chatMessages != null && chatMessages.size() > 0){
+//                    for(ChatMessages chatMessageList : chatMessages) {
+//                        messages.addAll(chatMessageList.getChatMessages());
+//                    }
+//                    DataManager.getInstance().updateRealmMessages(messages);
+//                }
+//                buildUiModels();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        chatMessagesReference.addValueEventListener(messagesListener);
+    }
+
+    public void createNewMesage(Message newMessage) {
+        DatabaseReference messageRef = chatMessagesReference.child("chatId").push();
+        newMessage.setMessageId(messageRef.getKey());
+        chatMessagesReference.child(newMessage.getMessageId()).setValue(newMessage);
     }
 
     public void writeNewCompany(Company company){

@@ -9,6 +9,7 @@ import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.Message;
+import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
@@ -88,5 +89,10 @@ public class DataManager {
 
     public void updateRealmMainAccountsModel(MainAccountsModel accountsModel) {
         realmManager.updateMainAccountsModel(accountsModel);
+    }
+
+    public void createNewMessage(Message newMessage) {
+        realmManager.insertOrUpdateMessage(new MessageRealm(newMessage));
+        fbManager.createNewMesage(newMessage);
     }
 }

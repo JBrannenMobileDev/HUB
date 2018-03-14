@@ -126,4 +126,15 @@ public class RealmManager {
         });
         realm.close();
     }
+
+    public void insertOrUpdateMessage(final MessageRealm messageRealm) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(messageRealm);
+            }
+        });
+        realm.close();
+    }
 }

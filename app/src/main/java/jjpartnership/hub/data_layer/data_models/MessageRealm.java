@@ -11,10 +11,10 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class MessageRealm extends RealmObject{
-    @PrimaryKey
     private String messageId;
     private String chatId;
     private String uid;
+    @PrimaryKey
     private long createdDate;
     private boolean savedToFirebase;
     private String messageContent;

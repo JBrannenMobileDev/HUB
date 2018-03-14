@@ -10,12 +10,14 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.tuyenmonkey.mkloader.MKLoader;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.Message;
+import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
 
 /**
@@ -24,10 +26,10 @@ import jjpartnership.hub.utils.BaseCallback;
 
 public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRecyclerAdapter.ViewHolder> {
     private Context context;
-    private List<Message> dataModel;
-    private BaseCallback<Message> messageSelectedCallback;
+    private List<MessageRealm> dataModel;
+    private BaseCallback<MessageRealm> messageSelectedCallback;
 
-    public SalesAgentRecyclerAdapter(@NonNull Context context, List<Message> dataModel, BaseCallback<Message> messageSelectedCallback) {
+    public SalesAgentRecyclerAdapter(@NonNull Context context, List<MessageRealm> dataModel, BaseCallback<MessageRealm> messageSelectedCallback) {
         this.context = context;
         this.dataModel = dataModel;
         this.messageSelectedCallback = messageSelectedCallback;
@@ -40,6 +42,8 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         TextView timeDate;
         TextView messageContent;
         TextView userIcon;
+        MKLoader sendingMk;
+        TextView status;
         public ViewHolder(View v) {
             super(v);
             root = v.findViewById(R.id.message_frame_layout);
@@ -48,6 +52,8 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
             messageContent = v.findViewById(R.id.message_content_tv);
             userIcon = v.findViewById(R.id.user_icon_tv);
             nameDateTimeLayout = v.findViewById(R.id.name_date_time_layout);
+            sendingMk = v.findViewById(R.id.sending_animation_mk);
+            status = v.findViewById(R.id.status_tv);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -67,17 +73,23 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String previousMessageUid = dataModel.get(position - 1).getCreatedByUid();
-        String currentMessageUid = dataModel.get(position).getCreatedByUid();
-        if(previousMessageUid.equals(currentMessageUid)){
-            holder.userIcon.setVisibility(View.GONE);
-            holder.nameDateTimeLayout.setVisibility(View.GONE);
-        }else{
+        MessageRealm message = dataModel.get(position);
+        if(position == 0){
             holder.userIcon.setVisibility(View.VISIBLE);
             holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+        }else {
+            String previousMessageUid = dataModel.get(position - 1).getUid();
+            String currentMessageUid = dataModel.get(position).getUid();
+            if (previousMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position).getCreatedDate(), dataModel.get(position-1).getCreatedDate())) {
+                holder.userIcon.setVisibility(View.GONE);
+                holder.nameDateTimeLayout.setVisibility(View.GONE);
+            } else {
+                holder.userIcon.setVisibility(View.VISIBLE);
+                holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+            }
         }
+        setMessageStatus(holder, message);
 
-        Message message = dataModel.get(position);
         holder.userName.setText(message.getMessageOwnerName());
         if(message.getCreatedDate() != 0) {
             holder.timeDate.setText(createFormattedTime(message.getCreatedDate()));
@@ -89,17 +101,36 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         holder.userIcon.setText(String.valueOf(message.getMessageOwnerName().charAt(0)));
     }
 
+    private void setMessageStatus(ViewHolder holder, MessageRealm message){
+        if (message.isSavedToFirebase()) {
+            holder.sendingMk.setVisibility(View.GONE);
+            holder.status.setVisibility(View.VISIBLE);
+        }else{
+            holder.sendingMk.setVisibility(View.VISIBLE);
+            holder.status.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean isTimeSinceLastMessageGreaterThan4Min(long createdDate, long createdDatePrevious) {
+        long min_4 = 240000;
+        long timeLapsedInMilli = createdDate - createdDatePrevious;
+        if(timeLapsedInMilli > min_4){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public int getItemCount() {
         return dataModel.size();
     }
 
     private String createFormattedTime(long createdDate) {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("hh:mm aaa - MM/dd/yy");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("h:mm aaa - M/dd/yy");
         return dateFormatter.format(new Date(createdDate));
     }
 
-    public void OnDataSetChanged(List<Message> dataModel) {
+    public void OnDataSetChanged(List<MessageRealm> dataModel) {
         this.dataModel = dataModel;
     }
 }
