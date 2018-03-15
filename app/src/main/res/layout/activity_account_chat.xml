@@ -58,7 +58,13 @@
                 android:backgroundTint="@android:color/transparent"
                 android:hint="Message (Sales Team)"
                 android:paddingLeft="16dp"
-                android:textColorHint="@color/colorPrimaryLight" />
+                android:textColorHint="@color/colorPrimaryLight"
+                android:inputType="textMultiLine"
+                android:enabled="true"
+                android:minLines="1"
+                android:maxLines="4"
+                android:isScrollContainer="true"
+                android:focusable="true"/>
 
             <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
                 android:id="@+id/user_message_customer_et"
@@ -70,7 +76,13 @@
                 android:hint="Message (Account)"
                 android:paddingLeft="16dp"
                 android:textColorHint="@color/colorPrimaryLight"
-                android:visibility="gone" />
+                android:visibility="gone"
+                android:inputType="textMultiLine"
+                android:enabled="true"
+                android:minLines="1"
+                android:maxLines="4"
+                android:isScrollContainer="true"
+                android:focusable="true"/>
         </FrameLayout>
     </LinearLayout>
 

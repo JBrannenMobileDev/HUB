@@ -2,6 +2,7 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agen
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +22,7 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,6 +33,7 @@ import jjpartnership.hub.utils.BaseCallback;
 public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     @BindView(R.id.chat_empty_state)TextView emptyStateMessage;
     @BindView(R.id.chat_recycler_view)RecyclerView chatRecycler;
+    @BindView(R.id.fab)FloatingActionButton fab;
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
@@ -58,6 +61,31 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         chatRecycler.setLayoutManager(layoutManager);
         initAdapters();
         return v;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chatRecycler.smoothScrollToPosition(chatRecycler.getAdapter().getItemCount()-1);
+            }
+        });
+
+
+        chatRecycler.addOnScrollListener(
+                new HideShowScrollListener() {
+                    @Override
+                    public void onHide() {
+                        fab.hide();
+                    }
+
+                    @Override
+                    public void onShow() {
+                        fab.show();
+                    }
+                });
     }
 
     @Override
@@ -103,6 +131,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
 
     @Override
     public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm) {
+        //TODO sort messages by createdTime
         if(messagesRealm.size() > 0){
             emptyStateMessage.setVisibility(View.GONE);
         }else {

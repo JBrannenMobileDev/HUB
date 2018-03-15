@@ -4,25 +4,15 @@
     android:id="@+id/message_frame_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
+    android:layout_marginTop="32dp"
     android:background="?android:attr/selectableItemBackground">
-
-    <com.tuyenmonkey.mkloader.MKLoader
-        android:id="@+id/sending_animation_mk"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="right"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        app:mk_color="@color/colorPrimaryLight"
-        app:mk_type="Worm" />
 
     <TextView
         android:id="@+id/user_icon_tv"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="2dp"
         android:background="@drawable/rounded_rectangle_blue_sharp"
         android:gravity="center"
         android:text="C"
@@ -32,14 +22,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="14dp"
         android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/name_date_time_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="48dp"
+            android:layout_marginLeft="64dp"
             android:orientation="horizontal">
 
             <TextView
@@ -59,6 +48,13 @@
                 android:text="6:56AM - 03/13/18"
                 android:textColor="@color/colorPrimaryLight" />
 
+            <com.tuyenmonkey.mkloader.MKLoader
+                android:id="@+id/sending_animation_mk"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                app:mk_color="@color/colorPrimaryLight"
+                app:mk_type="Sharingan" />
+
             <TextView
                 android:id="@+id/status_tv"
                 android:layout_width="wrap_content"
@@ -77,7 +73,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="48dp"
+            android:layout_marginLeft="64dp"
             android:layout_marginRight="8dp"
             android:orientation="horizontal">
 
@@ -87,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:ellipsize="end"
-                android:text="Be the first to post a message! Be the first to post a message! Be the first to post a message! Be the first to post a message!"
+                android:text="Be the first to post a message!"
                 android:textColor="@android:color/black" />
         </LinearLayout>
     </LinearLayout>

@@ -6,6 +6,7 @@
     <color name="colorAccenttest">#3eb395</color>
     <color name="colorAccent">#43b3ab</color>
     <color name="colorOrange">#fc9c01</color>
+    <color name="colorRed">#fc1f1f</color>
     <color name="black_overlay">#66000000</color>
     <color name="boot_bg">#d08100</color>
     <color name="white">#ffffff</color>

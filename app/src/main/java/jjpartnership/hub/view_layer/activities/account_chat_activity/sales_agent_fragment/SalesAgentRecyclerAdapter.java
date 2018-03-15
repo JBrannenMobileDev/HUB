@@ -19,6 +19,7 @@ import java.util.List;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.DpUtil;
 
 /**
  * Created by Jonathan on 3/9/2018.
@@ -77,28 +78,52 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         if(position == 0){
             holder.userIcon.setVisibility(View.VISIBLE);
             holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+            if(message.getCreatedDate() != 0) {
+                holder.timeDate.setText(createFormattedTime(message.getCreatedDate(), 0));
+            }
+            setLayoutMargin(holder, 0, 8, 0, 0);
         }else {
             String previousMessageUid = dataModel.get(position - 1).getUid();
             String currentMessageUid = dataModel.get(position).getUid();
             if (previousMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position).getCreatedDate(), dataModel.get(position-1).getCreatedDate())) {
                 holder.userIcon.setVisibility(View.GONE);
                 holder.nameDateTimeLayout.setVisibility(View.GONE);
+                if(position == dataModel.size()-1){
+                    setLayoutMargin(holder, 0, 6, 0, 16);
+                }else{
+                    setLayoutMargin(holder, 0, 6, 0, 0);
+                }
             } else {
                 holder.userIcon.setVisibility(View.VISIBLE);
                 holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+                if(position == dataModel.size()-1){
+                    setLayoutMargin(holder, 0, 32, 0, 16);
+                }else{
+                    setLayoutMargin(holder, 0, 32, 0, 0);
+                }
+            }
+            if(message.getCreatedDate() != 0) {
+                holder.timeDate.setText(createFormattedTime(message.getCreatedDate(), dataModel.get(position - 1).getCreatedDate()));
             }
         }
         setMessageStatus(holder, message);
 
         holder.userName.setText(message.getMessageOwnerName());
-        if(message.getCreatedDate() != 0) {
-            holder.timeDate.setText(createFormattedTime(message.getCreatedDate()));
-        }
 
         if(message.getMessageContent() != null && !message.getMessageContent().isEmpty()) {
             holder.messageContent.setText(message.getMessageContent());
         }
         holder.userIcon.setText(String.valueOf(message.getMessageOwnerName().charAt(0)));
+    }
+
+    private void setLayoutMargin(ViewHolder holder, float leftDp, float topDp, float rightDp, float bottomDp){
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins((int)DpUtil.pxFromDp(context, leftDp), (int)DpUtil.pxFromDp(context, topDp),
+                (int)DpUtil.pxFromDp(context, rightDp), (int)DpUtil.pxFromDp(context, bottomDp));
+        holder.root.setLayoutParams(params);
     }
 
     private void setMessageStatus(ViewHolder holder, MessageRealm message){
@@ -125,9 +150,18 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         return dataModel.size();
     }
 
-    private String createFormattedTime(long createdDate) {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("h:mm aaa - M/dd/yy");
-        return dateFormatter.format(new Date(createdDate));
+    private String createFormattedTime(long createdDate, long previousCreatedDate) {
+        SimpleDateFormat timeDateFormat = new SimpleDateFormat("h:mm aaa - M/dd/yy");
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aaa");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("M/dd/yy");
+        if(previousCreatedDate > 0) {
+            String formattedCreatedDate = dateFormat.format(new Date(createdDate));
+            String formattedPreviousCreatedDate = dateFormat.format(new Date(previousCreatedDate));
+            if(formattedCreatedDate.equals(formattedPreviousCreatedDate)){
+                return timeFormat.format(new Date(createdDate));
+            }
+        }
+        return timeDateFormat.format(new Date(createdDate));
     }
 
     public void OnDataSetChanged(List<MessageRealm> dataModel) {
