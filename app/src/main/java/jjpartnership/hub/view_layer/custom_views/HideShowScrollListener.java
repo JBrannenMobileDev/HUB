@@ -16,13 +16,13 @@ public abstract class HideShowScrollListener extends RecyclerView.OnScrollListen
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
         if (scrolledDistance > HIDE_THRESHOLD && controlsVisible) {
-            onHide();
             controlsVisible = false;
             scrolledDistance = 0;
+            onHide();
         } else if (scrolledDistance < -HIDE_THRESHOLD && !controlsVisible) {
-            onShow();
             controlsVisible = true;
             scrolledDistance = 0;
+            onShow();
         }
 
         if ((controlsVisible && dy > 0) || (!controlsVisible && dy < 0)) {

@@ -1,5 +1,6 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,17 +18,22 @@ public class GroupChatRealm extends RealmObject{
     private RealmList<String> userIds;
     private MessageRealm mostRecentMessage;
     private long messageCreatedTime;
+    private String messageThreadId;
+    private RealmList<RequestRealm> customerRequests;
     private RealmList<String> currentlyTypingUserNames;
 
     public GroupChatRealm() {
     }
 
-    public GroupChatRealm(String chatId, List<String> userIds, Message messages, long messageCreatedTime, List<String> currentlyTypingUserNames) {
+    public GroupChatRealm(String chatId, List<String> userIds, Message messages, long messageCreatedTime,
+                          List<String> currentlyTypingUserNames, String messageThreadId, List<Request> requests) {
         this.chatId = chatId;
         this.userIds = createUserIdList(userIds);
         this.mostRecentMessage = new MessageRealm(messages);
         this.messageCreatedTime = messageCreatedTime;
         this.currentlyTypingUserNames = createCurrentlyTypingList(currentlyTypingUserNames);
+        this.messageThreadId = messageThreadId;
+        this.customerRequests = createCustomerRequsts(requests);
     }
 
     public GroupChatRealm(GroupChat chat){
@@ -36,6 +42,16 @@ public class GroupChatRealm extends RealmObject{
         this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
         this.messageCreatedTime = chat.getMessageCreatedTime();
         this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());
+        this.messageThreadId = chat.getMessageThreadId();
+        this.customerRequests = createCustomerRequsts(chat.getCustomerRequests());
+    }
+
+    private RealmList<RequestRealm> createCustomerRequsts(List<Request> requests){
+        RealmList<RequestRealm> realmRequests = new RealmList<>();
+        for(Request request : requests){
+            realmRequests.add(new RequestRealm(request));
+        }
+        return realmRequests;
     }
 
     private RealmList<String> createCurrentlyTypingList(List<String> currentlyTypingUserNames) {
@@ -61,6 +77,22 @@ public class GroupChatRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public RealmList<RequestRealm> getCustomerRequests() {
+        return customerRequests;
+    }
+
+    public void setCustomerRequests(RealmList<RequestRealm> customerRequests) {
+        this.customerRequests = customerRequests;
+    }
+
+    public String getMessageThreadId() {
+        return messageThreadId;
+    }
+
+    public void setMessageThreadId(String messageThreadId) {
+        this.messageThreadId = messageThreadId;
     }
 
     public RealmList<String> getCurrentlyTypingUserNames() {

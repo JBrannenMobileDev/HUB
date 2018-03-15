@@ -12,17 +12,19 @@ public class AccountRealm extends RealmObject{
     private String accountIdFire;
     private String companySalesId;
     private String companyCustomerId;
-    private String groupChatId;
+    private String groupChatSalesId;
+    private String groupChatCustomerId;
     private String accountId;
 
     public AccountRealm() {
     }
 
-    public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId, String accountId) {
+    public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId, String groupChatCustomerId, String accountId) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
-        this.groupChatId = groupChatId;
+        this.groupChatSalesId = groupChatId;
+        this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
     }
 
@@ -30,8 +32,17 @@ public class AccountRealm extends RealmObject{
         this.accountIdFire = account.getAccountIdFire();
         this.companySalesId = account.getCompanySalesId();
         this.companyCustomerId = account.getCompanyCustomerId();
-        this.groupChatId = account.getGroupChatId();
+        this.groupChatSalesId = account.getGroupChatSalesId();
         this.accountId = account.getAccountId();
+        this.groupChatCustomerId = account.getGroupChatCustomerId();
+    }
+
+    public String getGroupChatCustomerId() {
+        return groupChatCustomerId;
+    }
+
+    public void setGroupChatCustomerId(String groupChatCustomerId) {
+        this.groupChatCustomerId = groupChatCustomerId;
     }
 
     public String getAccountIdFire() {
@@ -58,12 +69,12 @@ public class AccountRealm extends RealmObject{
         this.companyCustomerId = companyCustomerId;
     }
 
-    public String getGroupChatId() {
-        return groupChatId;
+    public String getGroupChatSalesId() {
+        return groupChatSalesId;
     }
 
-    public void setGroupChatId(String groupChatId) {
-        this.groupChatId = groupChatId;
+    public void setGroupChatSalesId(String groupChatSalesId) {
+        this.groupChatSalesId = groupChatSalesId;
     }
 
     public String getAccountId() {

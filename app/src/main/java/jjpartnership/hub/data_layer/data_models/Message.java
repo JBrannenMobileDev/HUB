@@ -10,6 +10,7 @@ public class Message{
     private String messageId;
     private String chatId;
     private String createdByUid;
+    private String messageThreadId;
     private long createdDate;
     private boolean savedToFirebase;
     private String messageContent;
@@ -28,6 +29,15 @@ public class Message{
         this.messageOwnerName = realmMessage.getMessageOwnerName();
         this.readByUids = realmMessage.getReadByUids();
         this.savedToFirebase = realmMessage.isSavedToFirebase();
+        this.messageThreadId = realmMessage.getMessageThreadId();
+    }
+
+    public String getMessageThreadId() {
+        return messageThreadId;
+    }
+
+    public void setMessageThreadId(String messageThreadId) {
+        this.messageThreadId = messageThreadId;
     }
 
     public boolean isSavedToFirebase() {

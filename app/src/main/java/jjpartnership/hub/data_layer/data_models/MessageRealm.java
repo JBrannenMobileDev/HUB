@@ -14,6 +14,7 @@ public class MessageRealm extends RealmObject{
     private String messageId;
     private String chatId;
     private String uid;
+    private String messageThreadId;
     @PrimaryKey
     private long createdDate;
     private boolean savedToFirebase;
@@ -31,6 +32,7 @@ public class MessageRealm extends RealmObject{
             this.messageOwnerName = message.getMessageOwnerName();
             this.readByUids = createReadByUidList(message.getReadByUids());
             this.savedToFirebase = message.isSavedToFirebase();
+            this.messageThreadId = message.getMessageThreadId();
         }
     }
 
@@ -43,6 +45,14 @@ public class MessageRealm extends RealmObject{
     }
 
     public MessageRealm() {
+    }
+
+    public String getMessageThreadId() {
+        return messageThreadId;
+    }
+
+    public void setMessageThreadId(String messageThreadId) {
+        this.messageThreadId = messageThreadId;
     }
 
     public boolean isSavedToFirebase() {

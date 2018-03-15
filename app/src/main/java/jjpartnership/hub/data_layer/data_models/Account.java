@@ -9,16 +9,19 @@ public class Account {
     private String accountId;
     private String companySalesId;
     private String companyCustomerId;
-    private String groupChatId;
+    private String groupChatSalesId;
+    private String groupChatCustomerId;
 
     public Account() {
     }
 
-    public Account(String accountIdFire, String companyIdA, String companyIdB, String groupChatId, String accountId) {
+    public Account(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
+                   String groupChatCustomerId, String accountId) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
-        this.groupChatId = groupChatId;
+        this.groupChatSalesId = groupChatId;
+        this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
     }
 
@@ -26,8 +29,17 @@ public class Account {
         this.accountIdFire = accountRealm.getAccountIdFire();
         this.companySalesId = accountRealm.getCompanySalesId();
         this.companyCustomerId = accountRealm.getCompanyCustomerId();
-        this.groupChatId = accountRealm.getGroupChatId();
+        this.groupChatSalesId = accountRealm.getGroupChatSalesId();
         this.accountId = accountRealm.getAccountId();
+        this.groupChatCustomerId = accountRealm.getGroupChatCustomerId();
+    }
+
+    public String getGroupChatCustomerId() {
+        return groupChatCustomerId;
+    }
+
+    public void setGroupChatCustomerId(String groupChatCustomerId) {
+        this.groupChatCustomerId = groupChatCustomerId;
     }
 
     public String getAccountId() {
@@ -62,11 +74,11 @@ public class Account {
         this.companyCustomerId = companyCustomerId;
     }
 
-    public String getGroupChatId() {
-        return groupChatId;
+    public String getGroupChatSalesId() {
+        return groupChatSalesId;
     }
 
-    public void setGroupChatId(String groupChatId) {
-        this.groupChatId = groupChatId;
+    public void setGroupChatSalesId(String groupChatSalesId) {
+        this.groupChatSalesId = groupChatSalesId;
     }
 }

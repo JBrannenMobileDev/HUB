@@ -18,7 +18,7 @@ import io.realm.RealmList;
 
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
-import jjpartnership.hub.data_layer.data_models.ChatMessages;
+import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
@@ -190,7 +190,7 @@ public class FirebaseManager {
 
                 }
             };
-            groupChatsReference.child(account.getGroupChatId()).addListenerForSingleValueEvent(groupChatListener);
+            groupChatsReference.child(account.getGroupChatSalesId()).addListenerForSingleValueEvent(groupChatListener);
         }
     }
 
@@ -234,7 +234,7 @@ public class FirebaseManager {
 
         for(int i = 0; i < accounts.size(); i++){
             company = getAccountCompany(accounts.get(i));
-            groupChat = getGroupChat(accounts.get(i).getGroupChatId());
+            groupChat = getGroupChat(accounts.get(i).getGroupChatSalesId());
 
             rowItems.get(i).setAccountName(company.getName());
             rowItems.get(i).setAccountId(accounts.get(i).getAccountId());
@@ -305,9 +305,9 @@ public class FirebaseManager {
     }
 
     public void createNewMesage(Message newMessage) {
-        DatabaseReference messageRef = chatMessagesReference.child("chatId").push();
+        DatabaseReference messageRef = chatMessagesReference.child(newMessage.getMessageThreadId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
-        chatMessagesReference.child(newMessage.getMessageId()).setValue(newMessage);
+        chatMessagesReference.child(newMessage.getMessageThreadId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
     }
 
     public void writeNewCompany(Company company){
@@ -419,6 +419,7 @@ public class FirebaseManager {
         salesCompany.addIndustry("Pharma and Biotechnology");
         salesCompany.addIndustry("Chemical");
         salesCompany.setSalesCompany(true);
+        salesCompany.setBuyerCompany(false);
 
         DatabaseReference newCompARef = companiesReference.push();
         Company customerCompanyA = new Company();
@@ -427,6 +428,7 @@ public class FirebaseManager {
         customerCompanyA.setCompanyEmailDomain("@gmail.com");
         customerCompanyA.setCompanyId(newCompARef.getKey());
         customerCompanyA.setSalesCompany(false);
+        customerCompanyA.setBuyerCompany(true);
         customerCompanyA.addIndustry("Academia, Sciences and Education");
         industriesReference.push().setValue("Academia, Sciences and Education");
         Account accountA = createNewAccount(salesCompany, customerCompanyA, "700023611");
@@ -439,6 +441,7 @@ public class FirebaseManager {
         customerCompanyB.setCompanyEmailDomain("@gmail.com");
         customerCompanyB.setCompanyId(newCompBRef.getKey());
         customerCompanyB.setSalesCompany(false);
+        customerCompanyB.setBuyerCompany(true);
         customerCompanyB.addIndustry("Testing Labs and Health Institutes");
         industriesReference.push().setValue("Testing Labs and Health Institutes");
         Account accountB = createNewAccount(salesCompany, customerCompanyB, "700031434");
@@ -451,6 +454,7 @@ public class FirebaseManager {
         customerCompanyC.setCompanyEmailDomain("@gmail.com");
         customerCompanyC.setCompanyId(newCompCRef.getKey());
         customerCompanyC.setSalesCompany(false);
+        customerCompanyC.setBuyerCompany(true);
         customerCompanyC.addIndustry("Pharma and Biotechnology");
         industriesReference.push().setValue("Pharma and Biotechnology");
         Account accountC = createNewAccount(salesCompany, customerCompanyC, "700019967");
@@ -463,6 +467,7 @@ public class FirebaseManager {
         customerCompanyD.setCompanyEmailDomain("@gmail.com");
         customerCompanyD.setCompanyId(newCompDRef.getKey());
         customerCompanyD.setSalesCompany(false);
+        customerCompanyD.setBuyerCompany(true);
         customerCompanyD.addIndustry("Chemical");
         industriesReference.push().setValue("Chemical");
         Account accountD = createNewAccount(salesCompany, customerCompanyD, "700010532");
@@ -614,9 +619,9 @@ public class FirebaseManager {
         User salesUser5 = new User();
         salesUser5.setUid(newUser5Ref.getKey());
         salesUser5.setCompanyId(salesCompany.getCompanyId());
-        salesUser5.setEmail("APowers@gmail.com");
-        salesUser5.setFirstName("Austin");
-        salesUser5.setLastName("Powers");
+        salesUser5.setEmail("shawnamccollom@yahoo.com");
+        salesUser5.setFirstName("Shawna");
+        salesUser5.setLastName("Brannen");
         salesUser5.setPhoneNumber("4543342409");
         salesUser5.setUserType("sales_agent");
         salesUser5.setRole("sales_lvl_1");
@@ -638,9 +643,27 @@ public class FirebaseManager {
         DatabaseReference newGroupChatRef = groupChatsReference.push();
         GroupChat groupChat = new GroupChat();
         groupChat.setChatId(newGroupChatRef.getKey());
+        DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
+        MessageThread thread = new MessageThread();
+        thread.setMessageThreadId(newMessageThreadRef.getKey());
+        thread.setChatId(groupChat.getChatId());
+        database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
+        groupChat.setMessageThreadId(thread.getMessageThreadId());
         groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
 
-        account.setGroupChatId(groupChat.getChatId());
+        DatabaseReference newGroupChatCustomerRef = groupChatsReference.push();
+        GroupChat groupChatCustomer = new GroupChat();
+        groupChatCustomer.setChatId(newGroupChatCustomerRef.getKey());
+        DatabaseReference newMessageThreadSalesRef = database.getReference().child("messages").push();
+        MessageThread threadSales = new MessageThread();
+        threadSales.setMessageThreadId(newMessageThreadSalesRef.getKey());
+        threadSales.setChatId(groupChat.getChatId());
+        database.getReference().child("messages").child(threadSales.getMessageThreadId()).setValue(threadSales);
+        groupChat.setMessageThreadId(threadSales.getMessageThreadId());
+        groupChatsReference.child(groupChatCustomer.getChatId()).setValue(groupChatCustomer);
+
+        account.setGroupChatSalesId(groupChat.getChatId());
+        account.setGroupChatCustomerId(groupChatCustomer.getChatId());
         accountsReference.child(account.getAccountIdFire()).setValue(account);
 
         List<String> accountIdList = new ArrayList<>();
