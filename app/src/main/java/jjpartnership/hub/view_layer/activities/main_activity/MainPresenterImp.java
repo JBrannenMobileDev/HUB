@@ -33,10 +33,11 @@ public class MainPresenterImp implements MainPresenter {
             dataModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
                 @Override
                 public void onChange(MainAccountsModel updatedModel) {
-                    activity.onAccountModelReceived(updatedModel);
+                    if(updatedModel.isValid()) activity.onAccountModelReceived(realm.copyFromRealm(updatedModel));
                 }
             });
-            activity.onAccountModelReceived(dataModel);
+
+            if(dataModel.isValid()) activity.onAccountModelReceived(realm.copyFromRealm(dataModel));
         }
 
     }

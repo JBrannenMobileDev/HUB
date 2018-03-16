@@ -47,11 +47,15 @@ public class GroupChatRealm extends RealmObject{
     }
 
     private RealmList<RequestRealm> createCustomerRequsts(List<Request> requests){
-        RealmList<RequestRealm> realmRequests = new RealmList<>();
-        for(Request request : requests){
-            realmRequests.add(new RequestRealm(request));
+        if(requests != null) {
+            RealmList<RequestRealm> realmRequests = new RealmList<>();
+            for (Request request : requests) {
+                realmRequests.add(new RequestRealm(request));
+            }
+            return realmRequests;
+        }else{
+            return new RealmList<>();
         }
-        return realmRequests;
     }
 
     private RealmList<String> createCurrentlyTypingList(List<String> currentlyTypingUserNames) {

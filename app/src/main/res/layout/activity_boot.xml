@@ -64,9 +64,9 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="87dp"
         android:capitalize="characters"
-        android:text="HUB"
+        android:text="ClickField"
         android:textColor="@android:color/background_light"
-        android:textSize="64sp"
+        android:textSize="56dp"
         android:textStyle="bold" />
 
     <LinearLayout

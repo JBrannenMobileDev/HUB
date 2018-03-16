@@ -1,19 +1,22 @@
 package jjpartnership.hub.data_layer.data_models;
 
-import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Jonathan on 3/13/2018.
  */
 
 public class ChatMessages {
-    private List<Message> chatMessages;
+    private Map<String, Message> messages;
 
-    public List<Message> getChatMessages() {
-        return chatMessages;
+    public ChatMessages() {
     }
 
-    public void setChatMessages(List<Message> chatMessages) {
-        this.chatMessages = chatMessages;
+    public Map<String, Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Map<String, Message> messages) {
+        this.messages = messages;
     }
 }

@@ -1,12 +1,13 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by Jonathan on 3/15/2018.
  */
 
-public class RequestRealm {
+public class RequestRealm extends RealmObject{
     @PrimaryKey
     private String requestId;
     private boolean requestFullfilled;
@@ -35,7 +36,7 @@ public class RequestRealm {
         this.requestId = requestId;
     }
 
-    public boolean isRequestFullfilled() {
+    public Boolean isRequestFullfilled() {
         return requestFullfilled;
     }
 

@@ -62,8 +62,7 @@
                 android:layout_gravity="bottom"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
-                android:layout_weight="1"
-                android:text="sent"
+                android:text="✓"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/colorPrimaryLight"
                 android:visibility="gone" />

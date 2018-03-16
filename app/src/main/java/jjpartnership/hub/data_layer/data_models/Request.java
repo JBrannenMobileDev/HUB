@@ -32,7 +32,7 @@ public class Request {
         this.requestId = requestId;
     }
 
-    public boolean isRequestFullfilled() {
+    public Boolean isRequestFullfilled() {
         return requestFullfilled;
     }
 

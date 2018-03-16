@@ -2,6 +2,7 @@ package jjpartnership.hub.data_layer.firebase_db;
 
 import android.util.Log;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,6 +19,7 @@ import io.realm.RealmList;
 
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
+import jjpartnership.hub.data_layer.data_models.ChatMessages;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
@@ -286,14 +288,16 @@ public class FirebaseManager {
         ValueEventListener messagesListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-//                List<ChatMessages> chatMessages = (List<ChatMessages>) dataSnapshot.getValue();
-//                if(chatMessages != null && chatMessages.size() > 0){
-//                    for(ChatMessages chatMessageList : chatMessages) {
-//                        messages.addAll(chatMessageList.getChatMessages());
-//                    }
-//                    DataManager.getInstance().updateRealmMessages(messages);
-//                }
-//                buildUiModels();
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    ChatMessages chatMessage = postSnapshot.getValue(ChatMessages.class);
+                    if(chatMessage.getMessages() != null) {
+                        messages.addAll(chatMessage.getMessages().values());
+                    }
+                }
+                for(Message message : messages){
+                    message.setSavedToFirebase(true);
+                }
+                DataManager.getInstance().updateRealmMessages(messages);
             }
 
             @Override
@@ -301,7 +305,47 @@ public class FirebaseManager {
 
             }
         };
-        chatMessagesReference.addValueEventListener(messagesListener);
+        chatMessagesReference.addListenerForSingleValueEvent(messagesListener);
+
+        ChildEventListener chatMessageChildListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                ChatMessages chatMessages = dataSnapshot.getValue(ChatMessages.class);
+                messages = new ArrayList<>();
+                messages.addAll(chatMessages.getMessages().values());
+                for(Message message : messages){
+                    message.setSavedToFirebase(true);
+                }
+                DataManager.getInstance().updateRealmMessages(messages);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                ChatMessages chatMessages = dataSnapshot.getValue(ChatMessages.class);
+                messages = new ArrayList<>();
+                messages.addAll(chatMessages.getMessages().values());
+                for(Message message : messages){
+                    message.setSavedToFirebase(true);
+                }
+                DataManager.getInstance().updateRealmMessages(messages);
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        chatMessagesReference.addChildEventListener(chatMessageChildListener);
     }
 
     public void createNewMesage(Message newMessage) {
