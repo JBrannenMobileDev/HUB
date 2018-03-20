@@ -43,6 +43,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.facebook.shimmer:shimmer:0.1.0@aar'
     compile 'com.tuyenmonkey:mkloader:1.4.0'
+    compile 'io.realm:android-adapters:2.1.1'
     implementation files('libs/activation.jar')
 }
 

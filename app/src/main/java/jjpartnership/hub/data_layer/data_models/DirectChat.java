@@ -14,32 +14,65 @@ public class DirectChat {
     private String chatId;
     private String userIdA;
     private String userIdB;
-    private List<Message> messages;
+    private Message mostRecentMessage;
+    private long messageCreatedTime;
+    private String messageThreadId;
+    private List<String> currentlyTypingUserNames;
 
     public DirectChat() {
     }
 
-    public DirectChat(String chatId, String userIdA, String userIdB, List<Message> messages) {
+    public DirectChat(String chatId, String userIdA, String userIdB, List<String> currentlyTypingUserNames,
+                      Message mostRecentMessage, long messageCreatedTime, String messageThreadId) {
         this.chatId = chatId;
         this.userIdA = userIdA;
         this.userIdB = userIdB;
-        this.messages = messages;
+        this.currentlyTypingUserNames = currentlyTypingUserNames;
+        this.mostRecentMessage = mostRecentMessage;
+        this.messageCreatedTime = messageCreatedTime;
+        this.messageThreadId = messageThreadId;
     }
 
     public DirectChat(DirectChatRealm realm){
         this.chatId = realm.getChatId();
         this.userIdA = realm.getUserIdA();
         this.userIdB = realm.getUserIdB();
-        this.messages = createMessageList(realm.getMessages());
+        this.currentlyTypingUserNames = realm.getCurrentlyTypingUserNames();
+        this.mostRecentMessage = new Message(realm.getMostRecentMessage());
+        this.messageCreatedTime = realm.getMessageCreatedTime();
+        this.messageThreadId = realm.getMessageThreadId();
     }
 
-    private List<Message> createMessageList(RealmList<MessageRealm> messagesRealm) {
-        List<Message> messageList = new ArrayList<>();
-        for(MessageRealm messageRealm : messagesRealm){
-            messageList.add(new Message(messageRealm));
-        }
-        Collections.reverse(messageList);
-        return messageList;
+    public Message getMostRecentMessage() {
+        return mostRecentMessage;
+    }
+
+    public void setMostRecentMessage(Message mostRecentMessage) {
+        this.mostRecentMessage = mostRecentMessage;
+    }
+
+    public long getMessageCreatedTime() {
+        return messageCreatedTime;
+    }
+
+    public void setMessageCreatedTime(long messageCreatedTime) {
+        this.messageCreatedTime = messageCreatedTime;
+    }
+
+    public String getMessageThreadId() {
+        return messageThreadId;
+    }
+
+    public void setMessageThreadId(String messageThreadId) {
+        this.messageThreadId = messageThreadId;
+    }
+
+    public List<String> getCurrentlyTypingUserNames() {
+        return currentlyTypingUserNames;
+    }
+
+    public void setCurrentlyTypingUserNames(List<String> currentlyTypingUserNames) {
+        this.currentlyTypingUserNames = currentlyTypingUserNames;
     }
 
     public String getChatId() {
@@ -66,11 +99,4 @@ public class DirectChat {
         this.userIdB = userIdB;
     }
 
-    public List<Message> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(List<Message> messages) {
-        this.messages = messages;
-    }
 }

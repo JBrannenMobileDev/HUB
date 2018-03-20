@@ -1,6 +1,5 @@
 package jjpartnership.hub.data_layer.data_models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -25,6 +24,7 @@ public class UserRealm extends RealmObject{
     private String businessUnit;
     private String role;
     private String userType;
+    private int userColor;
     private RealmList<String> directChatIds;
     private RealmList<String> accountIds;
 
@@ -33,7 +33,7 @@ public class UserRealm extends RealmObject{
 
     public UserRealm(String uid, String email, String phoneNumber, String firstName, String lastName,
                      String companyId, String businessUnit, String role, String userType,
-                     RealmList<String> directChatIds, RealmList<String> accountIds) {
+                     RealmList<String> directChatIds, RealmList<String> accountIds, int userColor) {
         this.uid = uid;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -45,6 +45,7 @@ public class UserRealm extends RealmObject{
         this.userType = userType;
         this.directChatIds = directChatIds;
         this.accountIds = accountIds;
+        this.userColor = userColor;
     }
 
     public UserRealm(User user) {
@@ -59,6 +60,7 @@ public class UserRealm extends RealmObject{
         this.userType = user.getUserType();
         this.directChatIds = createDirectChats(user.getDirectChatIds());
         this.accountIds = createAccountIdList(user.getAccountIds());
+        this.userColor = user.getUserColor();
     }
 
     private RealmList<String> createAccountIdList(List<String> accountIds) {
@@ -83,6 +85,14 @@ public class UserRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public int getUserColor() {
+        return userColor;
+    }
+
+    public void setUserColor(int userColor) {
+        this.userColor = userColor;
     }
 
     public String getUid() {

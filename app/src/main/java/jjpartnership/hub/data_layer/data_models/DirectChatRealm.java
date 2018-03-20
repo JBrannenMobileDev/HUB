@@ -16,36 +16,77 @@ public class DirectChatRealm extends RealmObject{
     private String chatId;
     private String userIdA;
     private String userIdB;
-    private RealmList<MessageRealm> messages;
+    private MessageRealm mostRecentMessage;
+    private long messageCreatedTime;
+    private String messageThreadId;
+    private RealmList<String> currentlyTypingUserNames;
 
     public DirectChatRealm() {
     }
 
-    public DirectChatRealm(String chatId, String userIdA, String userIdB, List<Message> messages) {
+    public DirectChatRealm(String chatId, String userIdA, String userIdB, RealmList<String> currentlyTypingUserNames,
+                           MessageRealm mostRecentMessage, long messageCreatedTime, String messageThreadId) {
         this.chatId = chatId;
         this.userIdA = userIdA;
         this.userIdB = userIdB;
-        this.messages = createMessageList(messages);
+        this.currentlyTypingUserNames = currentlyTypingUserNames;
+        this.mostRecentMessage = mostRecentMessage;
+        this.messageCreatedTime = messageCreatedTime;
+        this.messageThreadId = messageThreadId;
     }
 
     public DirectChatRealm(DirectChat chat){
         this.chatId = chat.getChatId();
         this.userIdA = chat.getUserIdA();
         this.userIdB = chat.getUserIdB();
-        this.messages = createMessageList(chat.getMessages());
+        this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());
+        this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
+        this.messageCreatedTime = chat.getMessageCreatedTime();
+        this.messageThreadId = chat.getMessageThreadId();
     }
 
-    private RealmList<MessageRealm> createMessageList(List<Message> messages) {
-        if(messages != null) {
-            RealmList<MessageRealm> messagesRealm = new RealmList<>();
-            for (Message message : messages) {
-                messagesRealm.add(new MessageRealm(message));
+    private RealmList<String> createCurrentlyTypingList(List<String> currentlyTypingUserNames) {
+        if(currentlyTypingUserNames != null) {
+            RealmList<String> realmCurrentlyTypingList = new RealmList<>();
+            for (String userName : currentlyTypingUserNames) {
+                realmCurrentlyTypingList.add(userName);
             }
-            Collections.reverse(messagesRealm);
-            return messagesRealm;
+            return realmCurrentlyTypingList;
         }else{
             return new RealmList<>();
         }
+    }
+
+    public MessageRealm getMostRecentMessage() {
+        return mostRecentMessage;
+    }
+
+    public void setMostRecentMessage(MessageRealm mostRecentMessage) {
+        this.mostRecentMessage = mostRecentMessage;
+    }
+
+    public long getMessageCreatedTime() {
+        return messageCreatedTime;
+    }
+
+    public void setMessageCreatedTime(long messageCreatedTime) {
+        this.messageCreatedTime = messageCreatedTime;
+    }
+
+    public String getMessageThreadId() {
+        return messageThreadId;
+    }
+
+    public void setMessageThreadId(String messageThreadId) {
+        this.messageThreadId = messageThreadId;
+    }
+
+    public RealmList<String> getCurrentlyTypingUserNames() {
+        return currentlyTypingUserNames;
+    }
+
+    public void setCurrentlyTypingUserNames(RealmList<String> currentlyTypingUserNames) {
+        this.currentlyTypingUserNames = currentlyTypingUserNames;
     }
 
     public String getChatId() {
@@ -70,13 +111,5 @@ public class DirectChatRealm extends RealmObject{
 
     public void setUserIdB(String userIdB) {
         this.userIdB = userIdB;
-    }
-
-    public RealmList<MessageRealm> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(RealmList<MessageRealm> messages) {
-        this.messages = messages;
     }
 }

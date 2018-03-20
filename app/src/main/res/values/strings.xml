@@ -6,7 +6,7 @@
 
     <string name="action_settings">Settings</string>
 
-    <string name="title_activity_boot">Hub</string>
+    <string name="title_activity_boot">ClickField</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
@@ -93,5 +93,4 @@
     <string name="customer_chat_empty_state_message">Group chat for the Account. Account reps and sales agents can see this conversation.</string>
     <string name="sales_agent_welcome_message">ClickField is a messaging application that connects sales agents to their teams and to their customers. You can keep everyone in the loop, share leads with your sales team and respond instantly to your customers\' inquiries.</string>
     <string name="customer_welcome_message">ClickField is a messaging application that connects you to your sales reps. Find out the correct sales rep for your needs in minutes!</string>
-
 </resources>

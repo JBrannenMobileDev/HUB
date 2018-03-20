@@ -4,14 +4,13 @@ import java.util.List;
 
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.Company;
-import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.User;
-import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
 import jjpartnership.hub.data_layer.realm_db.RealmManager;
 import jjpartnership.hub.utils.BaseCallback;
@@ -41,6 +40,10 @@ public class DataManager {
 
     public void initializeDbData(){
         fbManager.loadCompaniesToFirebase();
+    }
+
+    public void syncFirebaseToRealmDb(){
+        fbManager.initDataListeners();
     }
 
     public void createNewUser(String uid, String email){
@@ -87,12 +90,24 @@ public class DataManager {
         realmManager.updateRealmMessages(messages);
     }
 
-    public void updateRealmMainAccountsModel(MainAccountsModel accountsModel) {
-        realmManager.updateMainAccountsModel(accountsModel);
+    public void updateRealmMessage(Message message) {
+        realmManager.updateRealmMessage(message);
+    }
+
+    public void updateRealmMainModels(MainAccountsModel accountsModel, MainRecentModel recentModel) {
+        realmManager.updateMainAccountsModel(accountsModel, recentModel);
     }
 
     public void createNewMessage(Message newMessage) {
         realmManager.insertOrUpdateMessage(new MessageRealm(newMessage));
         fbManager.createNewMesage(newMessage);
+    }
+
+    public void clearRealmData() {
+        realmManager.nukeDb();
+    }
+
+    public void setFreshInstallCallback(BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback) {
+        realmManager.setFreshInstallCallback(freshInstallDataLoadedToRealmCallback);
     }
 }

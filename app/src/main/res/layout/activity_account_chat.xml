@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:background="?attr/colorPrimary"
+        android:elevation="4dp"
         android:minHeight="?attr/actionBarSize"
         app:tabGravity="fill"
         app:tabMode="fixed"
@@ -56,15 +57,15 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="45dp"
                 android:backgroundTint="@android:color/transparent"
-                android:hint="Message (Sales Team)"
-                android:paddingLeft="16dp"
-                android:textColorHint="@color/colorPrimaryLight"
-                android:inputType="textMultiLine"
                 android:enabled="true"
-                android:minLines="1"
-                android:maxLines="4"
+                android:focusable="true"
+                android:hint="Message (Sales Team)"
+                android:inputType="textCapSentences|textMultiLine"
                 android:isScrollContainer="true"
-                android:focusable="true"/>
+                android:maxLines="4"
+                android:minLines="1"
+                android:paddingLeft="16dp"
+                android:textColorHint="@color/colorPrimaryLight" />
 
             <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
                 android:id="@+id/user_message_customer_et"
@@ -73,16 +74,16 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="45dp"
                 android:backgroundTint="@android:color/transparent"
+                android:enabled="true"
+                android:focusable="true"
                 android:hint="Message (Account)"
+                android:inputType="textCapSentences|textMultiLine"
+                android:isScrollContainer="true"
+                android:maxLines="4"
+                android:minLines="1"
                 android:paddingLeft="16dp"
                 android:textColorHint="@color/colorPrimaryLight"
-                android:visibility="gone"
-                android:inputType="textMultiLine"
-                android:enabled="true"
-                android:minLines="1"
-                android:maxLines="4"
-                android:isScrollContainer="true"
-                android:focusable="true"/>
+                android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
 

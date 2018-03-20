@@ -1,12 +1,14 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 
 /**
  * Created by jbrannen on 2/23/18.
  */
 
-public class Message{
+public class Message implements Comparable<Message>{
     private String messageId;
     private String chatId;
     private String createdByUid;
@@ -30,6 +32,11 @@ public class Message{
         this.readByUids = realmMessage.getReadByUids();
         this.savedToFirebase = realmMessage.isSavedToFirebase();
         this.messageThreadId = realmMessage.getMessageThreadId();
+    }
+
+    @Override
+    public int compareTo(@NonNull Message message) {
+        return (int) (this.createdDate - message.getCreatedDate());
     }
 
     public String getMessageThreadId() {

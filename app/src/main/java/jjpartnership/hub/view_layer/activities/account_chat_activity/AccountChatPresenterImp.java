@@ -12,7 +12,6 @@ public class AccountChatPresenterImp implements AccountChatPresenter {
 
     public AccountChatPresenterImp(AccountChatView activity) {
         this.activity = activity;
-        realm = Realm.getDefaultInstance();
         initDataListeners();
     }
 

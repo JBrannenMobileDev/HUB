@@ -9,7 +9,7 @@ import jjpartnership.hub.data_layer.data_models.MainRecentModel;
  */
 
 public interface MainView {
-    void onRecentModelREceived(MainRecentModel recentModel);
+    void onRecentModelReceived(MainRecentModel recentModel);
     void onAccountModelReceived(MainAccountsModel updatedModel);
     void onDirectMessagesModelReceived(MainDirectMessagesModel directModel);
     void setWelcomeMessage(String typeCustomer);

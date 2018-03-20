@@ -31,12 +31,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.Realm;
-import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
-import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
+import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.StringValidationUtil;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.create_customer_account_activity.CustomerAccountDetailsActivity;
@@ -79,6 +78,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
         ButterKnife.bind(this);
         hideStatusBar();
         Realm.init(getApplicationContext());
+        RealmUISingleton.getInstance().initRealmInstance();
         UserPreferences.getInstance().setContext(getApplicationContext());
         mAuth = FirebaseAuth.getInstance();
         mPasswordField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -147,7 +147,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                 hideLoadingState();
                 if(uid != null) {
                     if(currentUser.isEmailVerified()) {
-                        UserPreferences.getInstance().setUid(uid);
                         launchNextActivity(currentUser);
                     }else{
                         bootLoadingLayout.setVisibility(View.GONE);
@@ -333,6 +332,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
 
     private void launchNextActivity(FirebaseUser user) {
         if(user.isEmailVerified()) {
+            DataManager.getInstance().syncFirebaseToRealmDb();
             currentUser = mAuth.getCurrentUser();
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }else{

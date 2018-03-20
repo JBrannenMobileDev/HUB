@@ -32,6 +32,12 @@ public class CustomerChatFragment extends Fragment {
     }
 
     @Override
+    public void onDestroy(){
+
+        super.onDestroy();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnCustomerChatInteractionListener) {

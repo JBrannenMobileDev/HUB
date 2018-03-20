@@ -68,6 +68,12 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         initListeners();
     }
 
+    @Override
+    public void onDestroy(){
+
+        super.onDestroy();
+    }
+
     @OnClick(R.id.send_image_view)
     public void onSendClicked(){
         if(userInputSalesTeam.isShown()){

@@ -14,6 +14,7 @@ import java.util.Date;
 
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.utils.BaseCallback;
 
@@ -21,15 +22,19 @@ import jjpartnership.hub.utils.BaseCallback;
  * Created by Jonathan on 3/9/2018.
  */
 
-public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecyclerAdapter.ViewHolder> {
+public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAdapter.ViewHolder> {
     private Context context;
-    private MainAccountsModel dataModel;
+    private MainRecentModel dataModel;
     private BaseCallback<RowItem> rowSelectedCallback;
 
-    public AccountRecyclerAdapter(@NonNull Context context, MainAccountsModel dataModel, BaseCallback<RowItem> rowSelectedCallback) {
+    public RecentRecyclerAdapter(@NonNull Context context, MainRecentModel dataModel, BaseCallback<RowItem> rowSelectedCallback) {
         this.context = context;
         this.dataModel = dataModel;
         this.rowSelectedCallback = rowSelectedCallback;
+    }
+
+    public void onDataSetChanged(MainRecentModel recentModel) {
+        this.dataModel = recentModel;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -58,7 +63,7 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
     }
 
     @Override
-    public AccountRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecentRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.account_list_row_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -89,9 +94,5 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
     private String createFormattedTime(long createdDate) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("h:mm aaa - M/dd/yy");
         return dateFormatter.format(new Date(createdDate));
-    }
-
-    public void OnDataSetChanged(MainAccountsModel dataModel) {
-        this.dataModel = dataModel;
     }
 }

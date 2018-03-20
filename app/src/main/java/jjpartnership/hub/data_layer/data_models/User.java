@@ -17,6 +17,7 @@ public class User{
     private String businessUnit;
     private String role;
     private String userType;
+    private int userColor;
     private List<String> directChatIds;
     private List<String> accountIds;
 
@@ -25,7 +26,7 @@ public class User{
 
     public User(String uid, String email, String phoneNumber, String firstName, String lastName,
                 String companyId, String businessUnit, String role, String userType,
-                List<String> directChatIds, List<String> accountIds) {
+                List<String> directChatIds, List<String> accountIds, int userColor) {
         this.uid = uid;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -37,6 +38,7 @@ public class User{
         this.userType = userType;
         this.directChatIds = directChatIds;
         this.accountIds = accountIds;
+        this.userColor = userColor;
     }
 
     public User(UserRealm realmUser){
@@ -52,6 +54,7 @@ public class User{
             this.userType = realmUser.getUserType();
             this.directChatIds = realmUser.getDirectChatIds();
             this.accountIds = realmUser.getAccountIds();
+            this.userColor = realmUser.getUserColor();
         }
     }
 
@@ -60,6 +63,14 @@ public class User{
             accountIds = new ArrayList<>();
         }
         accountIds.add(accountId);
+    }
+
+    public int getUserColor() {
+        return userColor;
+    }
+
+    public void setUserColor(int userColor) {
+        this.userColor = userColor;
     }
 
     public String getUid() {

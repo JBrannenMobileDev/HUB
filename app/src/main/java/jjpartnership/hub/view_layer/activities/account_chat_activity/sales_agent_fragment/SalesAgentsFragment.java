@@ -10,18 +10,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.RealmResults;
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
 
 /**
@@ -37,7 +36,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
-    private LinearLayoutManager layoutManager;
+    private AdjustableScrollSpeedLayoutManager layoutManager;
     private SalesAgentRecyclerAdapter adapter;
     private BaseCallback<MessageRealm> messageSelectedCallback;
 
@@ -52,15 +51,19 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_chat, container, false);
         ButterKnife.bind(this, v);
-
-        presenter = new SalesAgentPresenterImp(this, getArguments().getString("account_name"),
-                getArguments().getString("account_id"));
-
-        layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        layoutManager = new AdjustableScrollSpeedLayoutManager(getActivity().getApplicationContext());
         layoutManager.setStackFromEnd(true);
         chatRecycler.setLayoutManager(layoutManager);
-        initAdapters();
+        initCallback();
+        presenter = new SalesAgentPresenterImp(this, getArguments().getString("account_name"),
+                getArguments().getString("account_id"));
         return v;
+    }
+
+    @Override
+    public void onDestroy(){
+        presenter.onDestroy();
+        super.onDestroy();
     }
 
     @Override
@@ -69,6 +72,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                layoutManager.setSpeedInMilliSeconds(65);
                 chatRecycler.smoothScrollToPosition(chatRecycler.getAdapter().getItemCount()-1);
             }
         });
@@ -114,7 +118,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         hideSoftKeyboard();
     }
 
-    private void initAdapters() {
+    private void initCallback() {
         messageSelectedCallback = new BaseCallback<MessageRealm>() {
             @Override
             public void onResponse(MessageRealm selectedMessage) {
@@ -126,25 +130,26 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
 
             }
         };
-        chatRecycler.setAdapter(adapter);
     }
 
     @Override
-    public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm) {
-        //TODO sort messages by createdTime
+    public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Integer> userColorMap) {
         if(messagesRealm.size() > 0){
             emptyStateMessage.setVisibility(View.GONE);
         }else {
             emptyStateMessage.setVisibility(View.VISIBLE);
         }
         if (adapter == null) {
-            adapter = new SalesAgentRecyclerAdapter(getActivity().getApplicationContext(), messagesRealm, messageSelectedCallback);
+            adapter = new SalesAgentRecyclerAdapter(getActivity().getApplicationContext(), messagesRealm,  messageSelectedCallback, userColorMap);
             chatRecycler.setAdapter(adapter);
-        } else {
-            adapter.OnDataSetChanged(messagesRealm);
         }
         adapter.notifyDataSetChanged();
-        chatRecycler.smoothScrollToPosition(messagesRealm.size()-1);
+        if(!fab.isShown()) {
+            layoutManager.setSpeedInMilliSeconds(500);
+            if(messagesRealm.size() > 0) chatRecycler.smoothScrollToPosition(messagesRealm.size() - 1);
+        }else{
+            //TODO show new message notification
+        }
     }
 
     @Override

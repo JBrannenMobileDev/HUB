@@ -1,5 +1,7 @@
 package jjpartnership.hub.data_layer.realm_db;
 
+import android.os.Handler;
+
 import java.util.List;
 
 import io.realm.Realm;
@@ -13,16 +15,20 @@ import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.RealmUISingleton;
 
 /**
  * Created by jbrannen on 2/24/18.
  */
 
 public class RealmManager {
+    private BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback;
 
     public RealmManager() {
     }
@@ -116,15 +122,34 @@ public class RealmManager {
         realm.close();
     }
 
-    public void updateMainAccountsModel(final MainAccountsModel accountsModel) {
+    public void updateRealmMessage(final Message message) {
+        final MessageRealm realmMessage = new MessageRealm(message);
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(realmMessage);
+            }
+        });
+        realm.close();
+    }
+
+    public void updateMainAccountsModel(final MainAccountsModel accountsModel, final MainRecentModel recentModel) {
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(accountsModel);
+                bgRealm.copyToRealmOrUpdate(recentModel);
             }
         });
         realm.close();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(freshInstallDataLoadedToRealmCallback != null) freshInstallDataLoadedToRealmCallback.onResponse(true);
+            }
+        }, 500);
     }
 
     public void insertOrUpdateMessage(final MessageRealm messageRealm) {
@@ -136,5 +161,14 @@ public class RealmManager {
             }
         });
         realm.close();
+    }
+
+    public void nukeDb() {
+        RealmUISingleton.getInstance().closeRealmInstance();
+        Realm.deleteRealm(Realm.getDefaultConfiguration());
+    }
+
+    public void setFreshInstallCallback(BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback) {
+        this.freshInstallDataLoadedToRealmCallback = freshInstallDataLoadedToRealmCallback;
     }
 }

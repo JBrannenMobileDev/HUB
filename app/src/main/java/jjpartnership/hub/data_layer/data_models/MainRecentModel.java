@@ -12,22 +12,22 @@ public class MainRecentModel extends RealmObject{
     public static final String PERM_ID = "main_recent_model";
     @PrimaryKey
     private String permanentId;
-    private RealmList<RecentRowItem> rowItems;
+    private RealmList<RowItem> rowItems;
 
     public MainRecentModel() {
         permanentId = PERM_ID;
     }
 
-    public MainRecentModel(RealmList<RecentRowItem> rowItems) {
+    public MainRecentModel(RealmList<RowItem> rowItems) {
         this.rowItems = rowItems;
         permanentId = PERM_ID;
     }
 
-    public RealmList<RecentRowItem> getRowItems() {
+    public RealmList<RowItem> getRowItems() {
         return rowItems;
     }
 
-    public void setRowItems(RealmList<RecentRowItem> rowItems) {
+    public void setRowItems(RealmList<RowItem> rowItems) {
         this.rowItems = rowItems;
     }
 }

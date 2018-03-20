@@ -2,6 +2,8 @@ package jjpartnership.hub.data_layer.data_models;
 
 import android.support.annotation.NonNull;
 
+import java.util.Comparator;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -64,4 +66,12 @@ public class RowItem extends RealmObject implements Comparable{
     public int compareTo(@NonNull Object item) {
         return this.accountName.compareToIgnoreCase(((RowItem)item).getAccountName());
     }
+
+    public static Comparator<RowItem> createdAtComparator = new Comparator<RowItem>() {
+
+        public int compare(RowItem item1, RowItem item2) {
+            return (int) (item1.getMessageCreatedAtTime()-item2.getMessageCreatedAtTime());
+        }
+
+    };
 }

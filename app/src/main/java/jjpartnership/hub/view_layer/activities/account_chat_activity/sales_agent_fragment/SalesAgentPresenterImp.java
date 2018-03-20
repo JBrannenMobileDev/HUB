@@ -2,6 +2,7 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agen
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.Realm;
@@ -13,6 +14,7 @@ import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 
 /**
@@ -31,7 +33,7 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
 
     public SalesAgentPresenterImp(SalesAgentView fragment, String account_name, String account_id) {
         this.fragment = fragment;
-        realm = Realm.getDefaultInstance();
+        realm = RealmUISingleton.getInstance().getRealmInstance();
         accountName = account_name;
         accountId = account_id;
         initDataListeners();
@@ -42,14 +44,22 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
         chatId = account.getGroupChatSalesId();
         groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", chatId).findFirst();
         user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
-        RealmResults<MessageRealm> messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll();
+        RealmResults<MessageRealm> messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
         messages.addChangeListener(new RealmChangeListener<RealmResults<MessageRealm>>() {
             @Override
             public void onChange(RealmResults<MessageRealm> messagesRealm) {
-                fragment.onReceiveMessages(messagesRealm);
+                fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm));
             }
         });
-        fragment.onReceiveMessages(messages);
+        fragment.onReceiveMessages(messages, getUsersColors(messages));
+    }
+
+    private HashMap<String, Integer> getUsersColors(RealmResults<MessageRealm> messagesRealm) {
+        HashMap<String, Integer> userColorsMap = new HashMap<>();
+        for(MessageRealm message : messagesRealm){
+            userColorsMap.put(message.getUid(), realm.where(UserRealm.class).equalTo("uid", message.getUid()).findFirst().getUserColor());
+        }
+        return userColorsMap;
     }
 
     @Override
@@ -74,5 +84,10 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
             DataManager.getInstance().createNewMessage(newMessage);
         }
         fragment.resetInputText();
+    }
+
+    @Override
+    public void onDestroy() {
+
     }
 }

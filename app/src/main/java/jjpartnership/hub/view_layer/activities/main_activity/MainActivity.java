@@ -29,6 +29,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
@@ -44,19 +45,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.search_results_layout)LinearLayout searchResultsLayout;
     @BindView(R.id.search_results_pager)ViewPager searchResultsPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
-    @BindView(R.id.recent_list_view)RecyclerView recentListView;
+    @BindView(R.id.recent_list_view)RecyclerView recentRecyclerView;
     @BindView(R.id.recent_title_tv)TextView recentTitle;
     @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
     @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesListView;
     @BindView(R.id.welcome_linear_layout)LinearLayout welcomeLayout;
     @BindView(R.id.welcome_message_tv)TextView welcomeMessage;
+    @BindView(R.id.recent_empty_state_layout)LinearLayout recent_empty_layout;
+    @BindView(R.id.accounts_empty_state_layout)LinearLayout accounts_empty_layout;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
     private AccountRecyclerAdapter accountsAdapter;
+    private RecentRecyclerAdapter recentRecyclerAdapter;
     private BaseCallback<RowItem> accountSelectedCallback;
-    private RecyclerView.LayoutManager layoutManager;
+    private BaseCallback<RowItem> recentSelectedCallback;
+    private BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback;
 
 
     @Override
@@ -75,11 +80,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        layoutManager = new LinearLayoutManager(getApplicationContext());
-        accountsRecyclerView.setLayoutManager(layoutManager);
-        presenter = new MainPresenterImp(this);
+        accountsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recentRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         initAnimations();
         initAdapters();
+        freshInstallDataLoadedToRealmCallback = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean object) {
+                presenter.fetchData();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+        DataManager.getInstance().setFreshInstallCallback(freshInstallDataLoadedToRealmCallback);
+        presenter = new MainPresenterImp(this);
+    }
+
+    @Override
+    public void onDestroy(){
+        presenter.onDestroy();
+        super.onDestroy();
     }
 
     private void initAdapters() {
@@ -97,8 +120,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         };
+
+        recentSelectedCallback = new BaseCallback<RowItem>() {
+            @Override
+            public void onResponse(RowItem rowItem) {
+                Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
+                accountChatIntent.putExtra("account_id", rowItem.getAccountId());
+                accountChatIntent.putExtra("account_name", rowItem.getAccountName());
+                startActivity(accountChatIntent);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
         accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<RowItem>()), accountSelectedCallback);
+        recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
         accountsRecyclerView.setAdapter(accountsAdapter);
+        recentRecyclerView.setAdapter(recentRecyclerAdapter);
     }
 
     @Override
@@ -238,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_sign_out) {
             FirebaseAuth.getInstance().signOut();
+            DataManager.getInstance().clearRealmData();
             startActivity(new Intent(getApplicationContext(), BootActivity.class));
         }
 
@@ -248,27 +289,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     @Override
-    public void onRecentModelREceived(MainRecentModel recentModel) {
+    public void onRecentModelReceived(MainRecentModel recentModel) {
         if(recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0){
             welcomeLayout.setVisibility(View.GONE);
-            recentTitle.setVisibility(View.VISIBLE);
-            //TODO initialize recent adapter
+            recent_empty_layout.setVisibility(View.GONE);
+            if(recentRecyclerAdapter == null){
+                recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
+                recentRecyclerView.setAdapter(recentRecyclerAdapter);
+            }else{
+                recentRecyclerAdapter.onDataSetChanged(recentModel);
+            }
+            recentRecyclerAdapter.notifyDataSetChanged();
         }
     }
 
     @Override
     public void onAccountModelReceived(MainAccountsModel dataModel) {
-//        if(dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
+        if(dataModel != null && dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
+            accounts_empty_layout.setVisibility(View.GONE);
             if (accountsAdapter == null) {
                 accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
                 accountsRecyclerView.setAdapter(accountsAdapter);
-            } else {
+            }else{
                 accountsAdapter.OnDataSetChanged(dataModel);
             }
             accountsAdapter.notifyDataSetChanged();
-//        }else{
-//            //TODO show no accounts view
-//        }
+        }
     }
 
     @Override
