@@ -1,7 +1,6 @@
 package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -33,10 +32,10 @@ import jjpartnership.hub.utils.UserPreferences;
 public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRecyclerAdapter.ViewHolder> {
     private Context context;
     private List<MessageRealm> dataModel;
-    private HashMap<String, Integer> userColorMap;
+    private HashMap<String, Long> userColorMap;
     private BaseCallback<MessageRealm> messageSelectedCallback;
 
-    public SalesAgentRecyclerAdapter(@NonNull Context context, List<MessageRealm> dataModel, BaseCallback<MessageRealm> messageSelectedCallback, HashMap<String, Integer> userColorMap) {
+    public SalesAgentRecyclerAdapter(@NonNull Context context, List<MessageRealm> dataModel, BaseCallback<MessageRealm> messageSelectedCallback, HashMap<String, Long> userColorMap) {
         this.context = context;
         this.dataModel = dataModel;
         this.messageSelectedCallback = messageSelectedCallback;
@@ -93,41 +92,59 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
             }
             if(dataModel.size() == 1){
                 if(isUserMessage){
-                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_grey));
+                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
                     setLayoutMargin(holder, 48, 8, 8, 16);
                 }else{
-                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_white_top_left));
-                    setLayoutMargin(holder, 0, 8, 48, 16);
+                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                    setLayoutMargin(holder, 8, 8, 48, 16);
                 }
             }else {
                 if(isUserMessage){
-                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_grey));
+                    if(dataModel.get(position).getUid().equals(dataModel.get(position + 1).getUid())) {
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_bottom_right));
+                    }else{
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
+                    }
                     setLayoutMargin(holder, 48, 8, 8, 0);
                 }else{
-                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_white_top_left));
-                    setLayoutMargin(holder, 0, 8, 48, 0);
+                    if(dataModel.get(position).getUid().equals(dataModel.get(position + 1).getUid())) {
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                    }else{
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                    }
+                    setLayoutMargin(holder, 8, 8, 48, 0);
                 }
             }
         }else {
             String previousMessageUid = dataModel.get(position - 1).getUid();
             String currentMessageUid = dataModel.get(position).getUid();
+
             if (previousMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position).getCreatedDate(), dataModel.get(position-1).getCreatedDate())) {
                 holder.userIcon.setVisibility(View.GONE);
                 holder.nameDateTimeLayout.setVisibility(View.GONE);
                 if(position == dataModel.size()-1){
                     if(isUserMessage){
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_grey));
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
                         setLayoutMargin(holder, 48, 2, 8, 16);
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_white));
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                         setLayoutMargin(holder, 8, 2, 48, 16);
                     }
                 }else{
+                    String nextMessageUid = dataModel.get(position + 1).getUid();
                     if(isUserMessage){
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_grey));
+                        if(nextMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_bottom_right));
+                        }else{
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
+                        }
                         setLayoutMargin(holder, 48, 2, 8, 0);
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_white));
+                        if(nextMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                        }else{
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                        }
                         setLayoutMargin(holder, 8, 2, 48, 0);
                     }
                 }
@@ -136,18 +153,27 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
                 holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                 if(position == dataModel.size()-1){
                     if(isUserMessage){
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_grey));
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
                         setLayoutMargin(holder, 48, 24, 8, 16);
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_white_top_left));
+                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                         setLayoutMargin(holder, 8, 24, 48, 16);
                     }
                 }else{
+                    String nextMessageUid = dataModel.get(position + 1).getUid();
                     if(isUserMessage){
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_grey));
+                        if(currentMessageUid.equals(nextMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_bottom_right));
+                        }else{
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
+                        }
                         setLayoutMargin(holder, 48, 24, 8, 0);
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_white_top_left));
+                        if(currentMessageUid.equals(nextMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                        }else{
+                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                        }
                         setLayoutMargin(holder, 8, 24, 48, 0);
                     }
                 }
@@ -178,11 +204,19 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
             params.gravity = Gravity.RIGHT;
             holder.timeDate.setTextColor(context.getResources().getColor(R.color.grey_text));
             holder.messageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
+            holder.messageContentLayout.setBackgroundTintList(context.getResources().getColorStateList(R.color.white));
         }else{
-            holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()))));
-            holder.userIcon.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()))));
-            holder.userName.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()))));
-            holder.timeDate.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()))));
+            if(userColorMap != null && !userColorMap.isEmpty()) {
+                holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
+                holder.messageContentLayout.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
+                holder.userIcon.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
+                holder.userName.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
+                holder.timeDate.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
+            }else{
+                holder.userName.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
+                holder.timeDate.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
+                holder.userIcon.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
+            }
             holder.messageContent.setTextColor(context.getResources().getColor(R.color.white));
             params.setMargins((int)DpUtil.pxFromDp(context, 39), (int)DpUtil.pxFromDp(context, 0),
                     (int)DpUtil.pxFromDp(context, 0), (int)DpUtil.pxFromDp(context, 0));

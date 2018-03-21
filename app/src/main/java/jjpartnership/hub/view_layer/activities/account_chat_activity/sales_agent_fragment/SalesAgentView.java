@@ -10,6 +10,6 @@ import jjpartnership.hub.data_layer.data_models.MessageRealm;
  */
 
 public interface SalesAgentView {
-    void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Integer> userColorMap);
+    void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Long> userColorMap);
     void resetInputText();
 }

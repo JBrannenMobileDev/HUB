@@ -15,7 +15,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -366,7 +365,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     @OnClick(R.id.customer_tv)
     public void onAccountTypeCustomerClicked(){
         customerTv.setBackgroundResource(R.drawable.rounded_rectangle_orange_right);
-        salesAgentTv.setBackgroundResource(R.drawable.rounded_rectangle_grey_left);
+        salesAgentTv.setBackgroundResource(R.drawable.rounded_rectangle_user_left);
         customerTv.setTextColor(getResources().getColor(R.color.white));
         salesAgentTv.setTextColor(getResources().getColor(R.color.grey_text));
         salesAgentSelected = false;
@@ -376,7 +375,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     public void onSalesAgentAccountTypeClicked(){
         salesAgentSelected = true;
         salesAgentTv.setBackgroundResource(R.drawable.rounded_rectangle_orange_left);
-        customerTv.setBackgroundResource(R.drawable.rounded_rectangle_grey_right);
+        customerTv.setBackgroundResource(R.drawable.rounded_rectangle_user_right);
         salesAgentTv.setTextColor(getResources().getColor(R.color.white));
         customerTv.setTextColor(getResources().getColor(R.color.grey_text));
     }

@@ -1,7 +1,11 @@
 package jjpartnership.hub.data_layer.data_models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import io.realm.RealmList;
 
 /**
  * Created by jbrannen on 3/6/18.
@@ -9,7 +13,7 @@ import java.util.List;
 
 public class GroupChat {
     private String chatId;
-    private List<String> userIds;
+    private Map<String, String> userIds;
     private Message mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
@@ -19,7 +23,7 @@ public class GroupChat {
     public GroupChat() {
     }
 
-    public GroupChat(String chatId, List<String> userIds, Message messages, long messageCreatedTime,
+    public GroupChat(String chatId, Map<String, String> userIds, Message messages, long messageCreatedTime,
                      List<String> currentlyTypingUserNames, String messageThreadId, List<Request> customerRequests) {
         this.chatId = chatId;
         this.userIds = userIds;
@@ -32,12 +36,20 @@ public class GroupChat {
 
     public GroupChat(GroupChatRealm realm){
         this.chatId = realm.getChatId();
-        this.userIds = realm.getUserIds();
+        this.userIds = createUidMap(realm.getUserIds());
         this.mostRecentMessage = new Message(realm.getMostRecentMessage());
         this.messageCreatedTime = realm.getMessageCreatedTime();
         this.currentlyTypingUserNames = realm.getCurrentlyTypingUserNames();
         this.messageThreadId = realm.getMessageThreadId();
         this.customerRequests = createCustomerRequsts(realm.getCustomerRequests());
+    }
+
+    private Map<String, String> createUidMap(List<String> userIds) {
+        Map<String, String> uidMap = new HashMap<>();
+        for(String uid : userIds){
+            uidMap.put(uid, uid);
+        }
+        return uidMap;
     }
 
     private List<Request> createCustomerRequsts(List<RequestRealm> realmRequests){
@@ -88,11 +100,21 @@ public class GroupChat {
         this.chatId = chatId;
     }
 
-    public List<String> getUserIds() {
+    public Map<String, String> getUserIds() {
         return userIds;
     }
 
-    public void setUserIds(List<String> userIds) {
+    public List<String> getUserIdsList() {
+        List<String> uidList = new ArrayList<>();
+        if(userIds != null) {
+            for (String uid : userIds.values()) {
+                uidList.add(uid);
+            }
+        }
+        return uidList;
+    }
+
+    public void setUserIds(Map<String, String> userIds) {
         this.userIds = userIds;
     }
 

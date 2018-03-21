@@ -110,4 +110,8 @@ public class DataManager {
     public void setFreshInstallCallback(BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback) {
         realmManager.setFreshInstallCallback(freshInstallDataLoadedToRealmCallback);
     }
+
+    public void updateRealmUserColor(long color, String uid) {
+        realmManager.insertOrUpdateUserColor(color, uid);
+    }
 }

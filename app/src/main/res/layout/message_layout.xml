@@ -41,7 +41,7 @@
                 android:layout_marginRight="8dp"
                 android:text="Jonathan"
                 android:textColor="@android:color/black"
-                android:textStyle="bold" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/time_date_tv"

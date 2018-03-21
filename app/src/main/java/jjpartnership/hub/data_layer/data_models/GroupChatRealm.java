@@ -38,7 +38,7 @@ public class GroupChatRealm extends RealmObject{
 
     public GroupChatRealm(GroupChat chat){
         this.chatId = chat.getChatId();
-        this.userIds = createUserIdList(chat.getUserIds());
+        this.userIds = createUserIdList(chat.getUserIdsList());
         this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
         this.messageCreatedTime = chat.getMessageCreatedTime();
         this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());

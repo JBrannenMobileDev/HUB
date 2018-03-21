@@ -133,7 +133,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     }
 
     @Override
-    public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Integer> userColorMap) {
+    public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Long> userColorMap) {
         if(messagesRealm.size() > 0){
             emptyStateMessage.setVisibility(View.GONE);
         }else {

@@ -13,6 +13,7 @@ import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
+import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
@@ -54,10 +55,11 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
         fragment.onReceiveMessages(messages, getUsersColors(messages));
     }
 
-    private HashMap<String, Integer> getUsersColors(RealmResults<MessageRealm> messagesRealm) {
-        HashMap<String, Integer> userColorsMap = new HashMap<>();
+    private HashMap<String, Long> getUsersColors(RealmResults<MessageRealm> messagesRealm) {
+        HashMap<String, Long> userColorsMap = new HashMap<>();
         for(MessageRealm message : messagesRealm){
-            userColorsMap.put(message.getUid(), realm.where(UserRealm.class).equalTo("uid", message.getUid()).findFirst().getUserColor());
+            UserColor userColor = realm.where(UserColor.class).equalTo("uid", message.getUid()).findFirst();
+            if(userColor != null) userColorsMap.put(message.getUid(), userColor.getColorId());
         }
         return userColorsMap;
     }

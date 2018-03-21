@@ -19,6 +19,7 @@ import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.User;
+import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.RealmUISingleton;
@@ -170,5 +171,16 @@ public class RealmManager {
 
     public void setFreshInstallCallback(BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback) {
         this.freshInstallDataLoadedToRealmCallback = freshInstallDataLoadedToRealmCallback;
+    }
+
+    public void insertOrUpdateUserColor(final long color, final String uid) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(new UserColor(uid, color));
+            }
+        });
+        realm.close();
     }
 }
