@@ -41,4 +41,20 @@
         app:elevation="3dp"
         app:fabSize="mini" />
 
+    <TextView
+        android:id="@+id/new_message_alert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="60dp"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/rounded_rectangle_blue_sharp"
+        android:elevation="3dp"
+        android:paddingBottom="2dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:text="new msg"
+        android:textColor="@color/white"
+        android:visibility="gone" />
+
 </FrameLayout>

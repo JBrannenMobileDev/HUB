@@ -2,9 +2,9 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agen
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +33,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     @BindView(R.id.chat_empty_state)TextView emptyStateMessage;
     @BindView(R.id.chat_recycler_view)RecyclerView chatRecycler;
     @BindView(R.id.fab)FloatingActionButton fab;
+    @BindView(R.id.new_message_alert)TextView newMessageAlert;
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
@@ -72,7 +73,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layoutManager.setSpeedInMilliSeconds(65);
+                layoutManager.setSpeedInMilliSeconds(55);
                 chatRecycler.smoothScrollToPosition(chatRecycler.getAdapter().getItemCount()-1);
             }
         });
@@ -83,10 +84,21 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
                     @Override
                     public void onHide() {
                         fab.hide();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                fab.setBackgroundTintList(getResources().getColorStateList(R.color.white));
+                                fab.setImageTintList(getResources().getColorStateList(R.color.grey_text));
+                            }
+                        }, 300);
+                        animateHideNewMessageAlert();
                     }
 
                     @Override
                     public void onShow() {
+                        newMessageAlert.setVisibility(View.GONE);
+                        fab.setBackgroundTintList(getResources().getColorStateList(R.color.white));
+                        fab.setImageTintList(getResources().getColorStateList(R.color.grey_text));
                         fab.show();
                     }
                 });
@@ -133,7 +145,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     }
 
     @Override
-    public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Long> userColorMap) {
+    public void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Long> userColorMap, boolean isCurrentUserMessage) {
         if(messagesRealm.size() > 0){
             emptyStateMessage.setVisibility(View.GONE);
         }else {
@@ -145,11 +157,24 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         }
         adapter.notifyDataSetChanged();
         if(!fab.isShown()) {
-            layoutManager.setSpeedInMilliSeconds(500);
+            layoutManager.setSpeedInMilliSeconds(250);
             if(messagesRealm.size() > 0) chatRecycler.smoothScrollToPosition(messagesRealm.size() - 1);
-        }else{
-            //TODO show new message notification
+        }else if(!isCurrentUserMessage){
+            fab.setBackgroundTintList(getResources().getColorStateList(R.color.colorAccent));
+            fab.setImageTintList(getResources().getColorStateList(R.color.white));
+            animateShowNewMessageAlert();
         }
+    }
+
+    private void animateShowNewMessageAlert() {
+        newMessageAlert.animate().scaleX(0f).setDuration(0);
+        newMessageAlert.setVisibility(View.VISIBLE);
+        newMessageAlert.animate().scaleX(1f).setDuration(150);
+    }
+
+    private void animateHideNewMessageAlert() {
+        newMessageAlert.animate().scaleX(0f).setDuration(150);
+        newMessageAlert.setVisibility(View.GONE);
     }
 
     @Override

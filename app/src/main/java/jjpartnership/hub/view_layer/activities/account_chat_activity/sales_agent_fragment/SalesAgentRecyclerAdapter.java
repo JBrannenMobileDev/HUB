@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.tuyenmonkey.mkloader.MKLoader;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -46,12 +48,16 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         FrameLayout root;
         LinearLayout nameDateTimeLayout;
         LinearLayout messageContentLayout;
+        LinearLayout messageOnlyContentLayout;
+        LinearLayout nameDateOnlyLayout;
         TextView userName;
         TextView timeDate;
         TextView messageContent;
         TextView userIcon;
         MKLoader sendingMk;
         TextView status;
+        TextView newDateTv;
+
         public ViewHolder(View v) {
             super(v);
             root = v.findViewById(R.id.message_frame_layout);
@@ -63,6 +69,9 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
             sendingMk = v.findViewById(R.id.sending_animation_mk);
             status = v.findViewById(R.id.status_tv);
             messageContentLayout = v.findViewById(R.id.message_content_layout);
+            messageOnlyContentLayout = v.findViewById(R.id.message_only_content_layout);
+            nameDateOnlyLayout = v.findViewById(R.id.name_date_only_layout);
+            newDateTv = v.findViewById(R.id.new_date_tv);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -85,35 +94,60 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         MessageRealm message = dataModel.get(position);
         boolean isUserMessage = message.getUid().equals(UserPreferences.getInstance().getUid());
         if(position == 0){
-            holder.userIcon.setVisibility(View.VISIBLE);
-            holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
             if(message.getCreatedDate() != 0) {
-                holder.timeDate.setText(createFormattedTime(message.getCreatedDate(), 0));
+                holder.timeDate.setText(createFormattedTime(message.getCreatedDate()));
             }
             if(dataModel.size() == 1){
                 if(isUserMessage){
-                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
+                    holder.userIcon.setVisibility(View.GONE);
+                    holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
                     setLayoutMargin(holder, 48, 8, 8, 16);
                 }else{
-                    holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                    holder.userIcon.setVisibility(View.VISIBLE);
+                    holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                     setLayoutMargin(holder, 8, 8, 48, 16);
                 }
             }else {
                 if(isUserMessage){
-                    if(dataModel.get(position).getUid().equals(dataModel.get(position + 1).getUid())) {
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_bottom_right));
+                    holder.userIcon.setVisibility(View.GONE);
+                    if(dataModel.get(position).getUid().equals(dataModel.get(position + 1).getUid()) &&
+                            !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
+                        holder.nameDateTimeLayout.setVisibility(View.GONE);
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_bottom_right));
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
+                        holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
                     }
                     setLayoutMargin(holder, 48, 8, 8, 0);
                 }else{
-                    if(dataModel.get(position).getUid().equals(dataModel.get(position + 1).getUid())) {
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                    holder.userIcon.setVisibility(View.VISIBLE);
+                    if(dataModel.get(position).getUid().equals(dataModel.get(position + 1).getUid()) &&
+                            !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
+                        holder.nameDateTimeLayout.setVisibility(View.GONE);
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                        holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                     }
                     setLayoutMargin(holder, 8, 8, 48, 0);
                 }
+            }
+            if(message.getCreatedDate() != 0) {
+                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aaa");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy");
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+                String formattedTodaysDate = dateFormat.format(new Date());
+                String formattedYesterdaysDate = dateFormat.format(new Date(calendar.getTimeInMillis()));
+                String formattedCreatedDate = dateFormat.format(new Date(message.getCreatedDate()));
+                if(formattedCreatedDate.equals(formattedTodaysDate)){
+                    holder.newDateTv.setText("Today - " + timeFormat.format(new Date(message.getCreatedDate())));
+                }else if(formattedCreatedDate.equals(formattedYesterdaysDate)){
+                    holder.newDateTv.setText("Yesterday - " + timeFormat.format(new Date(message.getCreatedDate())));
+                }else{
+                    holder.newDateTv.setText(formattedCreatedDate);
+                }
+                holder.newDateTv.setVisibility(View.VISIBLE);
             }
         }else {
             String previousMessageUid = dataModel.get(position - 1).getUid();
@@ -121,65 +155,92 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
 
             if (previousMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position).getCreatedDate(), dataModel.get(position-1).getCreatedDate())) {
                 holder.userIcon.setVisibility(View.GONE);
-                holder.nameDateTimeLayout.setVisibility(View.GONE);
                 if(position == dataModel.size()-1){
+                    holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                     if(isUserMessage){
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
                         setLayoutMargin(holder, 48, 2, 8, 16);
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                         setLayoutMargin(holder, 8, 2, 48, 16);
                     }
                 }else{
+                    holder.nameDateTimeLayout.setVisibility(View.GONE);
                     String nextMessageUid = dataModel.get(position + 1).getUid();
                     if(isUserMessage){
                         if(nextMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_bottom_right));
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_bottom_right));
                         }else{
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
+                            holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                         }
                         setLayoutMargin(holder, 48, 2, 8, 0);
                     }else{
                         if(nextMessageUid.equals(currentMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
                         }else{
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                            holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                         }
                         setLayoutMargin(holder, 8, 2, 48, 0);
                     }
                 }
             } else {
                 holder.userIcon.setVisibility(View.VISIBLE);
-                holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                 if(position == dataModel.size()-1){
+                    holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                     if(isUserMessage){
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
                         setLayoutMargin(holder, 48, 24, 8, 16);
                     }else{
-                        holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                        holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                         setLayoutMargin(holder, 8, 24, 48, 16);
                     }
                 }else{
                     String nextMessageUid = dataModel.get(position + 1).getUid();
                     if(isUserMessage){
+                        holder.nameDateTimeLayout.setVisibility(View.GONE);
                         if(currentMessageUid.equals(nextMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_bottom_right));
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_bottom_right));
                         }else{
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
+                            holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
                         }
                         setLayoutMargin(holder, 48, 24, 8, 0);
                     }else{
                         if(currentMessageUid.equals(nextMessageUid) && !isTimeSinceLastMessageGreaterThan4Min(dataModel.get(position+1).getCreatedDate(), dataModel.get(position).getCreatedDate())) {
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_bottom_left));
+                            holder.nameDateTimeLayout.setVisibility(View.GONE);
                         }else{
-                            holder.messageContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
+                            holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
+                            holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
                         }
                         setLayoutMargin(holder, 8, 24, 48, 0);
                     }
                 }
             }
             if(message.getCreatedDate() != 0) {
-                holder.timeDate.setText(createFormattedTime(message.getCreatedDate(), dataModel.get(position - 1).getCreatedDate()));
+                SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aaa");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy");
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.DAY_OF_YEAR, -1);
+                String formattedTodaysDate = dateFormat.format(new Date());
+                String formattedYesterdaysDate = dateFormat.format(new Date(calendar.getTimeInMillis()));
+                String formattedCreatedDate = dateFormat.format(new Date(message.getCreatedDate()));
+                String formattedPreviousCreatedDate = dateFormat.format(new Date(dataModel.get(position - 1).getCreatedDate() ));
+                if(!formattedCreatedDate.equals(formattedPreviousCreatedDate)){
+                    if(formattedCreatedDate.equals(formattedTodaysDate)){
+                        holder.newDateTv.setText("Today - " + timeFormat.format(new Date(message.getCreatedDate())));
+                    }else if(formattedCreatedDate.equals(formattedYesterdaysDate)){
+                        holder.newDateTv.setText(String.format("Yesterday - " + timeFormat.format(new Date(message.getCreatedDate()))));
+                    }else{
+                        holder.newDateTv.setText(formattedCreatedDate);
+                    }
+                    holder.newDateTv.setVisibility(View.VISIBLE);
+                }else{
+                    holder.newDateTv.setVisibility(View.GONE);
+                }
+                holder.timeDate.setText(createFormattedTime(message.getCreatedDate()));
             }
         }
         setMessageStatus(holder, message);
@@ -192,45 +253,48 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         holder.userIcon.setText(String.valueOf(message.getMessageOwnerName().charAt(0)));
 
 
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+        FrameLayout.LayoutParams paramsMessageContentLayhout = new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT
         );
+        LinearLayout.LayoutParams paramsMessageOnlyContentLayout = (LinearLayout.LayoutParams)holder.messageOnlyContentLayout.getLayoutParams();
+        LinearLayout.LayoutParams paramsNameDateTimeLayout = (LinearLayout.LayoutParams)holder.nameDateTimeLayout.getLayoutParams();
         if(isUserMessage){
+            paramsMessageOnlyContentLayout.gravity = Gravity.RIGHT;
+            paramsNameDateTimeLayout.gravity = Gravity.RIGHT;
             holder.userIcon.setVisibility(View.GONE);
             holder.userName.setVisibility(View.GONE);
-            params.setMargins((int)DpUtil.pxFromDp(context, 39), (int)DpUtil.pxFromDp(context, 0),
+            paramsMessageContentLayhout.setMargins((int)DpUtil.pxFromDp(context, 34), (int)DpUtil.pxFromDp(context, 0),
                     (int)DpUtil.pxFromDp(context, 0), (int)DpUtil.pxFromDp(context, 0));
-            params.gravity = Gravity.RIGHT;
-            holder.timeDate.setTextColor(context.getResources().getColor(R.color.grey_text));
-            holder.messageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
-            holder.messageContentLayout.setBackgroundTintList(context.getResources().getColorStateList(R.color.white));
+            paramsMessageContentLayhout.gravity = Gravity.RIGHT;
+            holder.messageContent.setTextColor(Color.BLACK);
+            holder.messageOnlyContentLayout.setBackgroundTintList(context.getResources().getColorStateList(R.color.white));
         }else{
+            holder.userName.setVisibility(View.VISIBLE);
+            paramsMessageOnlyContentLayout.gravity = Gravity.LEFT;
+            paramsNameDateTimeLayout.gravity = Gravity.LEFT;
             if(userColorMap != null && !userColorMap.isEmpty()) {
                 holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
-                holder.messageContentLayout.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
+                holder.messageOnlyContentLayout.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
                 holder.userIcon.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
-                holder.userName.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
-                holder.timeDate.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
             }else{
-                holder.userName.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
-                holder.timeDate.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
                 holder.userIcon.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
             }
             holder.messageContent.setTextColor(context.getResources().getColor(R.color.white));
-            params.setMargins((int)DpUtil.pxFromDp(context, 39), (int)DpUtil.pxFromDp(context, 0),
+            paramsMessageContentLayhout.setMargins((int)DpUtil.pxFromDp(context, 34), (int)DpUtil.pxFromDp(context, 0),
                     (int)DpUtil.pxFromDp(context, 0), (int)DpUtil.pxFromDp(context, 0));
-            params.gravity = Gravity.LEFT;
-            holder.userName.setVisibility(View.VISIBLE);
+            paramsMessageContentLayhout.gravity = Gravity.LEFT;
         }
-        holder.messageContentLayout.setLayoutParams(params);
+        holder.messageContentLayout.setLayoutParams(paramsMessageContentLayhout);
+        holder.messageOnlyContentLayout.setLayoutParams(paramsMessageOnlyContentLayout);
+        holder.nameDateTimeLayout.setLayoutParams(paramsNameDateTimeLayout);
     }
 
 
     private void setLayoutMargin(ViewHolder holder, float leftDp, float topDp, float rightDp, float bottomDp){
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
         );
 
         params.setMargins((int)DpUtil.pxFromDp(context, leftDp), (int)DpUtil.pxFromDp(context, topDp),
@@ -241,8 +305,10 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
     private void setMessageStatus(ViewHolder holder, MessageRealm message){
         if (message.isSavedToFirebase()) {
             holder.sendingMk.setVisibility(View.GONE);
+            holder.status.setVisibility(View.GONE);
         }else{
             holder.sendingMk.setVisibility(View.VISIBLE);
+            holder.status.setVisibility(View.VISIBLE);
         }
     }
 
@@ -260,18 +326,9 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
         return dataModel.size();
     }
 
-    private String createFormattedTime(long createdDate, long previousCreatedDate) {
-        SimpleDateFormat timeDateFormat = new SimpleDateFormat("h:mm aaa - M/dd/yy");
+    private String createFormattedTime(long createdDate) {
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm aaa");
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
-        if(previousCreatedDate > 0) {
-            String formattedCreatedDate = dateFormat.format(new Date(createdDate));
-            String formattedPreviousCreatedDate = dateFormat.format(new Date(previousCreatedDate));
-            if(formattedCreatedDate.equals(formattedPreviousCreatedDate)){
-                return timeFormat.format(new Date(createdDate));
-            }
-        }
-        return timeDateFormat.format(new Date(createdDate));
+        return timeFormat.format(new Date(createdDate));
     }
 
     public void OnDataSetChanged(List<MessageRealm> dataModel) {

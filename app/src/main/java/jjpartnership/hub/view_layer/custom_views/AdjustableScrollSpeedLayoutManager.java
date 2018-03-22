@@ -12,7 +12,7 @@ import android.util.DisplayMetrics;
  */
 
 public class AdjustableScrollSpeedLayoutManager extends LinearLayoutManager {
-    private float MILLISECONDS_PER_INCH = 500f;
+    private float MILLISECONDS_PER_INCH = 250f;
     private Context mContext;
 
     public AdjustableScrollSpeedLayoutManager(Context context) {

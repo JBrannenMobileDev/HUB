@@ -49,10 +49,10 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
         messages.addChangeListener(new RealmChangeListener<RealmResults<MessageRealm>>() {
             @Override
             public void onChange(RealmResults<MessageRealm> messagesRealm) {
-                fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm));
+                fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm), user.getUid().equals(messagesRealm.get(messagesRealm.size() - 1).getUid()));
             }
         });
-        fragment.onReceiveMessages(messages, getUsersColors(messages));
+        fragment.onReceiveMessages(messages, getUsersColors(messages), user.getUid().equals(messages.get(messages.size()-1).getUid()));
     }
 
     private HashMap<String, Long> getUsersColors(RealmResults<MessageRealm> messagesRealm) {
