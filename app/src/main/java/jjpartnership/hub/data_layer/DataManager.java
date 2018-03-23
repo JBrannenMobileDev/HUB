@@ -10,6 +10,7 @@ import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
+import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
 import jjpartnership.hub.data_layer.realm_db.RealmManager;
@@ -113,5 +114,13 @@ public class DataManager {
 
     public void updateRealmUserColor(long color, String uid) {
         realmManager.insertOrUpdateUserColor(color, uid);
+    }
+
+    public void insertOrUpdateMessageThread(MessageThread thread) {
+        realmManager.insertOrUpdateMessageThread(thread);
+    }
+
+    public void updateFirebaseMessageThreadTyping(String chatId, String messageThreadId, String userName, boolean isTyping) {
+        fbManager.updateFirebaseMessageThreadTyping(chatId, messageThreadId, userName, isTyping);
     }
 }

@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="No messages - "
+            android:text="No currentlyTypingUserNames - "
             android:textColor="@color/colorPrimaryLight" />
 
         <TextView

@@ -8,4 +8,6 @@ public interface SalesAgentPresenter {
     void onUserInputChanged(String input);
     void onSendMessageClicked();
     void onDestroy();
+    void onStop();
+    void updateCurrentlyTypingName(String nameToDisplay);
 }

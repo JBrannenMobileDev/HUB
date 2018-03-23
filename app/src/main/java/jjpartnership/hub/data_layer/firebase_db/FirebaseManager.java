@@ -443,6 +443,7 @@ public class FirebaseManager {
 
     public void initChatMessagesListener(final List<String> messageThreadIds){
         List<ChildEventListener> childEventListeners = new ArrayList<>();
+        List<ValueEventListener> valueEventListeners = new ArrayList<>();
 
         for(int i = 0; i < messageThreadIds.size(); i++){
             childEventListeners.add(new ChildEventListener() {
@@ -488,6 +489,33 @@ public class FirebaseManager {
         for(int i = 0; i < messageThreadIds.size(); i++){
             chatMessagesReference.child(messageThreadIds.get(i)).child("messages").addChildEventListener(childEventListeners.get(i));
         }
+
+        for(int i = 0; i < messageThreadIds.size(); i++){
+            valueEventListeners.add(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot post : dataSnapshot.getChildren()){
+                        MessageThread thread = post.getValue(MessageThread.class);
+                        if(thread!= null){
+                            DataManager.getInstance().insertOrUpdateMessageThread(thread);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        for(int i = 0; i < messageThreadIds.size(); i++){
+            chatMessagesReference.child(messageThreadIds.get(i)).child("message_thread").addValueEventListener(valueEventListeners.get(i));
+        }
+    }
+
+    public void updateMessageThread(MessageThread thread){
+        chatMessagesReference.child(thread.getMessageThreadId()).child("message_thread").setValue(thread);
     }
 
     private void updateMainAccountModel(List<Message> messages) {
@@ -1000,5 +1028,33 @@ public class FirebaseManager {
 
             }
         });
+    }
+
+    public void updateFirebaseMessageThreadTyping(final String chatId, final String messageThreadId, final String userName, final boolean isTyping) {
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MessageThread thread = dataSnapshot.getValue(MessageThread.class);
+                if(thread != null){
+                    if(isTyping) {
+                        chatMessagesReference.child(messageThreadId).child("message_thread").child(messageThreadId).child("currentlyTypingUserNames").child(userName).setValue(userName);
+                    }else{
+                        chatMessagesReference.child(messageThreadId).child("message_thread").child(messageThreadId).child("currentlyTypingUserNames").child(userName).removeValue();
+                    }
+                }else{
+                    List<String> currentlyTypingNames = new ArrayList<>();
+                    currentlyTypingNames.add(userName);
+                    MessageThread newThread = new MessageThread(messageThreadId, chatId, null );
+                    chatMessagesReference.child(messageThreadId).child("message_thread").child(messageThreadId).setValue(newThread);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        chatMessagesReference.child(messageThreadId).child("message_thread").child(messageThreadId).addListenerForSingleValueEvent(listener);
     }
 }

@@ -16,10 +16,12 @@ import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
 
@@ -34,6 +36,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     @BindView(R.id.chat_recycler_view)RecyclerView chatRecycler;
     @BindView(R.id.fab)FloatingActionButton fab;
     @BindView(R.id.new_message_alert)TextView newMessageAlert;
+    @BindView(R.id.currently_typing_tv)TextView currentlyTypingTv;
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
@@ -65,6 +68,12 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     public void onDestroy(){
         presenter.onDestroy();
         super.onDestroy();
+    }
+
+    @Override
+    public void onStop(){
+        presenter.onStop();
+        super.onStop();
     }
 
     @Override
@@ -177,9 +186,53 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         newMessageAlert.setVisibility(View.GONE);
     }
 
+    private void animateShowCurrentlyTypingTv(){
+        currentlyTypingTv.animate().translationY(DpUtil.pxFromDp(getActivity().getApplicationContext(),25)).setDuration(0);
+        currentlyTypingTv.setVisibility(View.VISIBLE);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                currentlyTypingTv.animate().translationY(0f).setDuration(100);
+            }
+        }, 100);
+    }
+
+    private void animateHideCurrentlyTypingTv(){
+        currentlyTypingTv.animate().translationY(DpUtil.pxFromDp(getActivity().getApplicationContext(),25)).setDuration(100);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                currentlyTypingTv.setVisibility(View.GONE);            }
+        }, 100);
+    }
+
     @Override
     public void resetInputText() {
         mListener.resetUserInputSales();
+    }
+
+    @Override
+    public void onCurrentlyTypingUpdated(String nameToDisplay) {
+        if(currentlyTypingTv.isShown()){
+            if(nameToDisplay == null){
+                animateHideCurrentlyTypingTv();
+                currentlyTypingTv.setText("");
+                presenter.updateCurrentlyTypingName("");
+            }else {
+                animateHideCurrentlyTypingTv();
+                currentlyTypingTv.setText(nameToDisplay + " is typing...");
+                presenter.updateCurrentlyTypingName(nameToDisplay);
+                animateShowCurrentlyTypingTv();
+            }
+        }else{
+            if(nameToDisplay != null) {
+                currentlyTypingTv.setText(nameToDisplay + " is typing...");
+                presenter.updateCurrentlyTypingName(nameToDisplay);
+                animateShowCurrentlyTypingTv();
+            }
+        }
     }
 
     private void hideSoftKeyboard(){

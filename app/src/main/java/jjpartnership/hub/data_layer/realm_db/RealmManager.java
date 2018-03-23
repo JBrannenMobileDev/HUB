@@ -18,6 +18,8 @@ import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
+import jjpartnership.hub.data_layer.data_models.MessageThread;
+import jjpartnership.hub.data_layer.data_models.MessageThreadRealm;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
@@ -179,6 +181,17 @@ public class RealmManager {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(new UserColor(uid, color));
+            }
+        });
+        realm.close();
+    }
+
+    public void insertOrUpdateMessageThread(final MessageThread thread) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(new MessageThreadRealm(thread));
             }
         });
         realm.close();

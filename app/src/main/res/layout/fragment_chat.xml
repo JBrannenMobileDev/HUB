@@ -57,4 +57,20 @@
         android:textColor="@color/white"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/currently_typing_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="25dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="16dp"
+        android:background="@drawable/rounded_rectangle_accent"
+        android:elevation="3dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="Jonathan Brannen is typing..."
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
 </FrameLayout>
