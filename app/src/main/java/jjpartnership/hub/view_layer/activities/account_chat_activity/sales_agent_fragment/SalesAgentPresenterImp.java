@@ -2,6 +2,7 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agen
 
 import android.os.Handler;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,16 +40,15 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
     private UserRealm user;
     private GroupChatRealm groupChat;
     private MessageThreadRealm messageThread;
+    private RealmResults<MessageRealm> messages;
     private Handler handler;
     private Runnable runnable;
-    private String currentlyTypingName;
 
     public SalesAgentPresenterImp(SalesAgentView fragment, String account_name, String account_id) {
         this.fragment = fragment;
         realm = RealmUISingleton.getInstance().getRealmInstance();
         accountName = account_name;
         accountId = account_id;
-        currentlyTypingName = "";
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -65,7 +65,7 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
         groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", chatId).findFirst();
         user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
         messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", groupChat.getMessageThreadId()).findFirst();
-        RealmResults<MessageRealm> messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
+        messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
         if(messageThread != null) {
             messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
                 @Override
@@ -80,14 +80,19 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
                 fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm), user.getUid().equals(messagesRealm.get(messagesRealm.size() - 1).getUid()));
             }
         });
-        fragment.onReceiveMessages(messages, getUsersColors(messages), user.getUid().equals(messages.get(messages.size()-1).getUid()));
+        fragment.onReceiveMessages(messages, getUsersColors(messages), user.getUid().equals(messages.get(messages.size() - 1).getUid()));
+        updateAllMessagesToRead(messages);
+    }
+
+    private void updateAllMessagesToRead(RealmResults<MessageRealm> messages) {
+        DataManager.getInstance().updateMessages(messages);
     }
 
     private String getNameToDisplay(RealmList<String> currentlyTypingUserNames) {
         String nameToDisplay = null;
         if(currentlyTypingUserNames != null && currentlyTypingUserNames.size() > 0){
             for(int i = currentlyTypingUserNames.size()-1; i >= 0; i--){
-                if(!currentlyTypingUserNames.get(i).equals(currentlyTypingName) && !currentlyTypingUserNames.get(i).equals(user.getFirstName() + " " + user.getLastName())){
+                if(!currentlyTypingUserNames.get(i).equals(user.getFirstName() + " " + user.getLastName())){
                     return currentlyTypingUserNames.get(i);
                 }
             }
@@ -146,14 +151,9 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
 
     @Override
     public void onStop() {
+        if(messages != null) messages.removeAllChangeListeners();
+        if(messageThread != null) messageThread.removeAllChangeListeners();
         DataManager.getInstance().updateFirebaseMessageThreadTyping(groupChat.getChatId(),
                 groupChat.getMessageThreadId(), user.getFirstName() + " " + user.getLastName(), false);
     }
-
-    @Override
-    public void updateCurrentlyTypingName(String nameDisplayed) {
-        this.currentlyTypingName = nameDisplayed;
-    }
-
-
 }

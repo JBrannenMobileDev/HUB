@@ -103,27 +103,27 @@
                             android:text="6:56AM - 03/13/18"
                             android:textColor="@color/colorPrimaryLight"
                             android:textSize="12sp" />
-                    </LinearLayout>
 
-                    <com.tuyenmonkey.mkloader.MKLoader
-                        android:id="@+id/sending_animation_mk"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        app:mk_color="@color/colorPrimaryLight"
-                        app:mk_type="Sharingan" />
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/status_tv"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom"
-                        android:layout_marginLeft="8dp"
-                        android:layout_marginRight="8dp"
-                        android:text="Sending"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:text="Sending..."
                         android:textAlignment="viewEnd"
                         android:textColor="@color/colorPrimaryLight"
                         android:textSize="12sp"
-                        android:visibility="gone" />
+                        android:visibility="visible" />
+
+                    <com.tuyenmonkey.mkloader.MKLoader
+                        android:id="@+id/sending_animation_mk"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:mk_color="@color/colorPrimaryLight"
+                        app:mk_type="Sharingan" />
 
                 </LinearLayout>
 

@@ -110,4 +110,8 @@ public class Message implements Comparable<Message>{
     public void setMessageContent(String messageContent) {
         this.messageContent = messageContent;
     }
+
+    public void addReadByUid(String uid) {
+        readByUids.add(uid);
+    }
 }

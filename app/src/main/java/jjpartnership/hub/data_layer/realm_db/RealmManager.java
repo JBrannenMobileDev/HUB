@@ -196,4 +196,19 @@ public class RealmManager {
         });
         realm.close();
     }
+
+    public void insertOrUpdateMessages(List<Message> messageList) {
+        final RealmList<MessageRealm> realmMessages = new RealmList<>();
+        for(Message message : messageList){
+            realmMessages.add(new MessageRealm(message));
+        }
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(realmMessages);
+            }
+        });
+        realm.close();
+    }
 }

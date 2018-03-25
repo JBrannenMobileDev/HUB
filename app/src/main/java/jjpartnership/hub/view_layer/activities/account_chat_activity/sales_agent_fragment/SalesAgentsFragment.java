@@ -215,21 +215,20 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
 
     @Override
     public void onCurrentlyTypingUpdated(String nameToDisplay) {
-        if(currentlyTypingTv.isShown()){
-            if(nameToDisplay == null){
-                animateHideCurrentlyTypingTv();
-                currentlyTypingTv.setText("");
-                presenter.updateCurrentlyTypingName("");
-            }else {
-                animateHideCurrentlyTypingTv();
-                currentlyTypingTv.setText(nameToDisplay + " is typing...");
-                presenter.updateCurrentlyTypingName(nameToDisplay);
-                animateShowCurrentlyTypingTv();
+        if (currentlyTypingTv.isShown()) {
+            if(!currentlyTypingTv.getText().equals(nameToDisplay)) {
+                if (nameToDisplay == null) {
+                    animateHideCurrentlyTypingTv();
+                    currentlyTypingTv.setText("");
+                } else {
+                    animateHideCurrentlyTypingTv();
+                    currentlyTypingTv.setText(nameToDisplay + " is typing...");
+                    animateShowCurrentlyTypingTv();
+                }
             }
-        }else{
-            if(nameToDisplay != null) {
+        } else {
+            if (nameToDisplay != null) {
                 currentlyTypingTv.setText(nameToDisplay + " is typing...");
-                presenter.updateCurrentlyTypingName(nameToDisplay);
                 animateShowCurrentlyTypingTv();
             }
         }

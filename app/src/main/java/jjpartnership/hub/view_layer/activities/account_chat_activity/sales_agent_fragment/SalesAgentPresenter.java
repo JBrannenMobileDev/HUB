@@ -9,5 +9,4 @@ public interface SalesAgentPresenter {
     void onSendMessageClicked();
     void onDestroy();
     void onStop();
-    void updateCurrentlyTypingName(String nameToDisplay);
 }

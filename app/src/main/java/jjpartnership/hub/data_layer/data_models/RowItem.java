@@ -17,9 +17,18 @@ public class RowItem extends RealmObject implements Comparable{
     private String accountName;
     private String messageOwnerName;
     private String messageContent;
+    private boolean isNewMessage;
     private long messageCreatedAtTime;
 
     public RowItem() {
+    }
+
+    public boolean isNewMessage() {
+        return isNewMessage;
+    }
+
+    public void setNewMessage(boolean newMessage) {
+        this.isNewMessage = newMessage;
     }
 
     public String getAccountId() {

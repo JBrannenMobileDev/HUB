@@ -1,7 +1,10 @@
 package jjpartnership.hub.data_layer;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
@@ -15,6 +18,7 @@ import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
 import jjpartnership.hub.data_layer.realm_db.RealmManager;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.UserPreferences;
 
 /**
  * Created by jbrannen on 2/24/18.
@@ -122,5 +126,20 @@ public class DataManager {
 
     public void updateFirebaseMessageThreadTyping(String chatId, String messageThreadId, String userName, boolean isTyping) {
         fbManager.updateFirebaseMessageThreadTyping(chatId, messageThreadId, userName, isTyping);
+    }
+
+    public void updateMessages(RealmResults<MessageRealm> messages) {
+        List<Message> messageList = new ArrayList<>();
+        for(MessageRealm realmMessage : messages){
+            Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
+            String thisUid = UserPreferences.getInstance().getUid();
+            if(!temp.getReadByUids().contains(thisUid)) {
+                temp.addReadByUid(thisUid);
+                messageList.add(temp);
+            }
+        }if(messageList.size() > 0) {
+            realmManager.insertOrUpdateMessages(messageList);
+            fbManager.updateMessages(messageList);
+        }
     }
 }

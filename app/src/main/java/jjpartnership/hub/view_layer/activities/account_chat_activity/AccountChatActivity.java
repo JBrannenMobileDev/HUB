@@ -24,12 +24,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.cutomer_chat_fragment.CustomerChatFragment;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        CustomerChatFragment.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener, AccountChatView{
+        CustomerChatFragment.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener,
+        AccountChatView, AccountDetailsFragment.OnAccountDetailsInteractionListener{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
     @BindView(R.id.send_image_view)ImageView sendImage;
@@ -42,6 +44,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     private int colorGrey;
     private SalesAgentsFragment salesAgentFragment;
     private CustomerChatFragment customerChatFragment;
+    private AccountDetailsFragment accountDetailsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,12 +60,16 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         bundle.putString("account_id", getIntent().getStringExtra("account_id"));
         salesAgentFragment = new SalesAgentsFragment();
         customerChatFragment = new CustomerChatFragment();
+        accountDetailsFragment = new AccountDetailsFragment();
         salesAgentFragment.setArguments(bundle);
         customerChatFragment.setArguments(bundle);
+        accountDetailsFragment.setArguments(bundle);
+        adapter.addFragment(accountDetailsFragment, "Details");
         adapter.addFragment(salesAgentFragment, "Sales Team");
-        adapter.addFragment(customerChatFragment, "Account");
+        adapter.addFragment(customerChatFragment, "Customer");
         pager.setAdapter(adapter);
         tabLayout.setupWithViewPager(pager);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
         colorOrange = ContextCompat.getColor(getApplicationContext(), R.color.colorOrange);
         colorGrey = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryVeryLight);
         initListeners();
@@ -88,7 +95,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         userInputSalesTeam.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-
+                pager.setCurrentItem(1, true);
                 return false;
             }
         });
@@ -152,8 +159,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
             @Override
             public void onPageSelected(int position) {
-                hideKeyboard();
-                swapEditTextVisibility();
+                setEditTextVisible(position);
             }
 
             @Override
@@ -166,22 +172,28 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         userInputCustomer.setBackPressedListener(this);
     }
 
-    private void swapEditTextVisibility() {
+    private void setEditTextVisible(int position) {
         if(userInputSalesTeam.isShown()){
-            userInputSalesTeam.setVisibility(View.GONE);
-            userInputCustomer.setVisibility(View.VISIBLE);
-            if(userInputCustomer.getText().length() > 0){
-                setSendImageColor(colorOrange);
-            }else{
-                setSendImageColor(colorGrey);
+            if(position != 1) {
+                hideKeyboard();
+                userInputSalesTeam.setVisibility(View.GONE);
+                userInputCustomer.setVisibility(View.VISIBLE);
+                if (userInputCustomer.getText().length() > 0) {
+                    setSendImageColor(colorOrange);
+                } else {
+                    setSendImageColor(colorGrey);
+                }
             }
         }else{
-            userInputSalesTeam.setVisibility(View.VISIBLE);
-            userInputCustomer.setVisibility(View.GONE);
-            if(userInputSalesTeam.getText().length() > 0){
-                setSendImageColor(colorOrange);
-            }else{
-                setSendImageColor(colorGrey);
+            if(position != 2) {
+                hideKeyboard();
+                userInputSalesTeam.setVisibility(View.VISIBLE);
+                userInputCustomer.setVisibility(View.GONE);
+                if (userInputSalesTeam.getText().length() > 0) {
+                    setSendImageColor(colorOrange);
+                } else {
+                    setSendImageColor(colorGrey);
+                }
             }
         }
     }

@@ -2,8 +2,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/accounts_item_frame_layout"
     android:layout_width="match_parent"
-    android:background="?android:attr/selectableItemBackground"
-    android:layout_height="64dp">
+    android:layout_height="64dp"
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/account_icon_tv"
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:text="No currentlyTypingUserNames - "
+            android:text="No messages - "
             android:textColor="@color/colorPrimaryLight" />
 
         <TextView

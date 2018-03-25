@@ -10,7 +10,7 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
+        android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         android:minHeight="?attr/actionBarSize"
@@ -23,7 +23,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="48dp"
         android:orientation="vertical">
 
         <android.support.v4.view.ViewPager
@@ -59,7 +59,7 @@
                 android:backgroundTint="@android:color/transparent"
                 android:enabled="true"
                 android:focusable="true"
-                android:hint="Message (Sales Team)"
+                android:hint="Group Message (sales team)"
                 android:inputType="textCapSentences|textMultiLine"
                 android:isScrollContainer="true"
                 android:maxLines="4"
@@ -76,7 +76,7 @@
                 android:backgroundTint="@android:color/transparent"
                 android:enabled="true"
                 android:focusable="true"
-                android:hint="Message (Account)"
+                android:hint="Group Message (Customer)"
                 android:inputType="textCapSentences|textMultiLine"
                 android:isScrollContainer="true"
                 android:maxLines="4"

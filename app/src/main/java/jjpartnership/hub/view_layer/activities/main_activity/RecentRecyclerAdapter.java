@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -71,7 +72,6 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
         RowItem rowItem = dataModel.getRowItems().get(position);
         holder.accountName.setText(rowItem.getAccountName());
         if(rowItem.getMessageCreatedAtTime() != 0) {
@@ -84,6 +84,17 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
             holder.messageContent.setText(rowItem.getMessageContent());
         }
         holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
+        if(rowItem.isNewMessage()){
+            holder.accountName.setTextColor(Color.BLACK);
+            holder.messageOwnerName.setTextColor(Color.BLACK);
+            holder.messageTime.setTextColor(Color.BLACK);
+            holder.messageContent.setTextColor(Color.BLACK);
+        }else{
+            holder.accountName.setTextColor(context.getResources().getColor(R.color.grey_text));
+            holder.messageOwnerName.setTextColor(context.getResources().getColor(R.color.grey_text));
+            holder.messageTime.setTextColor(context.getResources().getColor(R.color.grey_text));
+            holder.messageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
+        }
     }
 
     @Override

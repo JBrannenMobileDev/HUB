@@ -101,11 +101,11 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
                 if(isUserMessage){
                     holder.userIcon.setVisibility(View.GONE);
                     holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
-                    setLayoutMargin(holder, 48, 8, 8, 16);
+                    setLayoutMargin(holder, 48, 8, 8, 32);
                 }else{
                     holder.userIcon.setVisibility(View.VISIBLE);
                     holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
-                    setLayoutMargin(holder, 8, 8, 48, 16);
+                    setLayoutMargin(holder, 8, 8, 48, 32);
                 }
             }else {
                 if(isUserMessage){
@@ -159,10 +159,10 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
                     holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                     if(isUserMessage){
                         holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user_top_right));
-                        setLayoutMargin(holder, 48, 2, 8, 16);
+                        setLayoutMargin(holder, 48, 2, 8, 32);
                     }else{
                         holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
-                        setLayoutMargin(holder, 8, 2, 48, 16);
+                        setLayoutMargin(holder, 8, 2, 48, 32);
                     }
                 }else{
                     holder.nameDateTimeLayout.setVisibility(View.GONE);
@@ -191,10 +191,10 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
                     holder.nameDateTimeLayout.setVisibility(View.VISIBLE);
                     if(isUserMessage){
                         holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_user));
-                        setLayoutMargin(holder, 48, 24, 8, 16);
+                        setLayoutMargin(holder, 48, 24, 8, 32);
                     }else{
                         holder.messageOnlyContentLayout.setBackground(context.getResources().getDrawable(R.drawable.rounded_rectangle_non_user_top_left));
-                        setLayoutMargin(holder, 8, 24, 48, 16);
+                        setLayoutMargin(holder, 8, 24, 48, 32);
                     }
                 }else{
                     String nextMessageUid = dataModel.get(position + 1).getUid();
