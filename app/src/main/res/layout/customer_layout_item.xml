@@ -114,37 +114,37 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/recent_empty_state_tv2"
+                android:id="@+id/contact_name_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:text="Samantha Miller"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/grey_text"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/recent_empty_state_tv"
+                android:id="@+id/contact_phone_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:text="Phone: (951)295-3343"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/grey_text"
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/recent_empty_state_tv3"
+                android:id="@+id/contact_email_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
                 android:text="Email: sMller@thermofisher.com"
-                android:textColor="@color/colorPrimary"
+                android:textColor="@color/grey_text"
                 android:textSize="14sp" />
 
         </LinearLayout>

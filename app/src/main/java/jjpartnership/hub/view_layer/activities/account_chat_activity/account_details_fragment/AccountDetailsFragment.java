@@ -7,12 +7,21 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 
-public class AccountDetailsFragment extends Fragment {
+public class AccountDetailsFragment extends Fragment implements AccountDetailsView{
+    @BindView(R.id.account_details_address_tv)TextView addressTv;
+    @BindView(R.id.account_details_industries_tv)TextView industriesTv;
 
     private OnAccountDetailsInteractionListener mListener;
+    private AccountDetailsPresenter presenter;
 
     public AccountDetailsFragment() {
         // Required empty public constructor
@@ -23,7 +32,12 @@ public class AccountDetailsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_account_details, container, false);
+        View v = inflater.inflate(R.layout.fragment_account_details, container, false);
+        ButterKnife.bind(this, v);
+        presenter = new AccountDetailsPresenterImp(this, getArguments().getString("account_name"),
+                getArguments().getString("account_id"));
+
+        return v;
     }
 
     @Override
@@ -41,6 +55,17 @@ public class AccountDetailsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @OnClick(R.id.driving_directions_iv)
+    public void onGetDirectionsClicked(){
+        presenter.onDirectionsClicked();
+    }
+
+    @Override
+    public void onReceiveCompanyData(String address, String industries) {
+        addressTv.setText(address);
+        industriesTv.setText(industries);
     }
 
     public interface OnAccountDetailsInteractionListener {

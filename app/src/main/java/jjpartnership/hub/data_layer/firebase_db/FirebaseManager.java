@@ -298,7 +298,23 @@ public class FirebaseManager {
 
                     }
                 };
+
+                ValueEventListener usersListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if(user != null){
+                            DataManager.getInstance().updateRealmUser(user);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
                 database.getReference("user_colors").child(uid).addListenerForSingleValueEvent(userColorsListener);
+                usersReference.child(uid).addListenerForSingleValueEvent(usersListener);
             }
         }else{
             fetchDirectChats(currentUser.getDirectChatIds());

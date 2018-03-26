@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/chat_bg"
+    android:background="@color/colorPrimaryVeryLight"
     tools:context="jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -24,7 +24,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Account Details"
-                android:textColor="@color/grey_text"
+                android:textColor="@color/colorPrimaryLight"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -39,56 +39,103 @@
                 android:paddingBottom="8dp"
                 android:paddingTop="8dp">
 
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp">
-
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:text="Address:"
-                        android:textColor="@color/grey_text" />
-
-                    <TextView
-                        android:id="@+id/textView5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="100dp"
-                        android:layout_weight="1"
-                        android:text="39329 Via Zaragoza Murrieta, Ca 92563"
-                        android:textColor="@color/grey_text" />
-                </FrameLayout>
-
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_marginTop="4dp">
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/textView3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:text="Address:"
+                        android:textColor="@color/grey_text"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
                         android:text="Industries:"
+                        android:textColor="@color/grey_text"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/account_details_address_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
+                        android:text="39329 Via Zaragoza Murrieta, Ca 92563"
                         android:textColor="@color/grey_text" />
 
                     <TextView
-                        android:id="@+id/textView5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="100dp"
+                        android:id="@+id/account_details_industries_tv"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Academia, Science and Education"
                         android:textColor="@color/grey_text" />
-                </FrameLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/driving_directions_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/rounded_rectangle_blue_stroke"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingBottom="4dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="4dp">
+
+                    <TextView
+                        android:id="@+id/textView12"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:paddingEnd="4dp"
+                        android:text="Directions"
+                        android:textColor="@color/colorAccent" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1">
+
+                        <ImageView
+                            android:id="@+id/imageView5"
+                            android:layout_width="35dp"
+                            android:layout_height="35dp"
+                            android:layout_gravity="center_vertical"
+                            android:layout_weight="1"
+                            android:src="@drawable/ic_directions_black_24dp"
+                            android:tint="@color/colorAccent" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
             </LinearLayout>
 
             <TextView
@@ -98,7 +145,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="32dp"
                 android:text="Account Contact"
-                android:textColor="@color/grey_text"
+                android:textColor="@color/colorPrimaryLight"
                 android:textStyle="bold" />
 
             <FrameLayout
@@ -127,7 +174,7 @@
                 android:layout_marginLeft="16dp"
                 android:layout_marginTop="32dp"
                 android:text="Assigned Sales Agents"
-                android:textColor="@color/grey_text"
+                android:textColor="@color/colorPrimaryLight"
                 android:textStyle="bold" />
 
             <FrameLayout
