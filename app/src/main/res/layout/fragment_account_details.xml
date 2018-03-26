@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryVeryLight"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -82,8 +83,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_weight="1"
+                        android:paddingEnd="16dp"
                         android:text="39329 Via Zaragoza Murrieta, Ca 92563"
-                        android:textColor="@color/grey_text" />
+                        android:textColor="@color/grey_text"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/account_details_industries_tv"
@@ -91,7 +94,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Academia, Science and Education"
-                        android:textColor="@color/grey_text" />
+                        android:textColor="@color/grey_text"
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -100,7 +104,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="8dp"
                     android:background="@drawable/rounded_rectangle_blue_stroke"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
@@ -143,15 +147,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="32dp"
-                android:text="Account Contact"
+                android:layout_marginTop="16dp"
+                android:text="Account Contacts"
                 android:textColor="@color/colorPrimaryLight"
                 android:textStyle="bold" />
 
             <FrameLayout
                 android:id="@+id/account_contacts_frame_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="8dp"
@@ -161,7 +165,7 @@
                 android:paddingTop="2dp">
 
                 <android.support.v7.widget.RecyclerView
-                    android:id="@+id/accountContacts_recycler_view"
+                    android:id="@+id/account_contacts_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false" />
@@ -172,7 +176,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:text="Assigned Sales Agents"
                 android:textColor="@color/colorPrimaryLight"
                 android:textStyle="bold" />
@@ -180,7 +184,7 @@
             <FrameLayout
                 android:id="@+id/assigned_sales_agents_frame_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
@@ -198,6 +202,6 @@
             </FrameLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
 </FrameLayout>

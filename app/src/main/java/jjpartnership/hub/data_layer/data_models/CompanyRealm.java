@@ -56,6 +56,7 @@ public class CompanyRealm extends RealmObject{
         this.accountList = createAccountList(company.getAccountList());
         this.salesCompany = company.isSalesCompany();
         this.buyerCompany = company.isBuyerCompany();
+        this.companyId = company.getCompanyId();
     }
 
     private RealmList<String> createIndustryList(List<String> industryList) {

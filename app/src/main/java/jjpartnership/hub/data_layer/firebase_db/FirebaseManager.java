@@ -23,6 +23,7 @@ import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
+import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
@@ -277,6 +278,12 @@ public class FirebaseManager {
         final Set<String> uids = new HashSet<>();
         for(GroupChat chat : groupChats){
             if(chat.getUserIdsList() != null) uids.addAll(chat.getUserIdsList());
+        }
+        RealmResults<CompanyRealm> companies = RealmUISingleton.getInstance().getRealmInstance().where(CompanyRealm.class).findAll();
+        if(companies != null && companies.size() > 0){
+            for(CompanyRealm company : companies) {
+                uids.addAll(company.getEmployeeList());
+            }
         }
 
         if(uids.size() > 0) {
