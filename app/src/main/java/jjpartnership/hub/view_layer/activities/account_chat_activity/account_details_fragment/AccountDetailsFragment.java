@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -175,6 +176,18 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         agentsAdapter = new AssignedAgentsRecyclerAdapter(getActivity().getApplicationContext(), salesAgents,
                 agentSelectedCallback, agentDirectMessageSelectedCallback);
         agentsRecycler.setAdapter(agentsAdapter);
+    }
+
+    @Override
+    public void launchDirectionsIntent(String address) {
+        if(address != null && !address.isEmpty()) {
+            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + address);
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+            startActivity(mapIntent);
+        }else{
+            Toast.makeText(getActivity().getApplicationContext(), "The company's address is unavailable.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public interface OnAccountDetailsInteractionListener {

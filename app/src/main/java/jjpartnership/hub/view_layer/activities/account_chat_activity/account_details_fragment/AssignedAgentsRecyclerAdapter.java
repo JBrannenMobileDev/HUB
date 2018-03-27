@@ -41,6 +41,7 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
         TextView role;
         TextView userIcon;
         FrameLayout root;
+        FrameLayout greyDivider;
         ImageView directMessageIv;
         public ViewHolder(View v) {
             super(v);
@@ -50,6 +51,7 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
             businessUnit = v.findViewById(R.id.info1_tv);
             role = v.findViewById(R.id.info2_tv);
             directMessageIv = v.findViewById(R.id.send_direct_message_iv);
+            greyDivider = v.findViewById(R.id.grey_divider_frame_layout);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,9 +90,11 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
         }else{
             holder.role.setText("Role: " + user.getRole());
         }
+        if(position == 0){
+            holder.greyDivider.setVisibility(View.GONE);
+        }
         holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));
         holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
-        holder.userIcon.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(user.getUserColor())));
     }
 
     @Override

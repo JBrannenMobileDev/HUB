@@ -49,6 +49,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter<ContactsRecycl
         FrameLayout root;
         LinearLayout directMessage;
         LinearLayout emailLayout;
+        FrameLayout greyDivider;
         LinearLayout call;
         public ViewHolder(View v) {
             super(v);
@@ -60,6 +61,7 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter<ContactsRecycl
             directMessage = v.findViewById(R.id.direct_message_layout);
             emailLayout = v.findViewById(R.id.send_email_layout);
             call = v.findViewById(R.id.call_layout);
+            greyDivider = v.findViewById(R.id.grey_divider_frame_layout);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -71,19 +73,19 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter<ContactsRecycl
             directMessage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    directMessageSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
                 }
             });
             emailLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    emailSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
                 }
             });
             call.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    callSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
                 }
             });
         }
@@ -104,7 +106,9 @@ public class ContactsRecyclerAdapter extends RecyclerView.Adapter<ContactsRecycl
         holder.number.setText("Phone number: " + getFormattedNumber(user.getPhoneNumber()));
         holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));
         holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
-        holder.userIcon.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(user.getUserColor())));
+        if(position == 0){
+            holder.greyDivider.setVisibility(View.GONE);
+        }
     }
 
     private String getFormattedNumber(String phoneNumber) {

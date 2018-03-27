@@ -276,9 +276,6 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
             if(userColorMap != null && !userColorMap.isEmpty()) {
                 holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
                 holder.messageOnlyContentLayout.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(userColorMap.get(message.getUid()).intValue())));
-                holder.userIcon.setTextColor(context.getResources().getColor(UserColorUtil.getUserColorDark(userColorMap.get(message.getUid()).intValue())));
-            }else{
-                holder.userIcon.setTextColor(context.getResources().getColor(R.color.colorAccentDark));
             }
             holder.messageContent.setTextColor(context.getResources().getColor(R.color.white));
             paramsMessageContentLayhout.setMargins((int)DpUtil.pxFromDp(context, 34), (int)DpUtil.pxFromDp(context, 0),

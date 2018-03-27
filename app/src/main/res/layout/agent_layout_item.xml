@@ -6,6 +6,14 @@
     android:background="?android:attr/selectableItemBackground"
     android:elevation="2dp">
 
+    <FrameLayout
+        android:id="@+id/grey_divider_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/colorPrimaryVeryLight">
+
+    </FrameLayout>
+
     <ImageView
         android:id="@+id/send_direct_message_iv"
         android:layout_width="50dp"

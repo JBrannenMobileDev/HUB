@@ -100,6 +100,6 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
 
     @Override
     public void onDirectionsClicked() {
-
+        fragment.launchDirectionsIntent(company.getAddress());
     }
 }

@@ -65,8 +65,8 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         customerChatFragment.setArguments(bundle);
         accountDetailsFragment.setArguments(bundle);
         adapter.addFragment(accountDetailsFragment, "Details");
-        adapter.addFragment(salesAgentFragment, "Sales Team");
-        adapter.addFragment(customerChatFragment, "Customer");
+        adapter.addFragment(salesAgentFragment, "Sales Team Chat");
+        adapter.addFragment(customerChatFragment, "Customer Chat");
         pager.setAdapter(adapter);
         tabLayout.setupWithViewPager(pager);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
