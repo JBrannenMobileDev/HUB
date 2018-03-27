@@ -91,6 +91,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="sale_agent_chat_empty_state_message">Group chat for the sales team! Only sales agents can see this conversation.</string>
     <string name="customer_chat_empty_state_message">Group chat for the Account. Account reps and sales agents can see this conversation.</string>
-    <string name="sales_agent_welcome_message">ClickField is a messaging application that connects sales agents to their teams and to their customers. You can keep everyone in the loop, share leads with your sales team and respond instantly to your customers\' inquiries.</string>
+    <string name="sales_agent_welcome_message">ClickField is a messaging application that connects sales agents to their teams and to their customers. You share leads with your sales team and respond instantly to your customers\' inquiries, while keeping everyone in the loop!</string>
     <string name="customer_welcome_message">ClickField is a messaging application that connects you to your sales reps. Find out the correct sales rep for your needs in minutes!</string>
 </resources>

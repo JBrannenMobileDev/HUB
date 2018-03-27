@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryVeryLight"
     android:orientation="vertical"
     tools:context="jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity">
 
@@ -38,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:background="@color/white"
-            android:elevation="4dp">
+            android:elevation="4dp"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/send_image_view"

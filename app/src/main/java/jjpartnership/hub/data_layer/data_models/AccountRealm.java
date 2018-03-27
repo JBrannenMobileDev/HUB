@@ -1,5 +1,8 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import java.util.Map;
+
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -15,17 +18,20 @@ public class AccountRealm extends RealmObject{
     private String groupChatSalesId;
     private String groupChatCustomerId;
     private String accountId;
+    private RealmList<String> accountSalesAgentUids;
 
     public AccountRealm() {
     }
 
-    public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId, String groupChatCustomerId, String accountId) {
+    public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
+                        String groupChatCustomerId, String accountId, RealmList<String> accountUids) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
         this.groupChatSalesId = groupChatId;
         this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
+        this.accountSalesAgentUids = accountUids;
     }
 
     public AccountRealm(Account account){
@@ -35,6 +41,26 @@ public class AccountRealm extends RealmObject{
         this.groupChatSalesId = account.getGroupChatSalesId();
         this.accountId = account.getAccountId();
         this.groupChatCustomerId = account.getGroupChatCustomerId();
+        this.accountSalesAgentUids = createRealmList(account.getAccountUsers());
+    }
+
+    private RealmList<String> createRealmList(Map<String, String> accountUsers) {
+        if(accountUsers != null) {
+            RealmList<String> userList = new RealmList<>();
+            for (String uid : accountUsers.values()) {
+                userList.add(uid);
+            }
+            return userList;
+        }
+        return new RealmList<>();
+    }
+
+    public RealmList<String> getAccountSalesAgentUids() {
+        return accountSalesAgentUids;
+    }
+
+    public void setAccountSalesAgentUids(RealmList<String> accountSalesAgentUids) {
+        this.accountSalesAgentUids = accountSalesAgentUids;
     }
 
     public String getGroupChatCustomerId() {

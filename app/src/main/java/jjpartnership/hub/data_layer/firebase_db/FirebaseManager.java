@@ -172,35 +172,50 @@ public class FirebaseManager {
 
     }
 
-    private void getCustomerIds(List<Account> accountList) {
-        for(Account account : accountList) {
-            String companyId;
-            if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
-                companyId = account.getCompanyCustomerId();
-            } else {
-                companyId = account.getCompanySalesId();
+    private void getCustomerIds(final List<Account> accountList) {
+        ValueEventListener companySalesListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Company company = dataSnapshot.getValue(Company.class);
+                if (company != null) {
+                    companies.add(company);
+                }
+                for(Account account : accountList) {
+                    String companyId;
+                    if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
+                        companyId = account.getCompanyCustomerId();
+                    } else {
+                        companyId = account.getCompanySalesId();
+                    }
+
+                    ValueEventListener companyListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Company company = dataSnapshot.getValue(Company.class);
+                            if (company != null) {
+                                companies.add(company);
+                            }
+                            if(companies.size() - 1 == accounts.size()){
+                                DataManager.getInstance().updateRealmCompanys(companies);
+                                getGroupChat(accounts);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    };
+                    companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
+                }
             }
 
-            ValueEventListener companyListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Company company = dataSnapshot.getValue(Company.class);
-                    if (company != null) {
-                        companies.add(company);
-                    }
-                    if(companies.size() == accounts.size()){
-                        DataManager.getInstance().updateRealmCompanys(companies);
-                        getGroupChat(accounts);
-                    }
-                }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            };
-            companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
-        }
+            }
+        };
+        companiesReference.child(accountList.get(0).getCompanySalesId()).addListenerForSingleValueEvent(companySalesListener);
     }
 
     private void getGroupChat(final List<Account> accountList) {
@@ -285,6 +300,7 @@ public class FirebaseManager {
                 uids.addAll(company.getEmployeeList());
             }
         }
+
 
         if(uids.size() > 0) {
             for (String uid : uids) {
@@ -422,8 +438,19 @@ public class FirebaseManager {
         Collections.reverse(recentRowItems);
         recentModel.setRowItems(recentRowItems);
 
-        DataManager.getInstance().updateRealmMainModels(accountsModel, recentModel);
+        DataManager.getInstance().updateRealmMainModels(accountsModel, filterModel(recentModel));
         initChatMessagesListener(groupChats, directChats);
+    }
+
+    private MainRecentModel filterModel(MainRecentModel recentModel) {
+        RealmList<RowItem> filteredRowItems = new RealmList<>();
+        for(RowItem item : recentModel.getRowItems()){
+            if(item.getMessageCreatedAtTime() > 0){
+                filteredRowItems.add(item);
+            }
+        }
+        recentModel.setRowItems(filteredRowItems);
+        return recentModel;
     }
 
     private void initChatMessagesListener(List<GroupChat> groupChats, List<DirectChat> directChats) {
@@ -623,7 +650,7 @@ public class FirebaseManager {
             Collections.reverse(recentRowItems);
             recentModel.setRowItems(recentRowItems);
 
-            DataManager.getInstance().updateRealmMainModels(copy, recentModel);
+            DataManager.getInstance().updateRealmMainModels(copy, filterModel(recentModel));
         }
     }
 
@@ -742,6 +769,10 @@ public class FirebaseManager {
 
             }
         });
+    }
+
+    private void updateAccountSalesAgentUids(String accountId, String uid) {
+        accountsReference.child(accountId).child("accountUsers").child(uid).setValue(uid);
     }
 
     public void onBoardNewSalesCompany(){
@@ -883,10 +914,10 @@ public class FirebaseManager {
         User salesUser1 = new User();
         salesUser1.setUid(newUser1Ref.getKey());
         salesUser1.setCompanyId(customerCompany.getCompanyId());
-        salesUser1.setEmail("jjbrent@gmail.com");
-        salesUser1.setFirstName("Jay");
-        salesUser1.setLastName("Brent");
-        salesUser1.setPhoneNumber("9512950355");
+        salesUser1.setEmail("memorizeitBible@gmail.com");
+        salesUser1.setFirstName("Adam");
+        salesUser1.setLastName("Truley");
+        salesUser1.setPhoneNumber("9512950348");
         salesUser1.setUserType("account_rep");
         salesUser1.setRole("rep1");
         salesUser1.addAccount(accountId);
@@ -911,6 +942,10 @@ public class FirebaseManager {
         salesUser1.addAccount(accountB.getAccountIdFire());
         salesUser1.addAccount(accountC.getAccountIdFire());
         salesUser1.addAccount(accountD.getAccountIdFire());
+        updateAccountSalesAgentUids(accountA.getAccountIdFire(), newUser1Ref.getKey());
+        updateAccountSalesAgentUids(accountB.getAccountIdFire(), newUser1Ref.getKey());
+        updateAccountSalesAgentUids(accountC.getAccountIdFire(), newUser1Ref.getKey());
+        updateAccountSalesAgentUids(accountD.getAccountIdFire(), newUser1Ref.getKey());
         salesUser1.setUserColor(UserColorUtil.getRandomUserColorId());
         updateOrCreateUserColor(salesUser1.getUserColor(), salesUser1.getUid());
         usersReference.child(salesUser1.getUid()).setValue(salesUser1);
@@ -928,6 +963,8 @@ public class FirebaseManager {
         salesUser2.setRole("CEO");
         salesUser2.addAccount(accountA.getAccountIdFire());
         salesUser2.addAccount(accountB.getAccountIdFire());
+        updateAccountSalesAgentUids(accountA.getAccountIdFire(), newUser2Ref.getKey());
+        updateAccountSalesAgentUids(accountB.getAccountIdFire(), newUser2Ref.getKey());
         salesUser2.setUserColor(UserColorUtil.getRandomUserColorId());
         updateOrCreateUserColor(salesUser2.getUserColor(), salesUser2.getUid());
         usersReference.child(salesUser2.getUid()).setValue(salesUser2);
@@ -945,6 +982,8 @@ public class FirebaseManager {
         salesUser3.setRole("sales_lvl_1");
         salesUser3.addAccount(accountC.getAccountIdFire());
         salesUser3.addAccount(accountD.getAccountIdFire());
+        updateAccountSalesAgentUids(accountC.getAccountIdFire(), newUser3Ref.getKey());
+        updateAccountSalesAgentUids(accountD.getAccountIdFire(), newUser3Ref.getKey());
         salesUser3.setUserColor(UserColorUtil.getRandomUserColorId());
         updateOrCreateUserColor(salesUser3.getUserColor(), salesUser3.getUid());
         usersReference.child(salesUser3.getUid()).setValue(salesUser3);
@@ -963,6 +1002,9 @@ public class FirebaseManager {
         salesUser4.addAccount(accountA.getAccountIdFire());
         salesUser4.addAccount(accountD.getAccountIdFire());
         salesUser4.addAccount(accountB.getAccountIdFire());
+        updateAccountSalesAgentUids(accountA.getAccountIdFire(), newUser4Ref.getKey());
+        updateAccountSalesAgentUids(accountB.getAccountIdFire(), newUser4Ref.getKey());
+        updateAccountSalesAgentUids(accountD.getAccountIdFire(), newUser4Ref.getKey());
         salesUser4.setUserColor(UserColorUtil.getRandomUserColorId());
         updateOrCreateUserColor(salesUser4.getUserColor(), salesUser4.getUid());
         usersReference.child(salesUser4.getUid()).setValue(salesUser4);
@@ -981,6 +1023,9 @@ public class FirebaseManager {
         salesUser5.addAccount(accountB.getAccountIdFire());
         salesUser5.addAccount(accountC.getAccountIdFire());
         salesUser5.addAccount(accountA.getAccountIdFire());
+        updateAccountSalesAgentUids(accountA.getAccountIdFire(), newUser5Ref.getKey());
+        updateAccountSalesAgentUids(accountB.getAccountIdFire(), newUser5Ref.getKey());
+        updateAccountSalesAgentUids(accountC.getAccountIdFire(), newUser5Ref.getKey());
         salesUser5.setUserColor(UserColorUtil.getRandomUserColorId());
         updateOrCreateUserColor(salesUser5.getUserColor(), salesUser5.getUid());
         usersReference.child(salesUser5.getUid()).setValue(salesUser5);

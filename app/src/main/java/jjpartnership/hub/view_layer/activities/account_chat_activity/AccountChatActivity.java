@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -25,16 +26,17 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.cutomer_chat_fragment.CustomerChatFragment;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_chat_fragment.CustomerChatFragment;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        CustomerChatFragment.OnCustomerChatInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener,
+        CustomerChatFragment.OnCustomerChatFragmentInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener,
         AccountChatView, AccountDetailsFragment.OnAccountDetailsInteractionListener{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
     @BindView(R.id.send_image_view)ImageView sendImage;
+    @BindView(R.id.user_input_layout)FrameLayout userInputLayout;
     @BindView(R.id.user_message_sales_team_et)BackAwareAutofillMultiLineEditText userInputSalesTeam;
     @BindView(R.id.user_message_customer_et)BackAwareAutofillMultiLineEditText userInputCustomer;
 
@@ -87,7 +89,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
             salesAgentFragment.onSendMessageClicked();
         }
         if(userInputCustomer.isShown()){
-//            customerChatFragment.onSendMessageClicked();
+            customerChatFragment.onSendMessageClicked();
         }
     }
 
@@ -95,7 +97,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         userInputSalesTeam.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                pager.setCurrentItem(1, true);
+
                 return false;
             }
         });
@@ -143,6 +145,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
                 }else{
                     setSendImageColor(colorGrey);
                 }
+                customerChatFragment.onUserInputChanged(charSequence);
             }
 
             @Override
@@ -173,19 +176,13 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     }
 
     private void setEditTextVisible(int position) {
-        if(userInputSalesTeam.isShown()){
-            if(position != 1) {
+        switch(position){
+            case 0:
                 hideKeyboard();
-                userInputSalesTeam.setVisibility(View.GONE);
-                userInputCustomer.setVisibility(View.VISIBLE);
-                if (userInputCustomer.getText().length() > 0) {
-                    setSendImageColor(colorOrange);
-                } else {
-                    setSendImageColor(colorGrey);
-                }
-            }
-        }else{
-            if(position != 2) {
+                animateHideUserInputLayout();
+                break;
+            case 1:
+                if(!userInputLayout.isShown()) animateShowUserInputLayout();
                 hideKeyboard();
                 userInputSalesTeam.setVisibility(View.VISIBLE);
                 userInputCustomer.setVisibility(View.GONE);
@@ -194,8 +191,27 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
                 } else {
                     setSendImageColor(colorGrey);
                 }
-            }
+                break;
+            case 2:
+                if(!userInputLayout.isShown()) animateShowUserInputLayout();
+                hideKeyboard();
+                userInputSalesTeam.setVisibility(View.GONE);
+                userInputCustomer.setVisibility(View.VISIBLE);
+                if (userInputCustomer.getText().length() > 0) {
+                    setSendImageColor(colorOrange);
+                } else {
+                    setSendImageColor(colorGrey);
+                }
+                break;
         }
+    }
+
+    private void animateShowUserInputLayout(){
+        userInputLayout.setVisibility(View.VISIBLE);
+    }
+
+    private void animateHideUserInputLayout(){
+        userInputLayout.setVisibility(View.GONE);
     }
 
     private void setSendImageColor(int color){
@@ -233,6 +249,16 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     @Override
     public void resetUserInputSales() {
         userInputSalesTeam.setText("");
+    }
+
+    @Override
+    public void resetUserInputCustomer() {
+        userInputCustomer.setText("");
+    }
+
+    @Override
+    public void onSetPagerPage(int position) {
+        pager.setCurrentItem(position);
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {

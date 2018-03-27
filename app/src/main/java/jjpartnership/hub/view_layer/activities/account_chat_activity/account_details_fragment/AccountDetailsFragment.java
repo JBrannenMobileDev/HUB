@@ -158,6 +158,16 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         presenter.onDirectionsClicked();
     }
 
+    @OnClick(R.id.contacts_group_chat_tv)
+    public void onContactsGroupChatClicked(){
+        mListener.onSetPagerPage(2);
+    }
+
+    @OnClick(R.id.agents_group_chat_tv)
+    public void onAgentsGroupChatClicked(){
+        mListener.onSetPagerPage(1);
+    }
+
     @Override
     public void onReceiveCompanyData(String address, String industries) {
         addressTv.setText(address);
@@ -191,6 +201,6 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     }
 
     public interface OnAccountDetailsInteractionListener {
-
+        void onSetPagerPage(int position);
     }
 }

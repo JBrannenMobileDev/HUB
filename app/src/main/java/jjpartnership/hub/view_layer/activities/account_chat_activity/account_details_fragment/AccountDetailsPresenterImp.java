@@ -1,17 +1,13 @@
 package jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
-import jjpartnership.hub.data_layer.data_models.MessageRealm;
-import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
 
@@ -44,10 +40,13 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
         account = realm.where(AccountRealm.class).equalTo("accountId", accountId).findFirst();
         if(account != null) {
             company = realm.where(CompanyRealm.class).equalTo("companyId", account.getCompanyCustomerId()).findFirst();
+            List<String> employeeList;
             if(company != null) {
                 parseDetailsData(company);
+                employeeList = getCompanyEmployeeUids(company.getEmployeeList());
+            }else{
+                employeeList = new ArrayList<>();
             }
-            List<String> employeeList = getCompanyEmployeeUids(company.getEmployeeList());
             if(employeeList.size() > 0){
                 for(String uid : employeeList){
                     UserRealm customer = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
@@ -57,15 +56,14 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
             if (customers.size() > 0) {
                 fragment.onRecieveCustomers(customers);
             }
-            chat = realm.where(GroupChatRealm.class).equalTo("chatId", account.getGroupChatSalesId()).findFirst();
-            if(chat != null){
-                if(chat.getUserIds() != null && chat.getUserIds().size() > 0){
-                    for(String uid : chat.getUserIds()){
-                        UserRealm salesAgent = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
-                        if(salesAgent != null)salesAgents.add(salesAgent);
-                    }
+
+            if(account.getAccountSalesAgentUids() != null && account.getAccountSalesAgentUids().size() > 0){
+                for(String uid : account.getAccountSalesAgentUids()){
+                    UserRealm salesAgent = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
+                    if(salesAgent != null)salesAgents.add(salesAgent);
                 }
             }
+
             if(salesAgents.size() > 0){
                 fragment.onReceiveSalesAgentData(salesAgents);
             }

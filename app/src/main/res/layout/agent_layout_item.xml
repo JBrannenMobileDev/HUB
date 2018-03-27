@@ -57,6 +57,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:maxLines="1"
                 android:text="Samantha Miller"
                 android:textColor="@color/grey_text"
                 android:textSize="16sp"
@@ -69,6 +70,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="16dp"
                 android:layout_marginRight="16dp"
+                android:maxLines="1"
                 android:text="Business unit: Chemicals"
                 android:textColor="@color/grey_text"
                 android:textSize="14sp" />
@@ -82,7 +84,8 @@
                 android:layout_marginRight="16dp"
                 android:text="Role: High toxicity sales"
                 android:textColor="@color/grey_text"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:maxLines="1" />
 
         </LinearLayout>
 
