@@ -21,6 +21,8 @@ import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
+import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 
 public class AccountDetailsFragment extends Fragment implements AccountDetailsView{
     @BindView(R.id.account_details_address_tv)TextView addressTv;
@@ -38,6 +40,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     private BaseCallback<UserRealm> agentDirectMessageSelectedCallback;
     private BaseCallback<UserRealm> emailSelectedCallback;
     private BaseCallback<UserRealm> callSelectedCallback;
+    private BaseCallback<String> currentUserProfileSelectedCallback;
 
     public AccountDetailsFragment() {
         // Required empty public constructor
@@ -60,10 +63,24 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     }
 
     private void initCallbacks() {
+        currentUserProfileSelectedCallback = new BaseCallback<String>() {
+            @Override
+            public void onResponse(String currentUserUid) {
+                Intent userProfileIntent = new Intent(getActivity().getApplicationContext(), UserProfileActivity.class);
+                userProfileIntent.putExtra("uid", currentUserUid);
+                startActivity(userProfileIntent);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+
         contactSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
-            public void onResponse(UserRealm object) {
-
+            public void onResponse(UserRealm user) {
+                launchDirectMessageIntent(user.getUid(), true);
             }
 
             @Override
@@ -74,8 +91,8 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
         directMessageSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
-            public void onResponse(UserRealm object) {
-
+            public void onResponse(UserRealm user) {
+                launchDirectMessageIntent(user.getUid(), false);
             }
 
             @Override
@@ -113,8 +130,8 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
         agentSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
-            public void onResponse(UserRealm object) {
-
+            public void onResponse(UserRealm user) {
+                launchDirectMessageIntent(user.getUid(), true);
             }
 
             @Override
@@ -125,8 +142,8 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
         agentDirectMessageSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
-            public void onResponse(UserRealm object) {
-
+            public void onResponse(UserRealm user) {
+                launchDirectMessageIntent(user.getUid(), false);
             }
 
             @Override
@@ -134,6 +151,13 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
             }
         };
+    }
+
+    private void launchDirectMessageIntent(String uid, boolean showUserInfo){
+        Intent directMessageIntent = new Intent(getActivity().getApplicationContext(), DirectMessageActivity.class);
+        directMessageIntent.putExtra("uid", uid);
+        directMessageIntent.putExtra("showUserInfo", showUserInfo);
+        startActivity(directMessageIntent);
     }
 
     @Override
@@ -184,7 +208,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     @Override
     public void onReceiveSalesAgentData(List<UserRealm> salesAgents) {
         agentsAdapter = new AssignedAgentsRecyclerAdapter(getActivity().getApplicationContext(), salesAgents,
-                agentSelectedCallback, agentDirectMessageSelectedCallback);
+                agentSelectedCallback, agentDirectMessageSelectedCallback, currentUserProfileSelectedCallback);
         agentsRecycler.setAdapter(agentsAdapter);
     }
 

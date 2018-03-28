@@ -37,8 +37,13 @@
         <activity
             android:name=".view_layer.activities.account_chat_activity.AccountChatActivity"
             android:parentActivityName=".view_layer.activities.main_activity.MainActivity"
-            android:screenOrientation="portrait"
-            />
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view_layer.activities.direct_message_activity.DirectMessageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view_layer.activities.user_profile_activity.UserProfileActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

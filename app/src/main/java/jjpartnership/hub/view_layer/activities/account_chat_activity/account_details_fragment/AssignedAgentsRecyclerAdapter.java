@@ -16,6 +16,7 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.UserColorUtil;
+import jjpartnership.hub.utils.UserPreferences;
 
 /**
  * Created by Jonathan on 3/9/2018.
@@ -26,13 +27,17 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
     private Context context;
     private BaseCallback<UserRealm> rowSelectedCallback;
     private BaseCallback<UserRealm> directMessageSelectedCallback;
+    private BaseCallback<String> currentUserProfileSelectedCallback;
+    private String currentUserId;
 
     public AssignedAgentsRecyclerAdapter(Context context, List<UserRealm> dataModel, BaseCallback<UserRealm> rowSelectedCallback,
-                                         BaseCallback<UserRealm> directMessageSelectedCallback) {
+                                         BaseCallback<UserRealm> directMessageSelectedCallback, BaseCallback<String> currentUserProfileSelectedCallback) {
         this.dataModel = dataModel;
         this.rowSelectedCallback = rowSelectedCallback;
         this.directMessageSelectedCallback = directMessageSelectedCallback;
+        this.currentUserProfileSelectedCallback = currentUserProfileSelectedCallback;
         this.context = context;
+        currentUserId = UserPreferences.getInstance().getUid();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -56,7 +61,11 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    rowSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
+                    if(currentUserId.equals(dataModel.get(getLayoutPosition()).getUid())){
+                        currentUserProfileSelectedCallback.onResponse(currentUserId);
+                    }else {
+                        rowSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
+                    }
                 }
             });
 
@@ -92,6 +101,11 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
         }
         if(position == 0){
             holder.greyDivider.setVisibility(View.GONE);
+        }
+        if(currentUserId.equals(user.getUid())){
+            holder.directMessageIv.setVisibility(View.GONE);
+        }else{
+            holder.directMessageIv.setVisibility(View.VISIBLE);
         }
         holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));
         holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));

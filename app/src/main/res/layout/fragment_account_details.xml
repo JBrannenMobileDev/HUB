@@ -168,13 +168,20 @@
                 android:layout_marginRight="8dp"
                 android:background="@drawable/rounded_rectangle_white_tile_bg"
                 android:elevation="2dp"
-                android:paddingBottom="2dp">
+                android:paddingTop="2dp">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/account_contacts_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="48dp"
+                    android:nestedScrollingEnabled="false" />
 
                 <TextView
                     android:id="@+id/contacts_group_chat_tv"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:layout_gravity="end"
+                    android:layout_gravity="bottom|end"
                     android:background="@drawable/rounded_rectangle_orange_stroke"
                     android:gravity="center_vertical"
                     android:text="SEND GROUP MESSAGE"
@@ -182,12 +189,6 @@
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/account_contacts_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:nestedScrollingEnabled="false" />
             </FrameLayout>
 
             <FrameLayout
@@ -202,7 +203,7 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="32dp"
                     android:gravity="center_vertical"
-                    android:text="Assigned Sales  Agents"
+                    android:text="Assigned Sales Agents"
                     android:textColor="@color/colorPrimaryLight"
                     android:textStyle="bold" />
 
@@ -217,13 +218,20 @@
                 android:layout_marginRight="8dp"
                 android:background="@drawable/rounded_rectangle_white_tile_bg"
                 android:elevation="2dp"
-                android:paddingBottom="2dp">
+                android:paddingTop="2dp">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/assigned_agents_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="48dp"
+                    android:nestedScrollingEnabled="false" />
 
                 <TextView
                     android:id="@+id/agents_group_chat_tv"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:layout_gravity="end"
+                    android:layout_gravity="bottom|end"
                     android:background="@drawable/rounded_rectangle_orange_stroke"
                     android:gravity="center_vertical"
                     android:text="SEND GROUP MESSAGE"
@@ -231,12 +239,6 @@
                     android:textColor="@color/white"
                     android:textStyle="bold" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/assigned_agents_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="50dp"
-                    android:nestedScrollingEnabled="false" />
             </FrameLayout>
 
         </LinearLayout>
