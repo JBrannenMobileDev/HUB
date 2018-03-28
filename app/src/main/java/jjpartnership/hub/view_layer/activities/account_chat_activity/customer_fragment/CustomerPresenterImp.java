@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_chat_fragment;
+package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_fragment;
 
 import android.os.Handler;
 
@@ -21,13 +21,15 @@ import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentPresenter;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentView;
 
 /**
  * Created by Jonathan on 3/13/2018.
  */
 
-public class CustomerChatPresenterImp implements CustomerChatPresenter {
-    private CustomerChatView fragment;
+public class CustomerPresenterImp implements CustomerPresenter {
+    private CustomerView fragment;
     private String userInput;
     private Realm realm;
     private String chatId;
@@ -40,7 +42,7 @@ public class CustomerChatPresenterImp implements CustomerChatPresenter {
     private Handler handler;
     private Runnable runnable;
 
-    public CustomerChatPresenterImp(CustomerChatView fragment, String account_name, String account_id) {
+    public CustomerPresenterImp(CustomerView fragment, String account_name, String account_id) {
         this.fragment = fragment;
         realm = RealmUISingleton.getInstance().getRealmInstance();
         accountName = account_name;

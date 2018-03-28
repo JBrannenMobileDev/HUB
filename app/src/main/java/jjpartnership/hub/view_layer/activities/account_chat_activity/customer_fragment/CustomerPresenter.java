@@ -1,10 +1,10 @@
-package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_chat_fragment;
+package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_fragment;
 
 /**
  * Created by Jonathan on 3/13/2018.
  */
 
-public interface CustomerChatPresenter {
+public interface CustomerPresenter {
     void onUserInputChanged(String input);
     void onSendMessageClicked();
     void onDestroy();

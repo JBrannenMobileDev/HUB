@@ -26,12 +26,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_chat_fragment.CustomerChatFragment;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_fragment.CustomerFragment;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        CustomerChatFragment.OnCustomerChatFragmentInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener,
+        CustomerFragment.OnCustomerChatFragmentInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener,
         AccountChatView, AccountDetailsFragment.OnAccountDetailsInteractionListener{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
@@ -45,7 +45,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     private int colorOrange;
     private int colorGrey;
     private SalesAgentsFragment salesAgentFragment;
-    private CustomerChatFragment customerChatFragment;
+    private CustomerFragment customerChatFragment;
     private AccountDetailsFragment accountDetailsFragment;
 
     @Override
@@ -61,7 +61,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         bundle.putString("account_name", getIntent().getStringExtra("account_name"));
         bundle.putString("account_id", getIntent().getStringExtra("account_id"));
         salesAgentFragment = new SalesAgentsFragment();
-        customerChatFragment = new CustomerChatFragment();
+        customerChatFragment = new CustomerFragment();
         accountDetailsFragment = new AccountDetailsFragment();
         salesAgentFragment.setArguments(bundle);
         customerChatFragment.setArguments(bundle);
@@ -70,6 +70,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         adapter.addFragment(salesAgentFragment, "Sales Team Chat");
         adapter.addFragment(customerChatFragment, "Customer Chat");
         pager.setAdapter(adapter);
+        pager.setOffscreenPageLimit(2);
         tabLayout.setupWithViewPager(pager);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         colorOrange = ContextCompat.getColor(getApplicationContext(), R.color.colorOrange);

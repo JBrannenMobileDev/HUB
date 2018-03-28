@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_chat_fragment;
+package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_fragment;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -31,13 +31,13 @@ import jjpartnership.hub.utils.UserPreferences;
  * Created by Jonathan on 3/9/2018.
  */
 
-public class CustomerChatRecyclerAdapter extends RecyclerView.Adapter<CustomerChatRecyclerAdapter.ViewHolder> {
+public class CustomerRecyclerAdapter extends RecyclerView.Adapter<CustomerRecyclerAdapter.ViewHolder> {
     private Context context;
     private List<MessageRealm> dataModel;
     private HashMap<String, Long> userColorMap;
     private BaseCallback<MessageRealm> messageSelectedCallback;
 
-    public CustomerChatRecyclerAdapter(@NonNull Context context, List<MessageRealm> dataModel, BaseCallback<MessageRealm> messageSelectedCallback, HashMap<String, Long> userColorMap) {
+    public CustomerRecyclerAdapter(@NonNull Context context, List<MessageRealm> dataModel, BaseCallback<MessageRealm> messageSelectedCallback, HashMap<String, Long> userColorMap) {
         this.context = context;
         this.dataModel = dataModel;
         this.messageSelectedCallback = messageSelectedCallback;
@@ -83,7 +83,7 @@ public class CustomerChatRecyclerAdapter extends RecyclerView.Adapter<CustomerCh
     }
 
     @Override
-    public CustomerChatRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CustomerRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;

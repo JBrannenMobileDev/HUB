@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_chat_fragment;
+package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_fragment;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -21,6 +21,10 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentPresenter;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentPresenterImp;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentRecyclerAdapter;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentView;
 import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
 
@@ -30,7 +34,7 @@ import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
  * {@link OnCustomerChatFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class CustomerChatFragment extends Fragment implements CustomerChatView{
+public class CustomerFragment extends Fragment implements CustomerView{
     @BindView(R.id.chat_empty_state)TextView emptyStateMessage;
     @BindView(R.id.chat_recycler_view)RecyclerView chatRecycler;
     @BindView(R.id.fab)FloatingActionButton fab;
@@ -38,12 +42,12 @@ public class CustomerChatFragment extends Fragment implements CustomerChatView{
     @BindView(R.id.currently_typing_tv)TextView currentlyTypingTv;
 
     private OnCustomerChatFragmentInteractionListener mListener;
-    private CustomerChatPresenter presenter;
+    private CustomerPresenter presenter;
     private AdjustableScrollSpeedLayoutManager layoutManager;
-    private CustomerChatRecyclerAdapter adapter;
+    private CustomerRecyclerAdapter adapter;
     private BaseCallback<MessageRealm> messageSelectedCallback;
 
-    public CustomerChatFragment() {
+    public CustomerFragment() {
         // Required empty public constructor
     }
 
@@ -58,7 +62,7 @@ public class CustomerChatFragment extends Fragment implements CustomerChatView{
         layoutManager.setStackFromEnd(true);
         chatRecycler.setLayoutManager(layoutManager);
         initCallback();
-        presenter = new CustomerChatPresenterImp(this, getArguments().getString("account_name"),
+        presenter = new CustomerPresenterImp(this, getArguments().getString("account_name"),
                 getArguments().getString("account_id"));
         return v;
     }
@@ -157,11 +161,10 @@ public class CustomerChatFragment extends Fragment implements CustomerChatView{
         if(messagesRealm.size() > 0){
             emptyStateMessage.setVisibility(View.GONE);
         }else {
-            emptyStateMessage.setText(getActivity().getResources().getString(R.string.customer_chat_empty_state_message));
             emptyStateMessage.setVisibility(View.VISIBLE);
         }
         if (adapter == null) {
-            adapter = new CustomerChatRecyclerAdapter(getActivity().getApplicationContext(), messagesRealm,  messageSelectedCallback, userColorMap);
+            adapter = new CustomerRecyclerAdapter(getActivity().getApplicationContext(), messagesRealm,  messageSelectedCallback, userColorMap);
             chatRecycler.setAdapter(adapter);
         }
         adapter.notifyDataSetChanged();

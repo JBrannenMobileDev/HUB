@@ -1057,9 +1057,9 @@ public class FirebaseManager {
         DatabaseReference newMessageThreadSalesRef = database.getReference().child("messages").push();
         MessageThread threadCustomer = new MessageThread();
         threadCustomer.setMessageThreadId(newMessageThreadSalesRef.getKey());
-        threadCustomer.setChatId(groupChat.getChatId());
+        threadCustomer.setChatId(groupChatCustomer.getChatId());
         database.getReference().child("messages").child(threadCustomer.getMessageThreadId()).setValue(threadCustomer);
-        groupChat.setMessageThreadId(threadCustomer.getMessageThreadId());
+        groupChatCustomer.setMessageThreadId(threadCustomer.getMessageThreadId());
         groupChatsReference.child(groupChatCustomer.getChatId()).setValue(groupChatCustomer);
 
         account.setGroupChatSalesId(groupChat.getChatId());
@@ -1134,6 +1134,8 @@ public class FirebaseManager {
             }
         };
 
-        chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).addListenerForSingleValueEvent(listener);
+        if(chatId != null && messageThreadId != null){
+            chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).addListenerForSingleValueEvent(listener);
+        }
     }
 }
