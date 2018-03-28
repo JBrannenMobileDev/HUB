@@ -533,6 +533,42 @@ public class FirebaseManager {
         for(int i = 0; i < messageThreadIds.size(); i++){
             chatMessagesReference.child(chatIds.get(i)).child("message_thread").child(messageThreadIds.get(i)).addValueEventListener(valueEventListeners.get(i));
         }
+
+        ChildEventListener userDirectChatsListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String directChatId = dataSnapshot.getValue(String.class);
+                if(directChatId != null && !directChatId.isEmpty()){
+                    //TODO somehow fetch the new DirectChat and save it to realm.
+                    //TODO also setup listeners for the new DirectChat.
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                String directChatId = dataSnapshot.getValue(String.class);
+                if(directChatId != null && !directChatId.isEmpty()){
+                    //TODO somehow fetch the new DirectChat and save it to realm.
+                    //TODO also setup listeners for the new DirectChat.
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        usersReference.child(UserPreferences.getInstance().getUid()).child("directChatIds").addChildEventListener(userDirectChatsListener);
     }
 
     private GroupChat getGroupChat(String groupChatId) {
@@ -1082,6 +1118,24 @@ public class FirebaseManager {
 
     public void loadCompaniesToFirebase(){
 
+    }
+
+    public void createNewDirectChat(String fromUid, String toUid){
+        DatabaseReference newDirectChatRef = directChatsReference.push();
+        DirectChat directChat = new DirectChat();
+        directChat.setChatId(newDirectChatRef.getKey());
+        directChat.setUserIdA(fromUid);
+        directChat.setUserIdB(toUid);
+        DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
+        MessageThread thread = new MessageThread();
+        thread.setMessageThreadId(newMessageThreadRef.getKey());
+        thread.setChatId(directChat.getChatId());
+        database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
+        directChat.setMessageThreadId(thread.getMessageThreadId());
+        directChatsReference.child(directChat.getChatId()).setValue(directChat);
+
+        usersReference.child(fromUid).child("directChats").child(directChat.getChatId()).setValue(directChat.getChatId());
+        usersReference.child(toUid).child("directChats").child(directChat.getChatId()).setValue(directChat.getChatId());
     }
 
     public void verifyUserAccountExists(final String email, final BaseCallback<String> userAccountExistsCallback) {

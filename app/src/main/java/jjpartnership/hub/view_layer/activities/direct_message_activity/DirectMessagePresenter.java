@@ -5,4 +5,9 @@ package jjpartnership.hub.view_layer.activities.direct_message_activity;
  */
 
 public interface DirectMessagePresenter {
+    void onSendMessageClicked();
+    void onUserInputChanged(CharSequence charSequence);
+    void onSendEmailClicked();
+    void onCallClicked();
 }
+

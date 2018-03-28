@@ -21,6 +21,8 @@ import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.CommunicationsUtil;
+import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 
@@ -41,6 +43,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     private BaseCallback<UserRealm> emailSelectedCallback;
     private BaseCallback<UserRealm> callSelectedCallback;
     private BaseCallback<String> currentUserProfileSelectedCallback;
+    private String currentUserUid;
 
     public AccountDetailsFragment() {
         // Required empty public constructor
@@ -54,6 +57,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         View v = inflater.inflate(R.layout.fragment_account_details, container, false);
         ButterKnife.bind(this, v);
         initCallbacks();
+        currentUserUid = UserPreferences.getInstance().getUid();
         contactsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         agentsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         presenter = new AccountDetailsPresenterImp(this, getArguments().getString("account_name"),
@@ -80,7 +84,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         contactSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(user.getUid(), true);
+                launchDirectMessageIntent(currentUserUid, user.getUid(), true);
             }
 
             @Override
@@ -92,7 +96,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         directMessageSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(user.getUid(), false);
+                launchDirectMessageIntent(currentUserUid, user.getUid(), false);
             }
 
             @Override
@@ -104,9 +108,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         emailSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-                emailIntent.setData(Uri.parse("mailto: " + user.getEmail()));
-                startActivity(Intent.createChooser(emailIntent, "Send e-mail"));
+                CommunicationsUtil.launchEmailIntent(user.getEmail(), getContext().getApplicationContext());
             }
 
             @Override
@@ -118,8 +120,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         callSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", user.getPhoneNumber(), null));
-                startActivity(intent);
+                CommunicationsUtil.launchPhoneCallIntent(user.getPhoneNumber(), getContext().getApplicationContext());
             }
 
             @Override
@@ -131,7 +132,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         agentSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(user.getUid(), true);
+                launchDirectMessageIntent(currentUserUid, user.getUid(), true);
             }
 
             @Override
@@ -143,7 +144,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         agentDirectMessageSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(user.getUid(), false);
+                launchDirectMessageIntent(currentUserUid, user.getUid(), false);
             }
 
             @Override
@@ -153,9 +154,10 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         };
     }
 
-    private void launchDirectMessageIntent(String uid, boolean showUserInfo){
+    private void launchDirectMessageIntent(String uid, String toUid, boolean showUserInfo){
         Intent directMessageIntent = new Intent(getActivity().getApplicationContext(), DirectMessageActivity.class);
         directMessageIntent.putExtra("uid", uid);
+        directMessageIntent.putExtra("toUid", toUid);
         directMessageIntent.putExtra("showUserInfo", showUserInfo);
         startActivity(directMessageIntent);
     }
@@ -214,14 +216,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
     @Override
     public void launchDirectionsIntent(String address) {
-        if(address != null && !address.isEmpty()) {
-            Uri gmmIntentUri = Uri.parse("google.navigation:q=" + address);
-            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            mapIntent.setPackage("com.google.android.apps.maps");
-            startActivity(mapIntent);
-        }else{
-            Toast.makeText(getActivity().getApplicationContext(), "The company's address is unavailable.", Toast.LENGTH_SHORT).show();
-        }
+        CommunicationsUtil.launchDirectionsIntent(address, getContext().getApplicationContext());
     }
 
     public interface OnAccountDetailsInteractionListener {

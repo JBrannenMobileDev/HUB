@@ -102,7 +102,7 @@
             android:tint="@color/colorPrimaryVeryLight" />
 
         <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
-            android:id="@+id/user_message_sales_team_et"
+            android:id="@+id/user_message_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

@@ -142,4 +142,8 @@ public class DataManager {
             fbManager.updateMessages(messageList);
         }
     }
+
+    public void createNewDirectChat(String uid, String toUid) {
+        fbManager.createNewDirectChat(uid, toUid);
+    }
 }
