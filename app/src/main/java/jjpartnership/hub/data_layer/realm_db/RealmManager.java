@@ -15,6 +15,7 @@ import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
@@ -137,13 +138,14 @@ public class RealmManager {
         realm.close();
     }
 
-    public void updateMainAccountsModel(final MainAccountsModel accountsModel, final MainRecentModel recentModel) {
+    public void updateMainAccountsModel(final MainAccountsModel accountsModel, final MainRecentModel recentModel, final MainDirectMessagesModel directModel) {
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(accountsModel);
                 bgRealm.copyToRealmOrUpdate(recentModel);
+                bgRealm.copyToRealmOrUpdate(directModel);
             }
         });
         realm.close();
@@ -207,6 +209,28 @@ public class RealmManager {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmMessages);
+            }
+        });
+        realm.close();
+    }
+
+    public void insertOrUpdateDirectChat(final DirectChat newDirectChat) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(new DirectChatRealm(newDirectChat));
+            }
+        });
+        realm.close();
+    }
+
+    public void insertOrUpdateDirectChatRealm(final DirectChatRealm directChat) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(directChat);
             }
         });
         realm.close();

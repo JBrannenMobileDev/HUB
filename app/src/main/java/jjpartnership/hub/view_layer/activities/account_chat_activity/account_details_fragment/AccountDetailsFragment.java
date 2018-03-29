@@ -84,7 +84,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         contactSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(currentUserUid, user.getUid(), true);
+
             }
 
             @Override
@@ -96,7 +96,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         directMessageSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(currentUserUid, user.getUid(), false);
+                launchDirectMessageIntent(currentUserUid, user.getUid());
             }
 
             @Override
@@ -132,7 +132,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         agentSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(currentUserUid, user.getUid(), true);
+
             }
 
             @Override
@@ -144,7 +144,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         agentDirectMessageSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(currentUserUid, user.getUid(), false);
+                launchDirectMessageIntent(currentUserUid, user.getUid());
             }
 
             @Override
@@ -154,11 +154,10 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         };
     }
 
-    private void launchDirectMessageIntent(String uid, String toUid, boolean showUserInfo){
+    private void launchDirectMessageIntent(String uid, String toUid){
         Intent directMessageIntent = new Intent(getActivity().getApplicationContext(), DirectMessageActivity.class);
         directMessageIntent.putExtra("uid", uid);
         directMessageIntent.putExtra("toUid", toUid);
-        directMessageIntent.putExtra("showUserInfo", showUserInfo);
         startActivity(directMessageIntent);
     }
 

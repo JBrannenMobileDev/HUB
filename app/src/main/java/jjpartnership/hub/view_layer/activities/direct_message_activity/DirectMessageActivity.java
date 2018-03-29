@@ -1,6 +1,10 @@
 package jjpartnership.hub.view_layer.activities.direct_message_activity;
 
+import android.app.SearchManager;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -9,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -35,7 +40,6 @@ import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditT
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
 
 public class DirectMessageActivity extends AppCompatActivity implements DirectMessageView, BackAwareAutofillMultiLineEditText.BackPressedListener{
-    @BindView(R.id.user_infor_linear_layout)LinearLayout userInfoLayout;
     @BindView(R.id.send_image_view)ImageView sendImage;
     @BindView(R.id.user_message_et)BackAwareAutofillMultiLineEditText userInput;
     @BindView(R.id.new_message_alert)TextView newMessageAlert;
@@ -62,7 +66,7 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
         initListeners();
         userInput.setBackPressedListener(this);
         presenter = new DirectMessagePresenterImp(this, getIntent().getStringExtra("uid"),
-                getIntent().getBooleanExtra("showUserInfo", false));
+                getIntent().getStringExtra("toUid"));
     }
 
     @Override
@@ -103,10 +107,42 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.direct_chat_menu, menu);
+        MenuItem action_email = menu.findItem(R.id.action_email);
+        Drawable drawable = action_email.getIcon();
+        if (drawable != null) {
+            drawable.mutate();
+            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        }
+        drawable = menu.findItem(R.id.action_call).getIcon();
+        if (drawable != null) {
+            drawable.mutate();
+            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        }
+        drawable = menu.findItem(R.id.action_profile).getIcon();
+        if (drawable != null) {
+            drawable.mutate();
+            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
+        }
+        if(item.getItemId() == R.id.action_email){
+            presenter.onSendEmailClicked();
+        }
+        if(item.getItemId() == R.id.action_call){
+            presenter.onCallClicked();
+        }
+        if(item.getItemId() == R.id.action_profile){
+            presenter.onProfileClicked();
         }
         return false;
     }
@@ -114,43 +150,19 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
     @OnClick(R.id.send_image_view)
     public void onSendClicked(){
         presenter.onSendMessageClicked();
-        animateHideDetails();
+        userInput.setText("");
         hideKeyboard();
-    }
-
-    @OnClick(R.id.direct_message_layout)
-    public void onSendDirectMessageClicked(){
-        userInfoLayout.setVisibility(View.GONE);
-    }
-
-    @OnClick(R.id.send_email_layout)
-    public void onSendEmailClicked(){
-        presenter.onSendEmailClicked();
-    }
-
-    @OnClick(R.id.call_layout)
-    public void onCallClicked(){
-        presenter.onCallClicked();
     }
 
     @Override
     public void onImeBack(BackAwareAutofillMultiLineEditText editText) {
-        animateShowDetails();
-    }
 
-    private void animateShowDetails() {
-        userInfoLayout.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), 0)).setDuration(250);
-    }
-
-    private void animateHideDetails() {
-        userInfoLayout.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -92)).setDuration(250);
     }
 
     private void initListeners() {
         userInput.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                animateHideDetails();
                 return false;
             }
         });
@@ -159,7 +171,7 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
             @Override
             public void onFocusChange(View view, boolean hasFocus) {
                 if(hasFocus){
-                    animateHideDetails();
+
                 }
             }
         });
@@ -197,11 +209,6 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
 
     private void setSendImageColor(int color){
         sendImage.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-    }
-
-    @Override
-    public void hideUserInfoLayout() {
-        userInfoLayout.setVisibility(View.GONE);
     }
 
     @Override

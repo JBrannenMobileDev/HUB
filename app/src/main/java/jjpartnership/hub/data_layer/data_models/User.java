@@ -1,7 +1,11 @@
 package jjpartnership.hub.data_layer.data_models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import io.realm.RealmList;
 
 /**
  * Created by jbrannen on 2/23/18.
@@ -18,7 +22,7 @@ public class User{
     private String role;
     private String userType;
     private int userColor;
-    private List<String> directChatIds;
+    private Map<String,String> directChats;
     private List<String> accountIds;
 
     public User() {
@@ -26,7 +30,7 @@ public class User{
 
     public User(String uid, String email, String phoneNumber, String firstName, String lastName,
                 String companyId, String businessUnit, String role, String userType,
-                List<String> directChatIds, List<String> accountIds, int userColor) {
+                Map<String,String> directChatIds, List<String> accountIds, int userColor) {
         this.uid = uid;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -36,7 +40,7 @@ public class User{
         this.businessUnit = businessUnit;
         this.role = role;
         this.userType = userType;
-        this.directChatIds = directChatIds;
+        this.directChats = directChatIds;
         this.accountIds = accountIds;
         this.userColor = userColor;
     }
@@ -52,10 +56,18 @@ public class User{
             this.businessUnit = realmUser.getBusinessUnit();
             this.role = realmUser.getRole();
             this.userType = realmUser.getUserType();
-            this.directChatIds = realmUser.getDirectChatIds();
+            this.directChats = createMap(realmUser.getDirectChatIds());
             this.accountIds = realmUser.getAccountIds();
             this.userColor = realmUser.getUserColor();
         }
+    }
+
+    private Map<String, String> createMap(RealmList<String> directChatIds) {
+        Map<String, String> dChatIdsMap = new HashMap<>();
+        for(String chatId : directChatIds){
+            dChatIdsMap.put(chatId, chatId);
+        }
+        return dChatIdsMap;
     }
 
     public void addAccount(String accountId) {
@@ -145,12 +157,12 @@ public class User{
         this.userType = userType;
     }
 
-    public List<String> getDirectChatIds() {
-        return directChatIds;
+    public Map<String,String> getDirectChats() {
+        return directChats;
     }
 
-    public void setDirectChatIds(List<String> directChatIds) {
-        this.directChatIds = directChatIds;
+    public void setDirectChats(Map<String,String> directChats) {
+        this.directChats = directChats;
     }
 
     public List<String> getAccountIds() {

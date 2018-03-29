@@ -8,8 +8,10 @@ import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
+import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
@@ -99,13 +101,18 @@ public class DataManager {
         realmManager.updateRealmMessage(message);
     }
 
-    public void updateRealmMainModels(MainAccountsModel accountsModel, MainRecentModel recentModel) {
-        realmManager.updateMainAccountsModel(accountsModel, recentModel);
+    public void updateRealmMainModels(MainAccountsModel accountsModel, MainRecentModel recentModel, MainDirectMessagesModel directModel) {
+        realmManager.updateMainAccountsModel(accountsModel, recentModel, directModel);
     }
 
     public void createNewMessage(Message newMessage) {
         realmManager.insertOrUpdateMessage(new MessageRealm(newMessage));
         fbManager.createNewMesage(newMessage);
+    }
+
+    public void createNewDirectMessage(Message newMessage) {
+        realmManager.insertOrUpdateMessage(new MessageRealm(newMessage));
+        fbManager.createNewDirectMesage(newMessage);
     }
 
     public void clearRealmData() {
@@ -144,6 +151,10 @@ public class DataManager {
     }
 
     public void createNewDirectChat(String uid, String toUid) {
-        fbManager.createNewDirectChat(uid, toUid);
+        realmManager.insertOrUpdateDirectChat(fbManager.createNewDirectChat(uid, toUid));
+    }
+
+    public void insertOrUpdateDirectChat(DirectChatRealm directChat){
+        realmManager.insertOrUpdateDirectChatRealm(directChat);
     }
 }

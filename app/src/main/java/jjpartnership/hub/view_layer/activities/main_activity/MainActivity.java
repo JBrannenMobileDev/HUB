@@ -30,14 +30,17 @@ import butterknife.ButterKnife;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
+import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
@@ -48,19 +51,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.recent_list_view)RecyclerView recentRecyclerView;
     @BindView(R.id.recent_title_tv)TextView recentTitle;
     @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
-    @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesListView;
+    @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesRecyclerView;
     @BindView(R.id.welcome_linear_layout)LinearLayout welcomeLayout;
     @BindView(R.id.welcome_message_tv)TextView welcomeMessage;
     @BindView(R.id.recent_empty_state_layout)LinearLayout recent_empty_layout;
     @BindView(R.id.accounts_empty_state_layout)LinearLayout accounts_empty_layout;
+    @BindView(R.id.direc_messages_empty_state_layout)LinearLayout direct_messages_empty_state;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
     private AccountRecyclerAdapter accountsAdapter;
     private RecentRecyclerAdapter recentRecyclerAdapter;
+    private DirectMessageRecyclerAdapter directRecyclerAdapter;
     private BaseCallback<RowItem> accountSelectedCallback;
     private BaseCallback<RowItem> recentSelectedCallback;
+    private BaseCallback<DirectItem> directMessageSelectedCallback;
     private BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback;
 
 
@@ -83,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
         accountsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recentRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        directMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         initAnimations();
         initAdapters();
         freshInstallDataLoadedToRealmCallback = new BaseCallback<Boolean>() {
@@ -136,10 +143,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         };
+
+        directMessageSelectedCallback = new BaseCallback<DirectItem>() {
+            @Override
+            public void onResponse(DirectItem directItem) {
+                Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
+                directMessageIntent.putExtra("uidTo", directItem.getMessageOwnerUid());
+                directMessageIntent.putExtra("uid", UserPreferences.getInstance().getUid());
+                startActivity(directMessageIntent);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
         accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<RowItem>()), accountSelectedCallback);
         recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
+        directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
         accountsRecyclerView.setAdapter(accountsAdapter);
         recentRecyclerView.setAdapter(recentRecyclerAdapter);
+        directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
     }
 
     @Override
@@ -319,8 +343,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onDirectMessagesModelReceived(MainDirectMessagesModel directModel) {
-
+    public void onDirectMessagesModelReceived(MainDirectMessagesModel dataModel) {
+        if(dataModel != null && dataModel.getDirectItems() != null && dataModel.getDirectItems().size() > 0) {
+            direct_messages_empty_state.setVisibility(View.GONE);
+            directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), dataModel, directMessageSelectedCallback);
+            directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
+            directRecyclerAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

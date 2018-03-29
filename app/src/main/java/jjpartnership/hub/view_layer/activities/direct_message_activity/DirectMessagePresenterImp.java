@@ -32,22 +32,17 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     private Realm realm;
     private UserRealm user;
     private DirectChatRealm directChat;
-    private boolean showUserInfo;
     private String userInput;
     private Handler handler;
     private Runnable runnable;
     private MessageThreadRealm messageThread;
     private RealmResults<MessageRealm> messages;
 
-    public DirectMessagePresenterImp(DirectMessageView activity, String uid, boolean showUserInfo) {
+    public DirectMessagePresenterImp(DirectMessageView activity, String uid, String toUid) {
         this.activity = activity;
-        this.toUid = uid;
+        this.toUid = toUid;
         this.realm = RealmUISingleton.getInstance().getRealmInstance();
-        this.showUserInfo = showUserInfo;
-        this.uid = UserPreferences.getInstance().getUid();
-        if(!this.showUserInfo){
-            activity.hideUserInfoLayout();
-        }
+        this.uid = uid;
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -60,8 +55,10 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
 
     private void fetchData() {
         user = realm.where(UserRealm.class).equalTo("uid", toUid).findFirst();
-        if(user != null)
-        directChat = realm.where(DirectChatRealm.class).equalTo("userIdB", toUid).findFirst();
+        if(user != null) {
+            directChat = realm.where(DirectChatRealm.class).equalTo("userIdB", toUid).findFirst();
+            activity.setActivityTitle(user.getFirstName() + " " + user.getLastName());
+        }
         if(directChat == null){
             directChat = realm.where(DirectChatRealm.class).equalTo("userIdA", toUid).findFirst();
         }
@@ -98,7 +95,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     private HashMap<String, Long> getUsersColors(RealmResults<MessageRealm> messagesRealm) {
         HashMap<String, Long> userColorsMap = new HashMap<>();
         for(MessageRealm message : messagesRealm){
-            UserColor userColor = realm.where(UserColor.class).equalTo("toUid", message.getUid()).findFirst();
+            UserColor userColor = realm.where(UserColor.class).equalTo("uid", message.getUid()).findFirst();
             if(userColor != null) userColorsMap.put(message.getUid(), userColor.getColorId());
         }
         return userColorsMap;
@@ -136,7 +133,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
             newMessage.setSavedToFirebase(false);
             newMessage.setMessageOwnerName(user.getFirstName() + " " + user.getLastName());
             newMessage.setMessageThreadId(directChat.getMessageThreadId());
-            DataManager.getInstance().createNewMessage(newMessage);
+            DataManager.getInstance().createNewDirectMessage(newMessage);
         }
     }
 
@@ -162,5 +159,10 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     @Override
     public void onCallClicked() {
         activity.onSendCallIntent(user.getPhoneNumber());
+    }
+
+    @Override
+    public void onProfileClicked() {
+
     }
 }

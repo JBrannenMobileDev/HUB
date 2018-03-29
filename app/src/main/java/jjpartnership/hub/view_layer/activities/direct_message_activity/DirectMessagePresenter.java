@@ -9,5 +9,6 @@ public interface DirectMessagePresenter {
     void onUserInputChanged(CharSequence charSequence);
     void onSendEmailClicked();
     void onCallClicked();
+    void onProfileClicked();
 }
 

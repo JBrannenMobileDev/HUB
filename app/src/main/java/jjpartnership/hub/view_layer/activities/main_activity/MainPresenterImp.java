@@ -5,6 +5,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmModel;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
@@ -19,6 +20,7 @@ public class MainPresenterImp implements MainPresenter {
     private Realm realm;
     private MainAccountsModel dataModel;
     private MainRecentModel recentModel;
+    private MainDirectMessagesModel directModel;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
@@ -29,6 +31,7 @@ public class MainPresenterImp implements MainPresenter {
     private void initDataListeners() {
         dataModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
         recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+        directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
         UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
         if(user != null){
             CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
@@ -51,6 +54,15 @@ public class MainPresenterImp implements MainPresenter {
                 }
             });
             activity.onRecentModelReceived(recentModel);
+        }
+        if(directModel != null){
+            directModel.addChangeListener(new RealmChangeListener<MainDirectMessagesModel>() {
+                @Override
+                public void onChange(MainDirectMessagesModel updatedModel) {
+                    activity.onDirectMessagesModelReceived(updatedModel);
+                }
+            });
+            activity.onDirectMessagesModelReceived(directModel);
         }
         if(UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)){
             activity.setWelcomeMessage(UserRealm.TYPE_SALES);

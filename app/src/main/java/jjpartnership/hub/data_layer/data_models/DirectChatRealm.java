@@ -35,6 +35,16 @@ public class DirectChatRealm extends RealmObject{
         this.messageThreadId = messageThreadId;
     }
 
+    public String getDirectChatUid(String currentUid){
+        if(!userIdA.equals(currentUid)){
+            return userIdA;
+        }
+        if(!userIdB.equals(currentUid)){
+            return userIdB;
+        }
+        return "";
+    }
+
     public DirectChatRealm(DirectChat chat){
         this.chatId = chat.getChatId();
         this.userIdA = chat.getUserIdA();

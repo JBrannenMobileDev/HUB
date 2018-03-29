@@ -1,5 +1,6 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import java.util.Collection;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -58,7 +59,7 @@ public class UserRealm extends RealmObject{
         this.businessUnit = user.getBusinessUnit();
         this.role = user.getRole();
         this.userType = user.getUserType();
-        this.directChatIds = createDirectChats(user.getDirectChatIds());
+        if(user.getDirectChats() != null) this.directChatIds = createDirectChats(user.getDirectChats().values());
         this.accountIds = createAccountIdList(user.getAccountIds());
         this.userColor = user.getUserColor();
     }
@@ -75,7 +76,7 @@ public class UserRealm extends RealmObject{
         }
     }
 
-    private RealmList<String> createDirectChats(List<String> directChatIds) {
+    private RealmList<String> createDirectChats(Collection<String> directChatIds) {
         if(directChatIds != null) {
             RealmList<String> directChatIdsRealm = new RealmList<>();
             for (String directChatId : directChatIds) {

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/accounts_item_frame_layout"
+    android:id="@+id/direct_message_item_frame_layout"
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
-        android:id="@+id/account_icon_tv"
+        android:id="@+id/user_icon_tv"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="center_vertical"
@@ -26,11 +26,11 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/account_name_tv"
+            android:id="@+id/user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:text="Loma Linda University"
+            android:text="Shawna Brannen"
             android:textColor="@color/colorPrimaryLight"
             android:textStyle="bold" />
 
@@ -55,14 +55,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/message_owner_name_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:text="No messages - "
-            android:textColor="@color/colorPrimaryLight" />
-
-        <TextView
             android:id="@+id/message_content_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,7 +63,7 @@
             android:ellipsize="end"
             android:ems="3"
             android:maxLines="1"
-            android:text="Be the first to post a message!"
+            android:text="Hey! it was good talking with you today!"
             android:textColor="@color/colorPrimaryLight" />
     </LinearLayout>
 
