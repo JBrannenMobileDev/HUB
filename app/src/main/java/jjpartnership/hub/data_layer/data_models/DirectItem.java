@@ -80,6 +80,6 @@ public class DirectItem extends RealmObject implements Comparable<DirectItem>{
 
     @Override
     public int compareTo(@NonNull DirectItem directItem) {
-        return (int) (messageCreatedAtTime - directItem.getMessageCreatedAtTime());
+        return (int) (directItem.getMessageCreatedAtTime() - messageCreatedAtTime);
     }
 }

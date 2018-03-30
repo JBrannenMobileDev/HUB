@@ -48,17 +48,25 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/recent_title_tv"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="24dp"
-                android:text="Recent"
-                android:textColor="@color/colorPrimaryLight"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:id="@+id/recent_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:layout_weight="1"
+                    android:text="Recent"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/recent_frame_layout"
@@ -111,17 +119,33 @@
 
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/accounts_title_tv"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="40dp"
-                android:text="Accounts"
-                android:textColor="@color/colorPrimaryLight"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="40dp">
+
+                <TextView
+                    android:id="@+id/accounts_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:text="Accounts"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/add_account_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:tint="@color/colorPrimaryLight"
+                    app:srcCompat="@drawable/ic_add_black_24dp" />
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/accounts_frame_layout"
@@ -174,17 +198,33 @@
 
             </FrameLayout>
 
-            <TextView
-                android:id="@+id/direct_messages_title_tv"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="12dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="40dp"
-                android:text="Direct Messages"
-                android:textColor="@color/colorPrimaryLight"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="40dp">
+
+                <TextView
+                    android:id="@+id/direct_messages_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:text="Direct Messages"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/add_direct_message_iv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:tint="@color/colorPrimaryLight"
+                    app:srcCompat="@drawable/ic_add_black_24dp" />
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/direct_messages_frame_layout"

@@ -14,10 +14,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.RowItem;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserColorUtil;
+import jjpartnership.hub.utils.UserPreferences;
 
 /**
  * Created by Jonathan on 3/9/2018.
@@ -45,6 +49,12 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
         TextView messageOwnerName;
         TextView messageContent;
         TextView accountIcon;
+
+        FrameLayout directMessageLayout;
+        TextView userName;
+        TextView directMessageContent;
+        TextView directMessageTime;
+        TextView userIcon;
         public ViewHolder(View v) {
             super(v);
             root = v.findViewById(R.id.accounts_item_frame_layout);
@@ -53,6 +63,11 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
             messageOwnerName = v.findViewById(R.id.message_owner_name_tv);
             messageContent = v.findViewById(R.id.message_content_tv);
             accountIcon = v.findViewById(R.id.account_icon_tv);
+            userName = v.findViewById(R.id.user_name);
+            userIcon = v.findViewById(R.id.user_icon_tv);
+            directMessageTime = v.findViewById(R.id.message_time_tv);
+            directMessageContent = v.findViewById(R.id.direct_message_content_tv);
+            directMessageLayout = v.findViewById(R.id.direct_message_frame_layout);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -65,36 +80,77 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
 
     @Override
     public RecentRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.account_list_row_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.account_list_recent_row_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        RowItem rowItem = dataModel.getRowItems().get(position);
-        holder.accountName.setText(rowItem.getAccountName());
-        if(rowItem.getMessageCreatedAtTime() != 0) {
-            holder.messageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
+                RowItem rowItem = dataModel.getRowItems().get(position);
+                if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
+                    holder.directMessageLayout.setVisibility(View.GONE);
+                    holder.accountName.setText(rowItem.getAccountName());
+                    if (rowItem.getMessageCreatedAtTime() != 0) {
+                        holder.messageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
+                    }
+                    if (rowItem.getMessageOwnerName() != null && !rowItem.getMessageOwnerName().isEmpty()) {
+                        holder.messageOwnerName.setText(rowItem.getMessageOwnerName() + " - ");
+                    }
+                    if (rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
+                        holder.messageContent.setText(rowItem.getMessageContent());
+                    }
+                    holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
+                    if (rowItem.isNewMessage()) {
+                        holder.accountName.setTextColor(Color.BLACK);
+                        holder.messageOwnerName.setTextColor(Color.BLACK);
+                        holder.messageTime.setTextColor(Color.BLACK);
+                        holder.messageContent.setTextColor(Color.BLACK);
+                    } else {
+                        holder.accountName.setTextColor(context.getResources().getColor(R.color.grey_text));
+                        holder.messageOwnerName.setTextColor(context.getResources().getColor(R.color.grey_text));
+                        holder.messageTime.setTextColor(context.getResources().getColor(R.color.grey_text));
+                        holder.messageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
+                    }
+                }else{
+                    holder.directMessageLayout.setVisibility(View.VISIBLE);
+                    DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();
+                    UserRealm user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid())).findFirst();
+                    if(user != null){
+                        holder.userName.setText(user.getFirstName() + " " + user.getLastName());
+                        holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));
+                    }
+
+                    if(rowItem.getMessageCreatedAtTime() != 0) {
+                        holder.directMessageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
+                    }
+                    if(rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
+                        holder.directMessageContent.setText(rowItem.getMessageContent());
+                    }
+
+                    if (rowItem.isNewMessage()) {
+                        holder.directMessageTime.setTextColor(Color.BLACK);
+                        holder.directMessageContent.setTextColor(Color.BLACK);
+                        holder.userName.setTextColor(Color.BLACK);
+                    } else {
+                        holder.directMessageTime.setTextColor(context.getResources().getColor(R.color.grey_text));
+                        holder.directMessageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
+                        holder.userName.setTextColor(context.getResources().getColor(R.color.grey_text));
+                    }
+
+                    holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
+                }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if(dataModel.getRowItems().get(position) instanceof RowItem){
+            return 0;
         }
-        if(rowItem.getMessageOwnerName() != null && !rowItem.getMessageOwnerName().isEmpty()) {
-            holder.messageOwnerName.setText(rowItem.getMessageOwnerName() + " - ");
-        }
-        if(rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
-            holder.messageContent.setText(rowItem.getMessageContent());
-        }
-        holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
-        if(rowItem.isNewMessage()){
-            holder.accountName.setTextColor(Color.BLACK);
-            holder.messageOwnerName.setTextColor(Color.BLACK);
-            holder.messageTime.setTextColor(Color.BLACK);
-            holder.messageContent.setTextColor(Color.BLACK);
-        }else{
-            holder.accountName.setTextColor(context.getResources().getColor(R.color.grey_text));
-            holder.messageOwnerName.setTextColor(context.getResources().getColor(R.color.grey_text));
-            holder.messageTime.setTextColor(context.getResources().getColor(R.color.grey_text));
-            holder.messageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
-        }
+//        if(dataModel.getRowObjects().get(position) instanceof DirectItem){
+//            return 1;
+//        }
+        return 0;
     }
 
     @Override

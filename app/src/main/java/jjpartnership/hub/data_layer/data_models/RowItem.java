@@ -12,15 +12,28 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class RowItem extends RealmObject implements Comparable{
+    public static final String TYPE_ACCOUNT = "type_account";
+    public static final String TYPE_DIRECT = "type_direct";
+
     @PrimaryKey
     private String accountId;
     private String accountName;
     private String messageOwnerName;
     private String messageContent;
     private boolean isNewMessage;
+    private String itemType;
     private long messageCreatedAtTime;
 
     public RowItem() {
+        this.itemType = TYPE_ACCOUNT;
+    }
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
     }
 
     public boolean isNewMessage() {

@@ -56,17 +56,17 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     private void fetchData() {
         user = realm.where(UserRealm.class).equalTo("uid", toUid).findFirst();
         if(user != null) {
-            directChat = realm.where(DirectChatRealm.class).equalTo("userIdB", toUid).findFirst();
             activity.setActivityTitle(user.getFirstName() + " " + user.getLastName());
         }
+        directChat = realm.where(DirectChatRealm.class).equalTo("userIdB", toUid).findFirst();
         if(directChat == null){
             directChat = realm.where(DirectChatRealm.class).equalTo("userIdA", toUid).findFirst();
         }
         if(directChat == null){
             DataManager.getInstance().createNewDirectChat(uid, toUid);
+            directChat = realm.where(DirectChatRealm.class).equalTo("userIdB", toUid).findFirst();
         }
 
-        directChat = realm.where(DirectChatRealm.class).equalTo("userIdB", toUid).findFirst();
         messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", directChat.getMessageThreadId()).findFirst();
         messages = realm.where(MessageRealm.class).equalTo("chatId", directChat.getChatId()).findAll().sort("createdDate");
         if(messageThread != null) {

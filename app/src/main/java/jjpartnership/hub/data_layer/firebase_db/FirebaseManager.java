@@ -435,16 +435,7 @@ public class FirebaseManager {
         for(RowItem item : accountRowItems){
             sortedByMostRecent.add(item);
         }
-        Collections.sort(sortedByMostRecent, RowItem.createdAtComparator);
-        MainRecentModel recentModel = new MainRecentModel();
-        RealmList<RowItem> recentRowItems = new RealmList<>();
-        if(sortedByMostRecent.size() > 4) {
-            recentRowItems.addAll(sortedByMostRecent.subList(0, 5));
-        }else{
-            recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
-        }
-        Collections.reverse(recentRowItems);
-        recentModel.setRowItems(recentRowItems);
+
 
         MainDirectMessagesModel directModel = new MainDirectMessagesModel();
         RealmList<DirectItem> directItems = new RealmList<>();
@@ -466,6 +457,27 @@ public class FirebaseManager {
         }
         Collections.sort(directItems);
         directModel.setDirectItems(directItems);
+
+        for(DirectItem item : directItems){
+            RowItem newRowItem = new RowItem();
+            newRowItem.setItemType(RowItem.TYPE_DIRECT);
+            newRowItem.setAccountId(item.getDirectChatId());
+            newRowItem.setNewMessage(item.isNewMessage());
+            newRowItem.setMessageContent(item.getMessageContent());
+            newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
+            sortedByMostRecent.add(newRowItem);
+        }
+
+        Collections.sort(sortedByMostRecent, RowItem.createdAtComparator);
+        Collections.reverse(sortedByMostRecent);
+        MainRecentModel recentModel = new MainRecentModel();
+        RealmList<RowItem> recentRowItems = new RealmList<>();
+        if(sortedByMostRecent.size() > 4) {
+            recentRowItems.addAll(sortedByMostRecent.subList(0, 5));
+        }else{
+            recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
+        }
+        recentModel.setRowItems(recentRowItems);
 
         DataManager.getInstance().updateRealmMainModels(accountsModel, filterModel(recentModel), directModel);
         initChatMessagesListener(groupChats, directChats);
@@ -671,9 +683,9 @@ public class FirebaseManager {
                     copy.getRowItems().get(i).setMessageContent(message.getMessageContent());
                     copy.getRowItems().get(i).setMessageCreatedAtTime(message.getCreatedDate());
                     copy.getRowItems().get(i).setMessageOwnerName(message.getMessageOwnerName());
-                    if(!message.getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                    if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
                         copy.getRowItems().get(i).setNewMessage(true);
-                    }else{
+                    } else {
                         copy.getRowItems().get(i).setNewMessage(false);
                     }
                     sortedByMostRecent.add(copy.getRowItems().get(i));
@@ -682,7 +694,57 @@ public class FirebaseManager {
                 }
             }
 
+
+            DirectChatRealm newDChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
+            DirectItem newItem = null;
+            if(newDChat != null){
+                newItem = new DirectItem();
+                newItem.setDirectChatId(message.getChatId());
+                newItem.setNewMessage(true);
+                newItem.setMessageOwnerName(message.getMessageOwnerName());
+                newItem.setMessageOwnerUid(message.getCreatedByUid());
+                newItem.setMessageContent(message.getMessageContent());
+                newItem.setMessageCreatedAtTime(message.getCreatedDate());
+            }
+
+            MainDirectMessagesModel previousModel = RealmUISingleton.getInstance().getRealmInstance().where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
+            MainDirectMessagesModel newDirectModel = new MainDirectMessagesModel();
+            RealmList<DirectItem> directItems = new RealmList<>();
+            boolean alreadyExists = false;
+            for(DirectItem directItem : previousModel.getDirectItems()){
+                DirectItem copyItem = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(directItem);
+                if((message.getCreatedDate() > directItem.getMessageCreatedAtTime()) && (message.getChatId().equals(directItem.getDirectChatId()))){
+                    copyItem.setMessageCreatedAtTime(message.getCreatedDate());
+                    copyItem.setMessageContent(message.getMessageContent());
+                    copyItem.setMessageOwnerUid(message.getCreatedByUid());
+                    copyItem.setMessageOwnerName(message.getMessageOwnerName());
+                    copyItem.setNewMessage(true);
+                    directItems.add(copyItem);
+                }else{
+                    directItems.add(copyItem);
+                }
+                if(newItem != null && newItem.getDirectChatId().equals(directItem.getDirectChatId())){
+                    alreadyExists = true;
+                }
+            }
+
+            if(newItem != null && !alreadyExists) directItems.add(newItem);
+            Collections.sort(directItems);
+            newDirectModel.setDirectItems(directItems);
+
+            for(DirectItem item : directItems){
+                RowItem newRowItem = new RowItem();
+                newRowItem.setItemType(RowItem.TYPE_DIRECT);
+                newRowItem.setAccountId(item.getDirectChatId());
+                newRowItem.setNewMessage(item.isNewMessage());
+                newRowItem.setMessageContent(item.getMessageContent());
+                newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
+                sortedByMostRecent.add(newRowItem);
+            }
+
+
             Collections.sort(sortedByMostRecent, RowItem.createdAtComparator);
+            Collections.reverse(sortedByMostRecent);
             MainRecentModel recentModel = new MainRecentModel();
             RealmList<RowItem> recentRowItems = new RealmList<>();
             if (sortedByMostRecent.size() > 4) {
@@ -690,25 +752,7 @@ public class FirebaseManager {
             } else {
                 recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
             }
-            Collections.reverse(recentRowItems);
             recentModel.setRowItems(recentRowItems);
-
-            MainDirectMessagesModel previousModel = RealmUISingleton.getInstance().getRealmInstance().where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
-            MainDirectMessagesModel newDirectModel = new MainDirectMessagesModel();
-            RealmList<DirectItem> directItems = new RealmList<>();
-            for(DirectItem directItem : previousModel.getDirectItems()){
-                DirectItem copyItem = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(directItem);
-                if(message.getCreatedDate() > directItem.getMessageCreatedAtTime()){
-                    copyItem.setMessageCreatedAtTime(message.getCreatedDate());
-                    copyItem.setMessageContent(message.getMessageContent());
-                    copyItem.setMessageOwnerUid(message.getCreatedByUid());
-                    copyItem.setMessageOwnerName(message.getMessageOwnerName());
-                    copyItem.setNewMessage(true);
-                    directItems.add(copyItem);
-                }
-            }
-            Collections.sort(directItems);
-            newDirectModel.setDirectItems(directItems);
 
             DataManager.getInstance().updateRealmMainModels(copy, filterModel(recentModel), newDirectModel);
         }

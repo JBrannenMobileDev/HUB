@@ -35,17 +35,11 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
     public class ViewHolder extends RecyclerView.ViewHolder {
         FrameLayout root;
         TextView accountName;
-        TextView messageTime;
-        TextView messageOwnerName;
-        TextView messageContent;
         TextView accountIcon;
         public ViewHolder(View v) {
             super(v);
             root = v.findViewById(R.id.accounts_item_frame_layout);
             accountName = v.findViewById(R.id.account_name_tv);
-            messageTime = v.findViewById(R.id.most_recent_message_tv);
-            messageOwnerName = v.findViewById(R.id.message_owner_name_tv);
-            messageContent = v.findViewById(R.id.message_content_tv);
             accountIcon = v.findViewById(R.id.account_icon_tv);
 
             root.setOnClickListener(new View.OnClickListener() {
@@ -66,29 +60,14 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
         RowItem rowItem = dataModel.getRowItems().get(position);
         holder.accountName.setText(rowItem.getAccountName());
-        if(rowItem.getMessageCreatedAtTime() != 0) {
-            holder.messageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
-        }
-        if(rowItem.getMessageOwnerName() != null && !rowItem.getMessageOwnerName().isEmpty()) {
-            holder.messageOwnerName.setText(rowItem.getMessageOwnerName() + " - ");
-        }
-        if(rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
-            holder.messageContent.setText(rowItem.getMessageContent());
-        }
         holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
     }
 
     @Override
     public int getItemCount() {
         return dataModel.getRowItems().size();
-    }
-
-    private String createFormattedTime(long createdDate) {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("h:mm aaa - M/dd/yy");
-        return dateFormatter.format(new Date(createdDate));
     }
 
     public void OnDataSetChanged(MainAccountsModel dataModel) {

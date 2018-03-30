@@ -27,9 +27,11 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
@@ -37,6 +39,7 @@ import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
@@ -132,10 +135,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recentSelectedCallback = new BaseCallback<RowItem>() {
             @Override
             public void onResponse(RowItem rowItem) {
-                Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
-                accountChatIntent.putExtra("account_id", rowItem.getAccountId());
-                accountChatIntent.putExtra("account_name", rowItem.getAccountName());
-                startActivity(accountChatIntent);
+                if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
+                    Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
+                    accountChatIntent.putExtra("account_id", rowItem.getAccountId());
+                    accountChatIntent.putExtra("account_name", rowItem.getAccountName());
+                    startActivity(accountChatIntent);
+                }else{
+                    Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
+                    DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();
+                    if(dChat != null) directMessageIntent.putExtra("toUid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid()));
+                    directMessageIntent.putExtra("uid", UserPreferences.getInstance().getUid());
+                    startActivity(directMessageIntent);
+                }
             }
 
             @Override
@@ -148,7 +159,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(DirectItem directItem) {
                 Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
-                directMessageIntent.putExtra("uidTo", directItem.getMessageOwnerUid());
+                DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", directItem.getDirectChatId()).findFirst();
+                if(dChat != null) directMessageIntent.putExtra("toUid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid()));
                 directMessageIntent.putExtra("uid", UserPreferences.getInstance().getUid());
                 startActivity(directMessageIntent);
             }
@@ -174,6 +186,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             super.onBackPressed();
         }
+    }
+
+    @OnClick(R.id.add_account_iv)
+    public void onAddAccountClicked(){
+
+    }
+
+    @OnClick(R.id.add_direct_message_iv)
+    public void onNewDirectMessageClicked(){
+
     }
 
     @Override
