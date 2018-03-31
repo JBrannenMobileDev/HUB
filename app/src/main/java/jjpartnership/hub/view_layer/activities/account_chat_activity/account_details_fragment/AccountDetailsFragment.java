@@ -29,19 +29,13 @@ import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfile
 public class AccountDetailsFragment extends Fragment implements AccountDetailsView{
     @BindView(R.id.account_details_address_tv)TextView addressTv;
     @BindView(R.id.account_details_industries_tv)TextView industriesTv;
-    @BindView(R.id.account_contacts_recycler_view)RecyclerView contactsRecycler;
     @BindView(R.id.assigned_agents_recycler_view)RecyclerView agentsRecycler;
 
-    private ContactsRecyclerAdapter contactsAdapter;
     private AssignedAgentsRecyclerAdapter agentsAdapter;
     private OnAccountDetailsInteractionListener mListener;
     private AccountDetailsPresenter presenter;
-    private BaseCallback<UserRealm> contactSelectedCallback;
     private BaseCallback<UserRealm> agentSelectedCallback;
-    private BaseCallback<UserRealm> directMessageSelectedCallback;
     private BaseCallback<UserRealm> agentDirectMessageSelectedCallback;
-    private BaseCallback<UserRealm> emailSelectedCallback;
-    private BaseCallback<UserRealm> callSelectedCallback;
     private BaseCallback<String> currentUserProfileSelectedCallback;
     private String currentUserUid;
 
@@ -58,7 +52,6 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         ButterKnife.bind(this, v);
         initCallbacks();
         currentUserUid = UserPreferences.getInstance().getUid();
-        contactsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         agentsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         presenter = new AccountDetailsPresenterImp(this, getArguments().getString("account_name"),
                 getArguments().getString("account_id"));
@@ -73,54 +66,6 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
                 Intent userProfileIntent = new Intent(getActivity().getApplicationContext(), UserProfileActivity.class);
                 userProfileIntent.putExtra("uid", currentUserUid);
                 startActivity(userProfileIntent);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-
-        contactSelectedCallback = new BaseCallback<UserRealm>() {
-            @Override
-            public void onResponse(UserRealm user) {
-
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-
-        directMessageSelectedCallback = new BaseCallback<UserRealm>() {
-            @Override
-            public void onResponse(UserRealm user) {
-                launchDirectMessageIntent(currentUserUid, user.getUid());
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-
-        emailSelectedCallback = new BaseCallback<UserRealm>() {
-            @Override
-            public void onResponse(UserRealm user) {
-                CommunicationsUtil.launchEmailIntent(user.getEmail(), getContext().getApplicationContext());
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-
-        callSelectedCallback = new BaseCallback<UserRealm>() {
-            @Override
-            public void onResponse(UserRealm user) {
-                CommunicationsUtil.launchPhoneCallIntent(user.getPhoneNumber(), getContext().getApplicationContext());
             }
 
             @Override
@@ -183,11 +128,6 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         presenter.onDirectionsClicked();
     }
 
-    @OnClick(R.id.contacts_group_chat_tv)
-    public void onContactsGroupChatClicked(){
-        mListener.onSetPagerPage(2);
-    }
-
     @OnClick(R.id.agents_group_chat_tv)
     public void onAgentsGroupChatClicked(){
         mListener.onSetPagerPage(1);
@@ -197,13 +137,6 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     public void onReceiveCompanyData(String address, String industries) {
         addressTv.setText(address);
         industriesTv.setText(industries);
-    }
-
-    @Override
-    public void onRecieveCustomers(List<UserRealm> customers) {
-        contactsAdapter = new ContactsRecyclerAdapter(getActivity().getApplicationContext(), customers,
-                contactSelectedCallback, directMessageSelectedCallback, emailSelectedCallback, callSelectedCallback);
-        contactsRecycler.setAdapter(contactsAdapter);
     }
 
     @Override

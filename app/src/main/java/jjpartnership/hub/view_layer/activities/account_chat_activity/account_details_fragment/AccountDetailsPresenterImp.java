@@ -20,7 +20,6 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     private Realm realm;
     private AccountRealm account;
     private CompanyRealm company;
-    private List<UserRealm> customers;
     private GroupChatRealm chat;
     private List<UserRealm> salesAgents;
     private String accountName;
@@ -31,7 +30,6 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
         this.realm = RealmUISingleton.getInstance().getRealmInstance();
         this.accountName = account_name;
         this.accountId = account_id;
-        customers = new ArrayList<>();
         salesAgents = new ArrayList<>();
         fetchData();
     }
@@ -40,21 +38,8 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
         account = realm.where(AccountRealm.class).equalTo("accountId", accountId).findFirst();
         if(account != null) {
             company = realm.where(CompanyRealm.class).equalTo("companyId", account.getCompanyCustomerId()).findFirst();
-            List<String> employeeList;
             if(company != null) {
                 parseDetailsData(company);
-                employeeList = getCompanyEmployeeUids(company.getEmployeeList());
-            }else{
-                employeeList = new ArrayList<>();
-            }
-            if(employeeList.size() > 0){
-                for(String uid : employeeList){
-                    UserRealm customer = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
-                    if(customer != null) customers.add(customer);
-                }
-            }
-            if (customers.size() > 0) {
-                fragment.onRecieveCustomers(customers);
             }
 
             if(account.getAccountSalesAgentUids() != null && account.getAccountSalesAgentUids().size() > 0){
@@ -67,14 +52,6 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
             if(salesAgents.size() > 0){
                 fragment.onReceiveSalesAgentData(salesAgents);
             }
-        }
-    }
-
-    private List<String> getCompanyEmployeeUids(RealmList<String> employeeList) {
-        if(employeeList != null && employeeList.size() > 0){
-            return employeeList;
-        }else{
-            return new ArrayList<>();
         }
     }
 

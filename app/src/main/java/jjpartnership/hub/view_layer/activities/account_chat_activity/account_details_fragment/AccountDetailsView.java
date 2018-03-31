@@ -11,7 +11,6 @@ import jjpartnership.hub.data_layer.data_models.UserRealm;
 
 public interface AccountDetailsView {
     void onReceiveCompanyData(String address, String industries);
-    void onRecieveCustomers(List<UserRealm> customers);
     void onReceiveSalesAgentData(List<UserRealm> salesAgents);
     void launchDirectionsIntent(String address);
 }

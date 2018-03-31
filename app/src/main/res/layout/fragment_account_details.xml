@@ -148,55 +148,6 @@
                 android:layout_marginLeft="8dp">
 
                 <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="24dp"
-                    android:layout_marginBottom="8dp"
-                    android:layout_marginTop="32dp"
-                    android:gravity="center_vertical"
-                    android:text="Account Contacts"
-                    android:textColor="@color/colorPrimaryLight"
-                    android:textStyle="bold" />
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/account_contacts_frame_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:background="@drawable/rounded_rectangle_white_tile_bg"
-                android:elevation="2dp"
-                android:paddingTop="2dp">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/account_contacts_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="48dp"
-                    android:nestedScrollingEnabled="false" />
-
-                <TextView
-                    android:id="@+id/contacts_group_chat_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_gravity="bottom|end"
-                    android:background="@drawable/rounded_rectangle_orange_stroke"
-                    android:gravity="center_vertical"
-                    android:text="SEND GROUP MESSAGE"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textStyle="bold" />
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="8dp">
-
-                <TextView
                     android:id="@+id/textView65"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
