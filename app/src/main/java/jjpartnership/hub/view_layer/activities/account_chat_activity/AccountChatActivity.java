@@ -26,26 +26,24 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_fragment.CustomerFragment;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        CustomerFragment.OnCustomerChatFragmentInteractionListener, BackAwareAutofillMultiLineEditText.BackPressedListener,
+        BackAwareAutofillMultiLineEditText.BackPressedListener, CustomerRequestsFragment.OnFragmentInteractionListener,
         AccountChatView, AccountDetailsFragment.OnAccountDetailsInteractionListener{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
     @BindView(R.id.send_image_view)ImageView sendImage;
     @BindView(R.id.user_input_layout)FrameLayout userInputLayout;
     @BindView(R.id.user_message_sales_team_et)BackAwareAutofillMultiLineEditText userInputSalesTeam;
-    @BindView(R.id.user_message_customer_et)BackAwareAutofillMultiLineEditText userInputCustomer;
 
     private ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
     private String accountId;
     private int colorOrange;
     private int colorGrey;
     private SalesAgentsFragment salesAgentFragment;
-    private CustomerFragment customerChatFragment;
+    private CustomerRequestsFragment customerRequestsFragment;
     private AccountDetailsFragment accountDetailsFragment;
 
     @Override
@@ -61,14 +59,14 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         bundle.putString("account_name", getIntent().getStringExtra("account_name"));
         bundle.putString("account_id", getIntent().getStringExtra("account_id"));
         salesAgentFragment = new SalesAgentsFragment();
-        customerChatFragment = new CustomerFragment();
+        customerRequestsFragment = new CustomerRequestsFragment();
         accountDetailsFragment = new AccountDetailsFragment();
         salesAgentFragment.setArguments(bundle);
-        customerChatFragment.setArguments(bundle);
+        customerRequestsFragment.setArguments(bundle);
         accountDetailsFragment.setArguments(bundle);
         adapter.addFragment(accountDetailsFragment, "Details");
         adapter.addFragment(salesAgentFragment, "Sales Team Chat");
-        adapter.addFragment(customerChatFragment, "Customer Chat");
+        adapter.addFragment(customerRequestsFragment, "Customer Requests");
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(2);
         tabLayout.setupWithViewPager(pager);
@@ -88,9 +86,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     public void onSendClicked(){
         if(userInputSalesTeam.isShown()){
             salesAgentFragment.onSendMessageClicked();
-        }
-        if(userInputCustomer.isShown()){
-            customerChatFragment.onSendMessageClicked();
         }
     }
 
@@ -125,36 +120,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
             }
         });
 
-        userInputCustomer.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                return false;
-            }
-        });
-
-        userInputCustomer.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length() > 0){
-                    setSendImageColor(colorOrange);
-                }else{
-                    setSendImageColor(colorGrey);
-                }
-                customerChatFragment.onUserInputChanged(charSequence);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -173,7 +138,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         });
 
         userInputSalesTeam.setBackPressedListener(this);
-        userInputCustomer.setBackPressedListener(this);
     }
 
     private void setEditTextVisible(int position) {
@@ -186,7 +150,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
                 if(!userInputLayout.isShown()) animateShowUserInputLayout();
                 hideKeyboard();
                 userInputSalesTeam.setVisibility(View.VISIBLE);
-                userInputCustomer.setVisibility(View.GONE);
                 if (userInputSalesTeam.getText().length() > 0) {
                     setSendImageColor(colorOrange);
                 } else {
@@ -194,15 +157,8 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
                 }
                 break;
             case 2:
-                if(!userInputLayout.isShown()) animateShowUserInputLayout();
                 hideKeyboard();
-                userInputSalesTeam.setVisibility(View.GONE);
-                userInputCustomer.setVisibility(View.VISIBLE);
-                if (userInputCustomer.getText().length() > 0) {
-                    setSendImageColor(colorOrange);
-                } else {
-                    setSendImageColor(colorGrey);
-                }
+                userInputLayout.setVisibility(View.GONE);
                 break;
         }
     }
@@ -250,11 +206,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     @Override
     public void resetUserInputSales() {
         userInputSalesTeam.setText("");
-    }
-
-    @Override
-    public void resetUserInputCustomer() {
-        userInputCustomer.setText("");
     }
 
     @Override

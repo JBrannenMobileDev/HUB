@@ -16,6 +16,17 @@
 
         <!-- TODO: Update blank fragment layout -->
 
+        <Switch
+            android:id="@+id/new_message_switch"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/white"
+            android:elevation="1dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Notify new messages for this chat"
+            android:textColor="@color/grey_text" />
+
         <TextView
             android:id="@+id/chat_empty_state"
             android:layout_width="match_parent"
@@ -96,7 +107,6 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_gravity="bottom|right"
-            android:background="?android:attr/selectableItemBackground"
             android:padding="15dp"
             android:src="@drawable/ic_menu_send"
             android:tint="@color/colorPrimaryVeryLight" />

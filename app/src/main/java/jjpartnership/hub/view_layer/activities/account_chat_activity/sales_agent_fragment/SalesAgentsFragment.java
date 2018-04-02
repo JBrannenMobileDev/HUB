@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -37,6 +38,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     @BindView(R.id.fab)FloatingActionButton fab;
     @BindView(R.id.new_message_alert)TextView newMessageAlert;
     @BindView(R.id.currently_typing_tv)TextView currentlyTypingTv;
+    @BindView(R.id.new_message_switch)Switch newMessageSwitch;
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
@@ -93,6 +95,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
                     @Override
                     public void onHide() {
                         fab.hide();
+                        animateShowNewMessageSwitch();
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -109,6 +112,7 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
                         fab.setBackgroundTintList(getResources().getColorStateList(R.color.white));
                         fab.setImageTintList(getResources().getColorStateList(R.color.grey_text));
                         fab.show();
+                        animateHideNewMessageSwitch();
                     }
                 });
     }
@@ -196,6 +200,14 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
                 currentlyTypingTv.animate().translationY(0f).setDuration(100);
             }
         }, 100);
+    }
+
+    private void animateHideNewMessageSwitch(){
+        newMessageSwitch.animate().translationY(DpUtil.pxFromDp(getActivity().getApplicationContext(), -40)).setDuration(250);
+    }
+
+    private void animateShowNewMessageSwitch(){
+        newMessageSwitch.animate().translationY(0).setDuration(250);
     }
 
     private void animateHideCurrentlyTypingTv(){

@@ -718,7 +718,11 @@ public class FirebaseManager {
                     copyItem.setMessageContent(message.getMessageContent());
                     copyItem.setMessageOwnerUid(message.getCreatedByUid());
                     copyItem.setMessageOwnerName(message.getMessageOwnerName());
-                    copyItem.setNewMessage(true);
+                    if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+                        copyItem.setNewMessage(true);
+                    } else {
+                        copyItem.setNewMessage(false);
+                    }
                     directItems.add(copyItem);
                 }else{
                     directItems.add(copyItem);

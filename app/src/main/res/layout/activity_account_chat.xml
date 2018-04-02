@@ -47,7 +47,6 @@
                 android:layout_width="64dp"
                 android:layout_height="64dp"
                 android:layout_gravity="bottom|right"
-                android:background="?android:attr/selectableItemBackground"
                 android:padding="15dp"
                 android:src="@drawable/ic_menu_send"
                 android:tint="@color/colorPrimaryVeryLight" />
@@ -69,23 +68,6 @@
                 android:paddingLeft="16dp"
                 android:textColorHint="@color/colorPrimaryLight" />
 
-            <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
-                android:id="@+id/user_message_customer_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="45dp"
-                android:backgroundTint="@android:color/transparent"
-                android:enabled="true"
-                android:focusable="true"
-                android:hint="Group Message (Customer)"
-                android:inputType="textCapSentences|textMultiLine"
-                android:isScrollContainer="true"
-                android:maxLines="4"
-                android:minLines="1"
-                android:paddingLeft="16dp"
-                android:textColorHint="@color/colorPrimaryLight"
-                android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
 

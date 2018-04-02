@@ -9,7 +9,7 @@
     tools:context="jjpartnership.hub.view_layer.activities.main_activity.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -278,7 +278,7 @@
 
             </FrameLayout>
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
     <LinearLayout
         android:id="@+id/search_results_layout"

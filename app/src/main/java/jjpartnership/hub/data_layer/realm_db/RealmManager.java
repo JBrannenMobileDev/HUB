@@ -154,7 +154,7 @@ public class RealmManager {
             public void run() {
                 if(freshInstallDataLoadedToRealmCallback != null) freshInstallDataLoadedToRealmCallback.onResponse(true);
             }
-        }, 500);
+        }, 1000);
     }
 
     public void insertOrUpdateMessage(final MessageRealm messageRealm) {

@@ -170,10 +170,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         };
-        accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<RowItem>()), accountSelectedCallback);
+//        accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<RowItem>()), accountSelectedCallback);
         recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
         directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
-        accountsRecyclerView.setAdapter(accountsAdapter);
+//        accountsRecyclerView.setAdapter(accountsAdapter);
         recentRecyclerView.setAdapter(recentRecyclerAdapter);
         directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
     }
@@ -357,8 +357,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (accountsAdapter == null) {
                 accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
                 accountsRecyclerView.setAdapter(accountsAdapter);
-            }else{
-                accountsAdapter.OnDataSetChanged(dataModel);
             }
             accountsAdapter.notifyDataSetChanged();
         }

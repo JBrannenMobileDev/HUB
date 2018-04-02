@@ -80,6 +80,7 @@ public class MainPresenterImp implements MainPresenter {
     public void onDestroy() {
         if(dataModel != null) dataModel.removeAllChangeListeners();
         if(recentModel != null) recentModel.removeAllChangeListeners();
+        if(directModel != null) directModel.removeAllChangeListeners();
     }
 
     @Override

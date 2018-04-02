@@ -21,6 +21,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -47,6 +48,7 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
     @BindView(R.id.chat_recycler_view)RecyclerView chatRecycler;
     @BindView(R.id.fab)FloatingActionButton fab;
     @BindView(R.id.chat_empty_state)TextView emptyStateMessage;
+    @BindView(R.id.new_message_switch)Switch newMessageSwitch;
 
     private DirectMessagePresenter presenter;
     private AdjustableScrollSpeedLayoutManager layoutManager;
@@ -86,6 +88,7 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
                     @Override
                     public void onHide() {
                         fab.hide();
+                        animateShowNewMessageSwitch();
                         new Handler().postDelayed(new Runnable() {
                             @Override
                             public void run() {
@@ -102,6 +105,7 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
                         fab.setBackgroundTintList(getResources().getColorStateList(R.color.white));
                         fab.setImageTintList(getResources().getColorStateList(R.color.grey_text));
                         fab.show();
+                        animateHideNewMessageSwitch();
                     }
                 });
     }
@@ -268,6 +272,14 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
             public void run() {
                 currentlyTypingTv.setVisibility(View.GONE);            }
         }, 100);
+    }
+
+    private void animateHideNewMessageSwitch(){
+        newMessageSwitch.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -40)).setDuration(250);
+    }
+
+    private void animateShowNewMessageSwitch(){
+        newMessageSwitch.animate().translationY(0).setDuration(250);
     }
 
     @Override
