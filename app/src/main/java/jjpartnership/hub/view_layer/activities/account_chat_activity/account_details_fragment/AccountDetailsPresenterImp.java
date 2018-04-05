@@ -5,8 +5,10 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
+import jjpartnership.hub.data_layer.data_models.CustomerRequest;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
@@ -53,6 +55,12 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
                 fragment.onReceiveSalesAgentData(salesAgents);
             }
         }
+
+        createNewRequest();
+    }
+
+    private void createNewRequest() {
+        DataManager.getInstance().createNewCustomerRequest(account, company, "Can anyone provide a custome chemical capsul?");
     }
 
     private void parseDetailsData(CompanyRealm company) {

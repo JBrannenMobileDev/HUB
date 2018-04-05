@@ -6,7 +6,11 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.data_models.Account;
+import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.Company;
+import jjpartnership.hub.data_layer.data_models.CompanyRealm;
+import jjpartnership.hub.data_layer.data_models.CustomerRequest;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
@@ -107,12 +111,12 @@ public class DataManager {
 
     public void createNewMessage(Message newMessage) {
         realmManager.insertOrUpdateMessage(new MessageRealm(newMessage));
-        fbManager.createNewMesage(newMessage);
+        fbManager.createNewMessage(newMessage);
     }
 
     public void createNewDirectMessage(Message newMessage) {
         realmManager.insertOrUpdateMessage(new MessageRealm(newMessage));
-        fbManager.createNewDirectMesage(newMessage);
+        fbManager.createNewDirectMessage(newMessage);
     }
 
     public void clearRealmData() {
@@ -156,5 +160,17 @@ public class DataManager {
 
     public void insertOrUpdateDirectChat(DirectChatRealm directChat){
         realmManager.insertOrUpdateDirectChatRealm(directChat);
+    }
+
+    public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage) {
+        fbManager.createNewCustomerRequest(account, company, requestMessage);
+    }
+
+    public void insertOrUpdateCustomerRequest(List<CustomerRequest> request) {
+        realmManager.insertOrUpdateCustomerRequest(request);
+    }
+
+    public void insertOrUpdateCustomerRequest(CustomerRequestRealm request) {
+        realmManager.insertOrUpdateCustomerRequest(request);
     }
 }

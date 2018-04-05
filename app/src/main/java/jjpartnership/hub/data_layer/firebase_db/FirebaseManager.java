@@ -13,6 +13,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,8 @@ import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
+import jjpartnership.hub.data_layer.data_models.CustomerRequest;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
@@ -63,6 +66,7 @@ public class FirebaseManager {
     private DatabaseReference industriesReference;
     private DatabaseReference userColorsReference;
     private DatabaseReference chatMessagesReference;
+    private DatabaseReference customerRequestsReference;
 
     private FirebaseDatabase database;
 
@@ -72,6 +76,7 @@ public class FirebaseManager {
     private List<DirectChat> directChats;
     private List<Company> companies;
     private List<Message> messages;
+    private List<CustomerRequest> customerRequests;
     private String uid;
 
     private List<ChildEventListener> childEventListenersMessageThreads;
@@ -85,6 +90,7 @@ public class FirebaseManager {
         directChats = new ArrayList<>();
         companies = new ArrayList<>();
         messages = new ArrayList<>();
+        customerRequests = new ArrayList<>();
         database = FirebaseDatabase.getInstance();
         thisUserReference = database.getReference("users").child(UserPreferences.getInstance().getUid());
         thisUserAccountsReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("accountIds");
@@ -97,6 +103,7 @@ public class FirebaseManager {
         groupChatsReference = database.getReference("group_chats");
         industriesReference = database.getReference("industries");
         userColorsReference = database.getReference("user_colors");
+        customerRequestsReference = database.getReference("customer_requests");
     }
 
     public void initDataListeners() {
@@ -364,7 +371,7 @@ public class FirebaseManager {
                         }
                         if (directChats.size() == currentUser.getDirectChats().size()) {
                             DataManager.getInstance().updateRealmDirectChats(directChats);
-                            buildUiModels();
+                            fetchCustomerRequests(groupChats);
                         }
                     }
 
@@ -376,8 +383,53 @@ public class FirebaseManager {
                 directChatsReference.child(chatIds).addListenerForSingleValueEvent(chatListener);
             }
         }else{
-            buildUiModels();
+            fetchCustomerRequests(groupChats);
             //TODO delete all directChats from realm
+        }
+    }
+
+    private void fetchCustomerRequests(List<GroupChat> groupChats) {
+        int requestCount = 0;
+        for (GroupChat groupChat : groupChats) {
+            for (String requestId : groupChat.getCustomerRequestIds()) {
+                if(requestId != null && !requestId.isEmpty()){
+                    requestCount++;
+                }
+            }
+        }
+        final int finalCount = requestCount;
+
+        if(groupChats != null && groupChats.size() > 0) {
+            for (GroupChat groupChat : groupChats) {
+                for(String requestId : groupChat.getCustomerRequestIds()){
+                    ValueEventListener chatListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            CustomerRequest request = dataSnapshot.getValue(CustomerRequest.class);
+                            if (request != null) {
+                                customerRequests.add(request);
+                            }
+                            if (customerRequests.size() == finalCount) {
+                                DataManager.getInstance().insertOrUpdateCustomerRequest(customerRequests);
+                                buildUiModels();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    };
+                    if(requestId != null && !requestId.isEmpty()) {
+                        customerRequestsReference.child(requestId).addListenerForSingleValueEvent(chatListener);
+                    }
+                }
+            }
+            if(finalCount == 0){
+                buildUiModels();
+            }
+        }else{
+            buildUiModels();
         }
     }
 
@@ -472,8 +524,8 @@ public class FirebaseManager {
         Collections.reverse(sortedByMostRecent);
         MainRecentModel recentModel = new MainRecentModel();
         RealmList<RowItem> recentRowItems = new RealmList<>();
-        if(sortedByMostRecent.size() > 4) {
-            recentRowItems.addAll(sortedByMostRecent.subList(0, 5));
+        if(sortedByMostRecent.size() > 3) {
+            recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
         }else{
             recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
         }
@@ -751,8 +803,8 @@ public class FirebaseManager {
             Collections.reverse(sortedByMostRecent);
             MainRecentModel recentModel = new MainRecentModel();
             RealmList<RowItem> recentRowItems = new RealmList<>();
-            if (sortedByMostRecent.size() > 4) {
-                recentRowItems.addAll(sortedByMostRecent.subList(0, 5));
+            if (sortedByMostRecent.size() > 3) {
+                recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
             } else {
                 recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
             }
@@ -762,14 +814,14 @@ public class FirebaseManager {
         }
     }
 
-    public void createNewMesage(Message newMessage) {
+    public void createNewMessage(Message newMessage) {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
         updateRelatedGroupChatWithUserId(newMessage);
     }
 
-    public void createNewDirectMesage(Message newMessage) {
+    public void createNewDirectMessage(Message newMessage) {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
@@ -779,6 +831,18 @@ public class FirebaseManager {
         copy.setMostRecentMessage(new MessageRealm(newMessage));
         DataManager.getInstance().insertOrUpdateDirectChat(copy);
         directChatsReference.child(copy.getChatId()).setValue(new DirectChat(copy));
+    }
+
+    public void createNewRequestMessage(Message newMessage) {
+        DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
+        newMessage.setMessageId(messageRef.getKey());
+        chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
+        CustomerRequestRealm request = RealmUISingleton.getInstance().getRealmInstance().where(CustomerRequestRealm.class).equalTo("requestId", newMessage.getChatId()).findFirst();
+        CustomerRequestRealm copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(request);
+        copy.setMostRecentGroupMessage(new MessageRealm(newMessage));
+        copy.setMostRecentMessageTime(newMessage.getCreatedDate());
+        DataManager.getInstance().insertOrUpdateCustomerRequest(copy);
+        customerRequestsReference.child(copy.getRequestId()).setValue(new CustomerRequest(copy));
     }
 
     private void updateRelatedGroupChatWithUserId(Message newMessage) {
@@ -1278,5 +1342,29 @@ public class FirebaseManager {
         if(chatId != null && messageThreadId != null){
             chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).addListenerForSingleValueEvent(listener);
         }
+    }
+
+    public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage) {
+        DatabaseReference newGroupChatRef = groupChatsReference.push();
+        GroupChat groupChat = new GroupChat();
+        groupChat.setChatId(newGroupChatRef.getKey());
+        DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
+        MessageThread thread = new MessageThread();
+        thread.setMessageThreadId(newMessageThreadRef.getKey());
+        thread.setChatId(groupChat.getChatId());
+        database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
+        groupChat.setMessageThreadId(thread.getMessageThreadId());
+        groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
+
+        DatabaseReference newRequestRef = customerRequestsReference.push();
+        CustomerRequest request = new CustomerRequest();
+        request.setRequestId(newRequestRef.getKey());
+        request.setAccountId(account.getAccountId());
+        request.setGroupChatId(groupChat.getChatId());
+        request.setCustomerUid(company.getEmployeeList().get(0));
+        request.setOpen(true);
+        request.setOpenDate(new Date().getTime());
+        request.setRequestMessage(requestMessage);
+        customerRequestsReference.child(request.getRequestId()).setValue(request);
     }
 }

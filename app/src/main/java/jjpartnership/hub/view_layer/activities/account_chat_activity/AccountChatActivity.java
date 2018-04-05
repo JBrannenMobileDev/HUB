@@ -26,6 +26,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_requests_fragment.CustomerRequestsFragment;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 

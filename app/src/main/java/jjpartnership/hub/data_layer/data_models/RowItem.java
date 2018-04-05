@@ -14,6 +14,7 @@ import io.realm.annotations.PrimaryKey;
 public class RowItem extends RealmObject implements Comparable{
     public static final String TYPE_ACCOUNT = "type_account";
     public static final String TYPE_DIRECT = "type_direct";
+    public static final String TYPE_REQUEST = "type_request";
 
     @PrimaryKey
     private String accountId;

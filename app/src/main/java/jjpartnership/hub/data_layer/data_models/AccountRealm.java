@@ -19,12 +19,13 @@ public class AccountRealm extends RealmObject{
     private String groupChatCustomerId;
     private String accountId;
     private RealmList<String> accountSalesAgentUids;
+    private RealmList<String> customerRequestIds;
 
     public AccountRealm() {
     }
 
     public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
-                        String groupChatCustomerId, String accountId, RealmList<String> accountUids) {
+                        String groupChatCustomerId, String accountId, RealmList<String> accountUids, RealmList<String> customerRequestIds) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
@@ -32,6 +33,7 @@ public class AccountRealm extends RealmObject{
         this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
         this.accountSalesAgentUids = accountUids;
+        this.customerRequestIds = customerRequestIds;
     }
 
     public AccountRealm(Account account){
@@ -42,6 +44,7 @@ public class AccountRealm extends RealmObject{
         this.accountId = account.getAccountId();
         this.groupChatCustomerId = account.getGroupChatCustomerId();
         this.accountSalesAgentUids = createRealmList(account.getAccountUsers());
+        this.customerRequestIds = createRealmListRequestIds(account.getCustomerRequestIds());
     }
 
     private RealmList<String> createRealmList(Map<String, String> accountUsers) {
@@ -53,6 +56,25 @@ public class AccountRealm extends RealmObject{
             return userList;
         }
         return new RealmList<>();
+    }
+
+    private RealmList<String> createRealmListRequestIds(Map<String, String> requestIds) {
+        if(requestIds != null) {
+            RealmList<String> requests = new RealmList<>();
+            for (String uid : requestIds.values()) {
+                requests.add(uid);
+            }
+            return requests;
+        }
+        return new RealmList<>();
+    }
+
+    public RealmList<String> getCustomerRequestIds() {
+        return customerRequestIds;
+    }
+
+    public void setCustomerRequestIds(RealmList<String> customerRequestIds) {
+        this.customerRequestIds = customerRequestIds;
     }
 
     public RealmList<String> getAccountSalesAgentUids() {

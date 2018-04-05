@@ -10,6 +10,8 @@ import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
+import jjpartnership.hub.data_layer.data_models.CustomerRequest;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
@@ -231,6 +233,32 @@ public class RealmManager {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(directChat);
+            }
+        });
+        realm.close();
+    }
+
+    public void insertOrUpdateCustomerRequest(final List<CustomerRequest> requests) {
+        final RealmList<CustomerRequestRealm> realmRequests = new RealmList<>();
+        for(CustomerRequest request : requests){
+            realmRequests.add(new CustomerRequestRealm(request));
+        }
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(realmRequests);
+            }
+        });
+        realm.close();
+    }
+
+    public void insertOrUpdateCustomerRequest(final CustomerRequestRealm request) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(request);
             }
         });
         realm.close();

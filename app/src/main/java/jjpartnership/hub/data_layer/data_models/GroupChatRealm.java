@@ -1,6 +1,5 @@
 package jjpartnership.hub.data_layer.data_models;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -19,21 +18,10 @@ public class GroupChatRealm extends RealmObject{
     private MessageRealm mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
-    private RealmList<RequestRealm> customerRequests;
+    private RealmList<String> customerRequestIds;
     private RealmList<String> currentlyTypingUserNames;
 
     public GroupChatRealm() {
-    }
-
-    public GroupChatRealm(String chatId, List<String> userIds, Message messages, long messageCreatedTime,
-                          List<String> currentlyTypingUserNames, String messageThreadId, List<Request> requests) {
-        this.chatId = chatId;
-        this.userIds = createUserIdList(userIds);
-        this.mostRecentMessage = new MessageRealm(messages);
-        this.messageCreatedTime = messageCreatedTime;
-        this.currentlyTypingUserNames = createCurrentlyTypingList(currentlyTypingUserNames);
-        this.messageThreadId = messageThreadId;
-        this.customerRequests = createCustomerRequsts(requests);
     }
 
     public GroupChatRealm(GroupChat chat){
@@ -43,14 +31,14 @@ public class GroupChatRealm extends RealmObject{
         this.messageCreatedTime = chat.getMessageCreatedTime();
         this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());
         this.messageThreadId = chat.getMessageThreadId();
-        this.customerRequests = createCustomerRequsts(chat.getCustomerRequests());
+        this.customerRequestIds = createCustomerRequsts(chat.getCustomerRequestIds());
     }
 
-    private RealmList<RequestRealm> createCustomerRequsts(List<Request> requests){
+    private RealmList<String> createCustomerRequsts(List<String> requests){
         if(requests != null) {
-            RealmList<RequestRealm> realmRequests = new RealmList<>();
-            for (Request request : requests) {
-                realmRequests.add(new RequestRealm(request));
+            RealmList<String> realmRequests = new RealmList<>();
+            for (String request : requests) {
+                realmRequests.add(request);
             }
             return realmRequests;
         }else{
@@ -83,12 +71,12 @@ public class GroupChatRealm extends RealmObject{
         }
     }
 
-    public RealmList<RequestRealm> getCustomerRequests() {
-        return customerRequests;
+    public RealmList<String> getCustomerRequests() {
+        return customerRequestIds;
     }
 
-    public void setCustomerRequests(RealmList<RequestRealm> customerRequests) {
-        this.customerRequests = customerRequests;
+    public void setCustomerRequests(RealmList<String> customerRequests) {
+        this.customerRequestIds = customerRequests;
     }
 
     public String getMessageThreadId() {

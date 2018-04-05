@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.realm.RealmList;
-
 /**
  * Created by jbrannen on 3/6/18.
  */
@@ -17,21 +15,21 @@ public class GroupChat {
     private Message mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
-    private List<Request> customerRequests;
+    private List<String> customerRequestIds;
     private List<String> currentlyTypingUserNames;
 
     public GroupChat() {
     }
 
     public GroupChat(String chatId, Map<String, String> userIds, Message messages, long messageCreatedTime,
-                     List<String> currentlyTypingUserNames, String messageThreadId, List<Request> customerRequests) {
+                     List<String> currentlyTypingUserNames, String messageThreadId, List<String> customerRequests) {
         this.chatId = chatId;
         this.userIds = userIds;
         this.mostRecentMessage = messages;
         this.messageCreatedTime = messageCreatedTime;
         this.currentlyTypingUserNames = currentlyTypingUserNames;
         this.messageThreadId = messageThreadId;
-        this.customerRequests = customerRequests;
+        this.customerRequestIds = customerRequests;
     }
 
     public GroupChat(GroupChatRealm realm){
@@ -41,7 +39,7 @@ public class GroupChat {
         this.messageCreatedTime = realm.getMessageCreatedTime();
         this.currentlyTypingUserNames = realm.getCurrentlyTypingUserNames();
         this.messageThreadId = realm.getMessageThreadId();
-        this.customerRequests = createCustomerRequsts(realm.getCustomerRequests());
+        this.customerRequestIds = realm.getCustomerRequests();
     }
 
     private Map<String, String> createUidMap(List<String> userIds) {
@@ -52,14 +50,6 @@ public class GroupChat {
         return uidMap;
     }
 
-    private List<Request> createCustomerRequsts(List<RequestRealm> realmRequests){
-        List<Request> requests = new ArrayList<>();
-        for(RequestRealm realmRequest : realmRequests){
-            requests.add(new Request(realmRequest));
-        }
-        return requests;
-    }
-
     public String getMessageThreadId() {
         return messageThreadId;
     }
@@ -68,12 +58,12 @@ public class GroupChat {
         this.messageThreadId = messageThreadId;
     }
 
-    public List<Request> getCustomerRequests() {
-        return customerRequests;
+    public List<String> getCustomerRequestIds() {
+        return customerRequestIds;
     }
 
-    public void setCustomerRequests(List<Request> customerRequests) {
-        this.customerRequests = customerRequests;
+    public void setCustomerRequestIds(List<String> customerRequestIds) {
+        this.customerRequestIds = customerRequestIds;
     }
 
     public List<String> getCurrentlyTypingUserNames() {

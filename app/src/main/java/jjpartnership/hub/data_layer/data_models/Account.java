@@ -17,12 +17,13 @@ public class Account {
     private String groupChatSalesId;
     private String groupChatCustomerId;
     private Map<String, String> accountUsers;
+    private Map<String, String> customerRequestIds;
 
     public Account() {
     }
 
     public Account(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
-                   String groupChatCustomerId, String accountId, Map<String, String> accountUsers) {
+                   String groupChatCustomerId, String accountId, Map<String, String> accountUsers, Map<String, String> customerRequestIds) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
@@ -30,6 +31,7 @@ public class Account {
         this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
         this.accountUsers = accountUsers;
+        this.customerRequestIds = customerRequestIds;
     }
 
     public Account(AccountRealm accountRealm){
@@ -40,6 +42,7 @@ public class Account {
         this.accountId = accountRealm.getAccountId();
         this.groupChatCustomerId = accountRealm.getGroupChatCustomerId();
         this.accountUsers = createMap(accountRealm.getAccountSalesAgentUids());
+        this.customerRequestIds = createMapCustomerRequests(accountRealm.getCustomerRequestIds());
     }
 
     private Map<String, String> createMap(RealmList<String> accountUids) {
@@ -50,12 +53,28 @@ public class Account {
         return usersMap;
     }
 
+    private Map<String, String> createMapCustomerRequests(RealmList<String> customerRequestUids) {
+        Map<String, String> requestsMap = new HashMap<>();
+        for(String uid : customerRequestUids){
+            requestsMap.put(uid,uid);
+        }
+        return requestsMap;
+    }
+
     public Map<String, String> getAccountUsers() {
         return accountUsers;
     }
 
     public void setAccountUsers(Map<String, String> accountUsers) {
         this.accountUsers = accountUsers;
+    }
+
+    public Map<String, String> getCustomerRequestIds() {
+        return customerRequestIds;
+    }
+
+    public void setCustomerRequestIds(Map<String, String> customerRequestIds) {
+        this.customerRequestIds = customerRequestIds;
     }
 
     public String getGroupChatCustomerId() {
