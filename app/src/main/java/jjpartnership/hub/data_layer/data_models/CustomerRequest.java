@@ -12,7 +12,9 @@ public class CustomerRequest {
     private String accountId;
     private String customerUid;
     private String requestMessage;
+    private String requestSubject;
     private String groupChatId;
+    private String customerName;
     private Message mostRecentGroupMessage;
     private String mostRecentMessageUid;
     private long mostRecentMessageTime;
@@ -37,6 +39,24 @@ public class CustomerRequest {
         this.openDate = realm.getOpenDate();
         this.closeDate = realm.getCloseDate();
         this.resolutionType = realm.getResolutionType();
+        this.requestSubject = realm.getRequestSubject();
+        this.customerName = realm.getCustomerName();
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getRequestSubject() {
+        return requestSubject;
+    }
+
+    public void setRequestSubject(String requestSubject) {
+        this.requestSubject = requestSubject;
     }
 
     public static String getTypeResolved() {

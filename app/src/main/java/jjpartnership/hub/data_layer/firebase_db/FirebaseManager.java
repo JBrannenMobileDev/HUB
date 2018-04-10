@@ -436,6 +436,7 @@ public class FirebaseManager {
     private void buildUiModels() {
         MainAccountsModel accountsModel = new MainAccountsModel();
         RealmList<RowItem> accountRowItems = new RealmList<>();
+        RealmList<RowItem> requestRowItems = new RealmList<>();
         for(int i = 0; i < accounts.size(); i++){
             accountRowItems.add(new RowItem());
         }
@@ -480,11 +481,28 @@ public class FirebaseManager {
                 }
             }
         }
+
+        for(int i = 0; i < customerRequests.size(); i++){
+            CustomerRequest request = customerRequests.get(i);
+            if(request != null && request.isOpen()){
+                requestRowItems.get(i).setMessageContent(request.getRequestMessage());
+                requestRowItems.get(i).setMessageCreatedAtTime(request.getMostRecentMessageTime());
+                requestRowItems.get(i).setMessageOwnerName(request.getCustomerName());
+                if(!request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                    requestRowItems.get(i).setNewMessage(true);
+                }
+            }
+        }
+
         Collections.sort(accountRowItems);
         accountsModel.setRowItems(accountRowItems);
 
         RealmList<RowItem> sortedByMostRecent = new RealmList<>();
         for(RowItem item : accountRowItems){
+            sortedByMostRecent.add(item);
+        }
+
+        for(RowItem item : requestRowItems){
             sortedByMostRecent.add(item);
         }
 
@@ -1344,8 +1362,10 @@ public class FirebaseManager {
         }
     }
 
-    public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage) {
+    public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage, String createdByUid) {
         DatabaseReference newGroupChatRef = groupChatsReference.push();
+        UserRealm thisUser = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class)
+                .equalTo("uid", createdByUid).findFirst();
         GroupChat groupChat = new GroupChat();
         groupChat.setChatId(newGroupChatRef.getKey());
         DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
@@ -1365,6 +1385,20 @@ public class FirebaseManager {
         request.setOpen(true);
         request.setOpenDate(new Date().getTime());
         request.setRequestMessage(requestMessage);
+        request.setCustomerName(thisUser.getFirstName() + " " + thisUser.getLastName());
         customerRequestsReference.child(request.getRequestId()).setValue(request);
+
+        Message newMessage = new Message();
+        List<String> readByUids = new ArrayList<>();
+        readByUids.add(createdByUid);
+        newMessage.setMessageContent(requestMessage);
+        newMessage.setCreatedByUid(createdByUid);
+        newMessage.setChatId(groupChat.getChatId());
+        newMessage.setCreatedDate(new Date().getTime());
+        newMessage.setReadByUids(readByUids);
+        newMessage.setSavedToFirebase(false);
+        newMessage.setMessageOwnerName(thisUser.getFirstName() + " " + thisUser.getLastName());
+        newMessage.setMessageThreadId(groupChat.getMessageThreadId());
+        createNewMessage(newMessage);
     }
 }

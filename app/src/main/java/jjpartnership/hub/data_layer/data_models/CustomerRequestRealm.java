@@ -16,7 +16,9 @@ public class CustomerRequestRealm extends RealmObject{
     private String accountId;
     private String customerUid;
     private String requestMessage;
+    private String requestSubject;
     private String groupChatId;
+    private String customerName;
     private MessageRealm mostRecentGroupMessage;
     private String mostRecentMessageUid;
     private long mostRecentMessageTime;
@@ -41,6 +43,24 @@ public class CustomerRequestRealm extends RealmObject{
         this.openDate = data.getOpenDate();
         this.closeDate = data.getCloseDate();
         this.resolutionType = data.getResolutionType();
+        this.requestSubject = data.getRequestSubject();
+        this.customerName = data.getCustomerName();
+    }
+
+    public String getRequestSubject() {
+        return requestSubject;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public void setRequestSubject(String requestSubject) {
+        this.requestSubject = requestSubject;
     }
 
     public static String getTypeResolved() {

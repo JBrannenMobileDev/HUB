@@ -162,8 +162,8 @@ public class DataManager {
         realmManager.insertOrUpdateDirectChatRealm(directChat);
     }
 
-    public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage) {
-        fbManager.createNewCustomerRequest(account, company, requestMessage);
+    public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage, String createdByUid) {
+        fbManager.createNewCustomerRequest(account, company, requestMessage, createdByUid);
     }
 
     public void insertOrUpdateCustomerRequest(List<CustomerRequest> request) {

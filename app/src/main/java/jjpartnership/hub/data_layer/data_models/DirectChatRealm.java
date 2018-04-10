@@ -19,13 +19,17 @@ public class DirectChatRealm extends RealmObject{
     private MessageRealm mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
+    private String requestMessage;
+    private boolean isFromCustomerRequest;
+    private boolean isRequestOpen;
     private RealmList<String> currentlyTypingUserNames;
 
     public DirectChatRealm() {
     }
 
     public DirectChatRealm(String chatId, String userIdA, String userIdB, RealmList<String> currentlyTypingUserNames,
-                           MessageRealm mostRecentMessage, long messageCreatedTime, String messageThreadId) {
+                           MessageRealm mostRecentMessage, long messageCreatedTime, String messageThreadId,
+                           boolean isFromCustomerRequest, String requestMessage, boolean isRequestOpen) {
         this.chatId = chatId;
         this.userIdA = userIdA;
         this.userIdB = userIdB;
@@ -33,6 +37,9 @@ public class DirectChatRealm extends RealmObject{
         this.mostRecentMessage = mostRecentMessage;
         this.messageCreatedTime = messageCreatedTime;
         this.messageThreadId = messageThreadId;
+        this.isFromCustomerRequest = isFromCustomerRequest;
+        this.requestMessage = requestMessage;
+        this.isRequestOpen = isRequestOpen;
     }
 
     public String getDirectChatUid(String currentUid){
@@ -53,6 +60,9 @@ public class DirectChatRealm extends RealmObject{
         this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
         this.messageCreatedTime = chat.getMessageCreatedTime();
         this.messageThreadId = chat.getMessageThreadId();
+        this.isFromCustomerRequest = chat.isFromCustomerRequest();
+        this.requestMessage = chat.getRequestMessage();
+        this.isRequestOpen = chat.isRequestOpen();
     }
 
     private RealmList<String> createCurrentlyTypingList(List<String> currentlyTypingUserNames) {
@@ -65,6 +75,30 @@ public class DirectChatRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public boolean isRequestOpen() {
+        return isRequestOpen;
+    }
+
+    public void setRequestOpen(boolean requestOpen) {
+        isRequestOpen = requestOpen;
+    }
+
+    public String getRequestMessage() {
+        return requestMessage;
+    }
+
+    public void setRequestMessage(String requestMessage) {
+        this.requestMessage = requestMessage;
+    }
+
+    public boolean isFromCustomerRequest() {
+        return isFromCustomerRequest;
+    }
+
+    public void setFromCustomerRequest(boolean fromCustomerRequest) {
+        isFromCustomerRequest = fromCustomerRequest;
     }
 
     public MessageRealm getMostRecentMessage() {

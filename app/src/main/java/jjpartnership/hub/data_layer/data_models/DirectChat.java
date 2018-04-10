@@ -1,10 +1,6 @@
 package jjpartnership.hub.data_layer.data_models;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-
-import io.realm.RealmList;
 
 /**
  * Created by jbrannen on 3/6/18.
@@ -17,13 +13,17 @@ public class DirectChat {
     private Message mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
+    private String requestMessage;
+    private boolean isFromCustomerRequest;
+    private boolean isRequestOpen;
     private List<String> currentlyTypingUserNames;
 
     public DirectChat() {
     }
 
     public DirectChat(String chatId, String userIdA, String userIdB, List<String> currentlyTypingUserNames,
-                      Message mostRecentMessage, long messageCreatedTime, String messageThreadId) {
+                      Message mostRecentMessage, long messageCreatedTime, String messageThreadId,
+                      boolean isFromCustomerRequest, boolean isRequestOpen, String requestMessage) {
         this.chatId = chatId;
         this.userIdA = userIdA;
         this.userIdB = userIdB;
@@ -31,6 +31,9 @@ public class DirectChat {
         this.mostRecentMessage = mostRecentMessage;
         this.messageCreatedTime = messageCreatedTime;
         this.messageThreadId = messageThreadId;
+        this.isFromCustomerRequest = isFromCustomerRequest;
+        this.isRequestOpen = isRequestOpen;
+        this.requestMessage = requestMessage;
     }
 
     public DirectChat(DirectChatRealm realm){
@@ -41,6 +44,33 @@ public class DirectChat {
         this.mostRecentMessage = new Message(realm.getMostRecentMessage());
         this.messageCreatedTime = realm.getMessageCreatedTime();
         this.messageThreadId = realm.getMessageThreadId();
+        this.isFromCustomerRequest = realm.isFromCustomerRequest();
+        this.isRequestOpen = realm.isRequestOpen();
+        this.requestMessage = realm.getRequestMessage();
+    }
+
+    public String getRequestMessage() {
+        return requestMessage;
+    }
+
+    public void setRequestMessage(String requestMessage) {
+        this.requestMessage = requestMessage;
+    }
+
+    public boolean isRequestOpen() {
+        return isRequestOpen;
+    }
+
+    public void setRequestOpen(boolean requestOpen) {
+        isRequestOpen = requestOpen;
+    }
+
+    public boolean isFromCustomerRequest() {
+        return isFromCustomerRequest;
+    }
+
+    public void setFromCustomerRequest(boolean fromCustomerRequest) {
+        isFromCustomerRequest = fromCustomerRequest;
     }
 
     public Message getMostRecentMessage() {
