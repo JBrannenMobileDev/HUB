@@ -60,8 +60,7 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     }
 
     private void createNewRequest() {
-        //TODO setCreatedByUid.
-        DataManager.getInstance().createNewCustomerRequest(account, company, "Can anyone provide a custome chemical capsul?");
+        DataManager.getInstance().createNewCustomerRequest(account, company, "Can anyone provide a custome chemical capsul?", company.getEmployeeList().get(0));
     }
 
     private void parseDetailsData(CompanyRealm company) {

@@ -3,11 +3,19 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_r
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
+import butterknife.BindView;
+import io.realm.RealmList;
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
+import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AssignedAgentsRecyclerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -15,9 +23,18 @@ import jjpartnership.hub.R;
  * {@link CustomerRequestsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class CustomerRequestsFragment extends Fragment {
+public class CustomerRequestsFragment extends Fragment implements CustomerRequestView{
+    @BindView(R.id.request_info_linear_layout)LinearLayout requestInfo;
+    @BindView(R.id.open_requests_empty_state_layout)LinearLayout openRequestsEmptyStateView;
+    @BindView(R.id.open_requests_recycler_view)RecyclerView openRequestsRecycler;
+    @BindView(R.id.closed_requests_empty_state_layout)LinearLayout closedRequestEmptyStateView;
+    @BindView(R.id.closed_requests_recycler_view)RecyclerView closedRequestsRecycler;
+
 
     private OnFragmentInteractionListener mListener;
+    private CustomerRequestPresenter presenter;
+    private OpenRequestsRecyclerAdapter openRequestsAdapter;
+    private BaseCallback<CustomerRequestRealm> openRequestSelectedCallback;
 
     public CustomerRequestsFragment() {
         // Required empty public constructor
@@ -28,7 +45,25 @@ public class CustomerRequestsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_customer_requests, container, false);
+        View v = inflater.inflate(R.layout.fragment_customer_requests, container, false);
+        openRequestsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        initCallbacks();
+        presenter = new CustomerRequestPresenterImp(this, getArguments().getString("account_id"));
+        return v;
+    }
+
+    private void initCallbacks() {
+        openRequestSelectedCallback = new BaseCallback<CustomerRequestRealm>() {
+            @Override
+            public void onResponse(CustomerRequestRealm object) {
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
     }
 
     @Override
@@ -46,6 +81,12 @@ public class CustomerRequestsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onOpenRequestsReceived(RealmList<CustomerRequestRealm> openRequests) {
+        openRequestsAdapter = new OpenRequestsRecyclerAdapter(getActivity().getApplicationContext(), openRequests, openRequestSelectedCallback);
+        openRequestsRecycler.setAdapter(openRequestsAdapter);
     }
 
     /**

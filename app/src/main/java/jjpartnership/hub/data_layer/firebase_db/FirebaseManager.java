@@ -391,9 +391,11 @@ public class FirebaseManager {
     private void fetchCustomerRequests(List<GroupChat> groupChats) {
         int requestCount = 0;
         for (GroupChat groupChat : groupChats) {
-            for (String requestId : groupChat.getCustomerRequestIds()) {
-                if(requestId != null && !requestId.isEmpty()){
-                    requestCount++;
+            if(groupChat.getCustomerRequestIds() != null) {
+                for (String requestId : groupChat.getCustomerRequestIds()) {
+                    if (requestId != null && !requestId.isEmpty()) {
+                        requestCount++;
+                    }
                 }
             }
         }
@@ -401,27 +403,29 @@ public class FirebaseManager {
 
         if(groupChats != null && groupChats.size() > 0) {
             for (GroupChat groupChat : groupChats) {
-                for(String requestId : groupChat.getCustomerRequestIds()){
-                    ValueEventListener chatListener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            CustomerRequest request = dataSnapshot.getValue(CustomerRequest.class);
-                            if (request != null) {
-                                customerRequests.add(request);
+                if(groupChat.getCustomerRequestIds() != null) {
+                    for (String requestId : groupChat.getCustomerRequestIds()) {
+                        ValueEventListener chatListener = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                CustomerRequest request = dataSnapshot.getValue(CustomerRequest.class);
+                                if (request != null) {
+                                    customerRequests.add(request);
+                                }
+                                if (customerRequests.size() == finalCount) {
+                                    DataManager.getInstance().insertOrUpdateCustomerRequest(customerRequests);
+                                    buildUiModels();
+                                }
                             }
-                            if (customerRequests.size() == finalCount) {
-                                DataManager.getInstance().insertOrUpdateCustomerRequest(customerRequests);
-                                buildUiModels();
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
                             }
+                        };
+                        if (requestId != null && !requestId.isEmpty()) {
+                            customerRequestsReference.child(requestId).addListenerForSingleValueEvent(chatListener);
                         }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    };
-                    if(requestId != null && !requestId.isEmpty()) {
-                        customerRequestsReference.child(requestId).addListenerForSingleValueEvent(chatListener);
                     }
                 }
             }
