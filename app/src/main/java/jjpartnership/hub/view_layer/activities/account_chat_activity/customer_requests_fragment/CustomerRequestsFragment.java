@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
@@ -46,6 +47,7 @@ public class CustomerRequestsFragment extends Fragment implements CustomerReques
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_customer_requests, container, false);
+        ButterKnife.bind(this, v);
         openRequestsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         initCallbacks();
         presenter = new CustomerRequestPresenterImp(this, getArguments().getString("account_id"));
@@ -87,6 +89,11 @@ public class CustomerRequestsFragment extends Fragment implements CustomerReques
     public void onOpenRequestsReceived(RealmList<CustomerRequestRealm> openRequests) {
         openRequestsAdapter = new OpenRequestsRecyclerAdapter(getActivity().getApplicationContext(), openRequests, openRequestSelectedCallback);
         openRequestsRecycler.setAdapter(openRequestsAdapter);
+        if(openRequests != null && openRequests.size() > 0) {
+            openRequestsEmptyStateView.setVisibility(View.GONE);
+        }else{
+            openRequestsEmptyStateView.setVisibility(View.VISIBLE);
+        }
     }
 
     /**

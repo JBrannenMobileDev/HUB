@@ -37,7 +37,7 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     }
 
     private void fetchData() {
-        account = realm.where(AccountRealm.class).equalTo("accountId", accountId).findFirst();
+        account = realm.where(AccountRealm.class).equalTo("accountIdFire", accountId).findFirst();
         if(account != null) {
             company = realm.where(CompanyRealm.class).equalTo("companyId", account.getCompanyCustomerId()).findFirst();
             if(company != null) {
@@ -56,7 +56,7 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
             }
         }
 
-        createNewRequest();
+//        createNewRequest();
     }
 
     private void createNewRequest() {

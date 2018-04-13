@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -371,7 +372,7 @@ public class FirebaseManager {
                         }
                         if (directChats.size() == currentUser.getDirectChats().size()) {
                             DataManager.getInstance().updateRealmDirectChats(directChats);
-                            fetchCustomerRequests(groupChats);
+                            fetchCustomerRequests(accounts);
                         }
                     }
 
@@ -383,28 +384,24 @@ public class FirebaseManager {
                 directChatsReference.child(chatIds).addListenerForSingleValueEvent(chatListener);
             }
         }else{
-            fetchCustomerRequests(groupChats);
+            fetchCustomerRequests(accounts);
             //TODO delete all directChats from realm
         }
     }
 
-    private void fetchCustomerRequests(List<GroupChat> groupChats) {
+    private void fetchCustomerRequests(List<Account> accounts) {
         int requestCount = 0;
-        for (GroupChat groupChat : groupChats) {
-            if(groupChat.getCustomerRequestIds() != null) {
-                for (String requestId : groupChat.getCustomerRequestIds()) {
-                    if (requestId != null && !requestId.isEmpty()) {
-                        requestCount++;
-                    }
-                }
+        for(Account accountTemp : accounts){
+            if(accountTemp.getCustomerRequestIds() != null){
+                requestCount = requestCount + accountTemp.getCustomerRequestIds().size();
             }
         }
         final int finalCount = requestCount;
 
-        if(groupChats != null && groupChats.size() > 0) {
-            for (GroupChat groupChat : groupChats) {
-                if(groupChat.getCustomerRequestIds() != null) {
-                    for (String requestId : groupChat.getCustomerRequestIds()) {
+        if(accounts != null && accounts.size() > 0) {
+            for (final Account localAccount : accounts) {
+                if(localAccount.getCustomerRequestIds() != null) {
+                    for (String requestId : localAccount.getCustomerRequestIds().values()) {
                         ValueEventListener chatListener = new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -451,7 +448,7 @@ public class FirebaseManager {
                 GroupChat groupChatCustomers = getGroupChat(accounts.get(i).getGroupChatCustomerId());
                 GroupChat groupChatSales = getGroupChat(accounts.get(i).getGroupChatSalesId());
                 accountRowItems.get(i).setAccountName(company.getName());
-                accountRowItems.get(i).setAccountId(accounts.get(i).getAccountId());
+                accountRowItems.get(i).setAccountId(accounts.get(i).getAccountIdFire());
                 if (groupChatSales.getMostRecentMessage() != null && groupChatCustomers != null) {
                     if (groupChatSales.getMessageCreatedTime() > groupChatCustomers.getMessageCreatedTime()) {
                         accountRowItems.get(i).setMessageContent(groupChatSales.getMostRecentMessage().getMessageContent());
@@ -647,9 +644,15 @@ public class FirebaseManager {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Message message = dataSnapshot.getValue(Message.class);
                     if(message != null) {
-                        message.setSavedToFirebase(true);
-                        updateMainAccountModel(message);
-                        DataManager.getInstance().updateRealmMessage(message);
+                        MessageRealm localMessage = RealmUISingleton.getInstance().getRealmInstance().
+                                where(MessageRealm.class).equalTo("messageId", message.getMessageId()).findFirst();
+                        if(localMessage != null && localMessage.getReadByUids().size() == message.getReadByUids().size()) {
+                            //Do nothing
+                        }else{
+                            message.setSavedToFirebase(true);
+                            updateMainAccountModel(message);
+                            DataManager.getInstance().updateRealmMessage(message);
+                        }
                     }
                 }
 
@@ -750,7 +753,7 @@ public class FirebaseManager {
             MainAccountsModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(model);
             RealmList<RowItem> sortedByMostRecent = new RealmList<>();
             for (int i = 0; i < copy.getRowItems().size(); i++) {
-                AccountRealm account = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountId", copy.getRowItems().get(i).getAccountId()).findFirst();
+                AccountRealm account = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountIdFire", copy.getRowItems().get(i).getAccountId()).findFirst();
                 if ((account.getGroupChatSalesId().equals(message.getChatId()) ||
                         account.getGroupChatCustomerId().equals(message.getChatId())) &&
                         message.getCreatedDate() >= copy.getRowItems().get(i).getMessageCreatedAtTime()) {
@@ -868,10 +871,12 @@ public class FirebaseManager {
     }
 
     private void updateRelatedGroupChatWithUserId(Message newMessage) {
-        List<String> uids = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", newMessage.getChatId()).findFirst().getUserIds();
-        if(uids != null){
-            if(!uids.contains(newMessage.getCreatedByUid())){
-                groupChatsReference.child(newMessage.getChatId()).child("userIds").push().setValue(newMessage.getCreatedByUid());
+        GroupChatRealm gChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", newMessage.getChatId()).findFirst();
+        if(gChat != null) {
+            if (gChat.getUserIds() != null) {
+                if (!gChat.getUserIds().contains(newMessage.getCreatedByUid())) {
+                    groupChatsReference.child(newMessage.getChatId()).child("userIds").push().setValue(newMessage.getCreatedByUid());
+                }
             }
         }
     }
@@ -1378,18 +1383,25 @@ public class FirebaseManager {
         thread.setChatId(groupChat.getChatId());
         database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
         groupChat.setMessageThreadId(thread.getMessageThreadId());
-        groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
 
         DatabaseReference newRequestRef = customerRequestsReference.push();
         CustomerRequest request = new CustomerRequest();
         request.setRequestId(newRequestRef.getKey());
-        request.setAccountId(account.getAccountId());
+        request.setAccountId(account.getAccountIdFire());
         request.setGroupChatId(groupChat.getChatId());
         request.setCustomerUid(company.getEmployeeList().get(0));
         request.setOpen(true);
         request.setOpenDate(new Date().getTime());
         request.setRequestMessage(requestMessage);
         request.setCustomerName(thisUser.getFirstName() + " " + thisUser.getLastName());
+
+        Map<String, String> customerRequestIds = new HashMap<>();
+        customerRequestIds.put(request.getRequestId(), request.getRequestId());
+        groupChat.setCustomerRequestIds(customerRequestIds);
+        Account accountFire = new Account(RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(account));
+        accountFire.setCustomerRequestIds(customerRequestIds);
+        updateAccount(accountFire);
+        groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
         customerRequestsReference.child(request.getRequestId()).setValue(request);
 
         Message newMessage = new Message();
@@ -1404,5 +1416,9 @@ public class FirebaseManager {
         newMessage.setMessageOwnerName(thisUser.getFirstName() + " " + thisUser.getLastName());
         newMessage.setMessageThreadId(groupChat.getMessageThreadId());
         createNewMessage(newMessage);
+    }
+
+    private void updateAccount(Account accountFire) {
+        accountsReference.child(accountFire.getAccountIdFire()).setValue(accountFire);
     }
 }

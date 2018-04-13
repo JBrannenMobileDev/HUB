@@ -2,6 +2,7 @@ package jjpartnership.hub.data_layer.data_models;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -34,10 +35,10 @@ public class GroupChatRealm extends RealmObject{
         this.customerRequestIds = createCustomerRequsts(chat.getCustomerRequestIds());
     }
 
-    private RealmList<String> createCustomerRequsts(List<String> requests){
+    private RealmList<String> createCustomerRequsts(Map<String, String> requests){
         if(requests != null) {
             RealmList<String> realmRequests = new RealmList<>();
-            for (String request : requests) {
+            for (String request : requests.values()) {
                 realmRequests.add(request);
             }
             return realmRequests;

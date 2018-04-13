@@ -60,7 +60,7 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
     }
 
     private void initDataListeners() {
-        AccountRealm account = realm.where(AccountRealm.class).equalTo("accountId", accountId).findFirst();
+        AccountRealm account = realm.where(AccountRealm.class).equalTo("accountIdFire", accountId).findFirst();
         chatId = account.getGroupChatSalesId();
         groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", chatId).findFirst();
         user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
