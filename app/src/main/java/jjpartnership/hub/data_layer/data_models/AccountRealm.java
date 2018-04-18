@@ -16,7 +16,6 @@ public class AccountRealm extends RealmObject{
     private String companySalesId;
     private String companyCustomerId;
     private String groupChatSalesId;
-    private String groupChatCustomerId;
     private String accountId;
     private RealmList<String> accountSalesAgentUids;
     private RealmList<String> customerRequestIds;
@@ -25,12 +24,11 @@ public class AccountRealm extends RealmObject{
     }
 
     public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
-                        String groupChatCustomerId, String accountId, RealmList<String> accountUids, RealmList<String> customerRequestIds) {
+                        String accountId, RealmList<String> accountUids, RealmList<String> customerRequestIds) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
         this.groupChatSalesId = groupChatId;
-        this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
         this.accountSalesAgentUids = accountUids;
         this.customerRequestIds = customerRequestIds;
@@ -42,7 +40,6 @@ public class AccountRealm extends RealmObject{
         this.companyCustomerId = account.getCompanyCustomerId();
         this.groupChatSalesId = account.getGroupChatSalesId();
         this.accountId = account.getAccountId();
-        this.groupChatCustomerId = account.getGroupChatCustomerId();
         this.accountSalesAgentUids = createRealmList(account.getAccountUsers());
         this.customerRequestIds = createRealmListRequestIds(account.getCustomerRequestIds());
     }
@@ -83,14 +80,6 @@ public class AccountRealm extends RealmObject{
 
     public void setAccountSalesAgentUids(RealmList<String> accountSalesAgentUids) {
         this.accountSalesAgentUids = accountSalesAgentUids;
-    }
-
-    public String getGroupChatCustomerId() {
-        return groupChatCustomerId;
-    }
-
-    public void setGroupChatCustomerId(String groupChatCustomerId) {
-        this.groupChatCustomerId = groupChatCustomerId;
     }
 
     public String getAccountIdFire() {

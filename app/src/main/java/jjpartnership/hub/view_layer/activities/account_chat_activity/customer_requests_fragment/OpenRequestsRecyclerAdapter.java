@@ -76,14 +76,14 @@ public class OpenRequestsRecyclerAdapter extends RecyclerView.Adapter<OpenReques
         UserRealm requester = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", request.getCustomerUid()).findFirst();
         if(request != null){
             holder.customerName.setText(request.getCustomerName());
-            holder.userIcon.setText(String.valueOf(request.getCustomerName()));
+            holder.userIcon.setText(String.valueOf(request.getCustomerName().charAt(0)));
         }
 
         if(request.getMostRecentMessageTime() != 0) {
             holder.messageTime.setText(createFormattedTime(request.getMostRecentMessageTime()));
         }
-        if(request.getMostRecentGroupMessage().getMessageContent() != null && !request.getMostRecentGroupMessage().getMessageContent().isEmpty()) {
-            holder.messageContent.setText(request.getMostRecentGroupMessage().getMessageContent());
+        if(request.getRequestMessage() != null) {
+            holder.messageContent.setText(request.getRequestMessage());
         }
         if(requester != null) holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(requester.getUserColor())));
     }

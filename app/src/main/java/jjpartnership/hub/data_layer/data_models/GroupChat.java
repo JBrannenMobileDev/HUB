@@ -22,14 +22,14 @@ public class GroupChat {
     }
 
     public GroupChat(String chatId, Map<String, String> userIds, Message messages, long messageCreatedTime,
-                     List<String> currentlyTypingUserNames, String messageThreadId, Map<String, String> customerRequests) {
+                     List<String> currentlyTypingUserNames, String messageThreadId, Map<String, String> customerRequestIds) {
         this.chatId = chatId;
         this.userIds = userIds;
         this.mostRecentMessage = messages;
         this.messageCreatedTime = messageCreatedTime;
         this.currentlyTypingUserNames = currentlyTypingUserNames;
         this.messageThreadId = messageThreadId;
-        this.customerRequestIds = customerRequests;
+        this.customerRequestIds = customerRequestIds;
     }
 
     public GroupChat(GroupChatRealm realm){

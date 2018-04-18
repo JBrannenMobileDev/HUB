@@ -64,23 +64,26 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
         chatId = account.getGroupChatSalesId();
         groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", chatId).findFirst();
         user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
-        messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", groupChat.getMessageThreadId()).findFirst();
-        messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
-        if(messageThread != null) {
-            messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
-                @Override
-                public void onChange(MessageThreadRealm threadRealm) {
-                    fragment.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserNames()));
-                }
-            });
+        if(groupChat != null && groupChat.getMessageThreadId() != null) {
+            messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", groupChat.getMessageThreadId()).findFirst();
+            if (messageThread != null) {
+                messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
+                    @Override
+                    public void onChange(MessageThreadRealm threadRealm) {
+                        fragment.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserNames()));
+                    }
+                });
+            }
         }
+        messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
+
         messages.addChangeListener(new RealmChangeListener<RealmResults<MessageRealm>>() {
-            @Override
-            public void onChange(RealmResults<MessageRealm> messagesRealm) {
-                if(messagesRealm.size() > 0) {
-                    fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm), user.getUid().equals(messagesRealm.get(messagesRealm.size() - 1).getUid()));
-                    updateAllMessagesToRead(messagesRealm);
-                }
+        @Override
+        public void onChange(RealmResults<MessageRealm> messagesRealm) {
+            if(messagesRealm.size() > 0) {
+                fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm), user.getUid().equals(messagesRealm.get(messagesRealm.size() - 1).getUid()));
+                updateAllMessagesToRead(messagesRealm);
+            }
             }
         });
         if(messages.size() > 0) {
@@ -158,7 +161,9 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
     public void onStop() {
         if(messages != null) messages.removeAllChangeListeners();
         if(messageThread != null) messageThread.removeAllChangeListeners();
-        DataManager.getInstance().updateFirebaseMessageThreadTyping(groupChat.getChatId(),
-                groupChat.getMessageThreadId(), user.getFirstName() + " " + user.getLastName(), false);
+        if(groupChat != null) {
+            DataManager.getInstance().updateFirebaseMessageThreadTyping(groupChat.getChatId(),
+                    groupChat.getMessageThreadId(), user.getFirstName() + " " + user.getLastName(), false);
+        }
     }
 }

@@ -15,7 +15,6 @@ public class Account {
     private String companySalesId;
     private String companyCustomerId;
     private String groupChatSalesId;
-    private String groupChatCustomerId;
     private Map<String, String> accountUsers;
     private Map<String, String> customerRequestIds;
 
@@ -23,12 +22,11 @@ public class Account {
     }
 
     public Account(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
-                   String groupChatCustomerId, String accountId, Map<String, String> accountUsers, Map<String, String> customerRequestIds) {
+                   String accountId, Map<String, String> accountUsers, Map<String, String> customerRequestIds) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
         this.groupChatSalesId = groupChatId;
-        this.groupChatCustomerId = groupChatCustomerId;
         this.accountId = accountId;
         this.accountUsers = accountUsers;
         this.customerRequestIds = customerRequestIds;
@@ -40,7 +38,6 @@ public class Account {
         this.companyCustomerId = accountRealm.getCompanyCustomerId();
         this.groupChatSalesId = accountRealm.getGroupChatSalesId();
         this.accountId = accountRealm.getAccountId();
-        this.groupChatCustomerId = accountRealm.getGroupChatCustomerId();
         this.accountUsers = createMap(accountRealm.getAccountSalesAgentUids());
         this.customerRequestIds = createMapCustomerRequests(accountRealm.getCustomerRequestIds());
     }
@@ -75,14 +72,6 @@ public class Account {
 
     public void setCustomerRequestIds(Map<String, String> customerRequestIds) {
         this.customerRequestIds = customerRequestIds;
-    }
-
-    public String getGroupChatCustomerId() {
-        return groupChatCustomerId;
-    }
-
-    public void setGroupChatCustomerId(String groupChatCustomerId) {
-        this.groupChatCustomerId = groupChatCustomerId;
     }
 
     public String getAccountId() {

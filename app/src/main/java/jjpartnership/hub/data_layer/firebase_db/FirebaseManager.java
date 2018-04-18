@@ -252,7 +252,7 @@ public class FirebaseManager {
                             groupChats.add(gChat);
                         }
                         if (groupChats.size() == accounts.size()) {
-                            getGroupChatCustomer(accountList);
+                            fetchUserColors(groupChats);
                         }
                     }
 
@@ -264,13 +264,14 @@ public class FirebaseManager {
                 groupChatsReference.child(account.getGroupChatSalesId()).addListenerForSingleValueEvent(groupChatListener);
             }
         }else{
-            getGroupChatCustomer(accountList);
+            DataManager.getInstance().updateRealmGroupChats(groupChats);
+            fetchUserColors(groupChats);
         }
     }
 
-    private void getGroupChatCustomer(List<Account> accountList) {
-        if(accountList.size() > 0) {
-            for (Account account : accountList) {
+    private void getGroupChatsFromRequests(final List<CustomerRequest> requestList) {
+        if(requestList.size() > 0) {
+            for (CustomerRequest request : requestList) {
                 ValueEventListener groupChatListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -285,9 +286,9 @@ public class FirebaseManager {
                             }
                             groupChats.add(gChat);
                         }
-                        if (groupChats.size() / 2 == accounts.size()) {
+                        if (groupChats.size() == groupChats.size()) {
                             DataManager.getInstance().updateRealmGroupChats(groupChats);
-                            fetchUserColors(groupChats);
+                            buildUiModels();
                         }
                     }
 
@@ -296,11 +297,11 @@ public class FirebaseManager {
 
                     }
                 };
-                groupChatsReference.child(account.getGroupChatCustomerId()).addListenerForSingleValueEvent(groupChatListener);
+                groupChatsReference.child(request.getGroupChatId()).addListenerForSingleValueEvent(groupChatListener);
             }
         }else{
             DataManager.getInstance().updateRealmGroupChats(groupChats);
-            fetchUserColors(groupChats);
+            buildUiModels();
         }
     }
 
@@ -411,7 +412,7 @@ public class FirebaseManager {
                                 }
                                 if (customerRequests.size() == finalCount) {
                                     DataManager.getInstance().insertOrUpdateCustomerRequest(customerRequests);
-                                    buildUiModels();
+                                    getGroupChatsFromRequests(customerRequests);
                                 }
                             }
 
@@ -427,10 +428,10 @@ public class FirebaseManager {
                 }
             }
             if(finalCount == 0){
-                buildUiModels();
+                getGroupChatsFromRequests(customerRequests);
             }
         }else{
-            buildUiModels();
+            getGroupChatsFromRequests(customerRequests);
         }
     }
 
@@ -442,41 +443,21 @@ public class FirebaseManager {
             accountRowItems.add(new RowItem());
         }
 
+        for(int i = 0; i < customerRequests.size(); i++){
+            requestRowItems.add(new RowItem());
+        }
+
         for(int i = 0; i < accounts.size(); i++){
             Company company = getAccountCompany(accounts.get(i));
             if(company != null) {
-                GroupChat groupChatCustomers = getGroupChat(accounts.get(i).getGroupChatCustomerId());
                 GroupChat groupChatSales = getGroupChat(accounts.get(i).getGroupChatSalesId());
                 accountRowItems.get(i).setAccountName(company.getName());
                 accountRowItems.get(i).setAccountId(accounts.get(i).getAccountIdFire());
-                if (groupChatSales.getMostRecentMessage() != null && groupChatCustomers != null) {
-                    if (groupChatSales.getMessageCreatedTime() > groupChatCustomers.getMessageCreatedTime()) {
-                        accountRowItems.get(i).setMessageContent(groupChatSales.getMostRecentMessage().getMessageContent());
-                        accountRowItems.get(i).setMessageCreatedAtTime(groupChatSales.getMostRecentMessage().getCreatedDate());
-                        accountRowItems.get(i).setMessageOwnerName(groupChatSales.getMostRecentMessage().getMessageOwnerName());
-                        if(!groupChatSales.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
-                            accountRowItems.get(i).setNewMessage(true);
-                        }
-                    } else {
-                        accountRowItems.get(i).setMessageContent(groupChatCustomers.getMostRecentMessage().getMessageContent());
-                        accountRowItems.get(i).setMessageCreatedAtTime(groupChatCustomers.getMostRecentMessage().getCreatedDate());
-                        accountRowItems.get(i).setMessageOwnerName(groupChatCustomers.getMostRecentMessage().getMessageOwnerName());
-                        if(!groupChatSales.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
-                            accountRowItems.get(i).setNewMessage(true);
-                        }
-                    }
-                } else if (groupChatSales.getMostRecentMessage() != null) {
+                if (groupChatSales.getMostRecentMessage() != null) {
                     accountRowItems.get(i).setMessageContent(groupChatSales.getMostRecentMessage().getMessageContent());
                     accountRowItems.get(i).setMessageCreatedAtTime(groupChatSales.getMostRecentMessage().getCreatedDate());
                     accountRowItems.get(i).setMessageOwnerName(groupChatSales.getMostRecentMessage().getMessageOwnerName());
                     if(!groupChatSales.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
-                        accountRowItems.get(i).setNewMessage(true);
-                    }
-                } else if (groupChatCustomers.getMostRecentMessage() != null) {
-                    accountRowItems.get(i).setMessageContent(groupChatCustomers.getMostRecentMessage().getMessageContent());
-                    accountRowItems.get(i).setMessageCreatedAtTime(groupChatCustomers.getMostRecentMessage().getCreatedDate());
-                    accountRowItems.get(i).setMessageOwnerName(groupChatCustomers.getMostRecentMessage().getMessageOwnerName());
-                    if(!groupChatCustomers.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
                         accountRowItems.get(i).setNewMessage(true);
                     }
                 }
@@ -489,7 +470,7 @@ public class FirebaseManager {
                 requestRowItems.get(i).setMessageContent(request.getRequestMessage());
                 requestRowItems.get(i).setMessageCreatedAtTime(request.getMostRecentMessageTime());
                 requestRowItems.get(i).setMessageOwnerName(request.getCustomerName());
-                if(!request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                if(request.getMostRecentGroupMessage() != null && !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
                     requestRowItems.get(i).setNewMessage(true);
                 }
             }
@@ -754,8 +735,7 @@ public class FirebaseManager {
             RealmList<RowItem> sortedByMostRecent = new RealmList<>();
             for (int i = 0; i < copy.getRowItems().size(); i++) {
                 AccountRealm account = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountIdFire", copy.getRowItems().get(i).getAccountId()).findFirst();
-                if ((account.getGroupChatSalesId().equals(message.getChatId()) ||
-                        account.getGroupChatCustomerId().equals(message.getChatId())) &&
+                if (account.getGroupChatSalesId().equals(message.getChatId()) &&
                         message.getCreatedDate() >= copy.getRowItems().get(i).getMessageCreatedAtTime()) {
                     copy.getRowItems().get(i).setMessageContent(message.getMessageContent());
                     copy.getRowItems().get(i).setMessageCreatedAtTime(message.getCreatedDate());
@@ -1125,9 +1105,9 @@ public class FirebaseManager {
         User salesUser1 = new User();
         salesUser1.setUid(newUser1Ref.getKey());
         salesUser1.setCompanyId(customerCompany.getCompanyId());
-        salesUser1.setEmail("memorizeitBible@gmail.com");
-        salesUser1.setFirstName("Adam");
-        salesUser1.setLastName("Truley");
+        salesUser1.setEmail("jonathan@clickfield.com");
+        salesUser1.setFirstName("Jay");
+        salesUser1.setLastName("Brannen");
         salesUser1.setPhoneNumber("9512950348");
         salesUser1.setUserType("account_rep");
         salesUser1.setRole("rep1");
@@ -1262,19 +1242,7 @@ public class FirebaseManager {
         groupChat.setMessageThreadId(thread.getMessageThreadId());
         groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
 
-        DatabaseReference newGroupChatCustomerRef = groupChatsReference.push();
-        GroupChat groupChatCustomer = new GroupChat();
-        groupChatCustomer.setChatId(newGroupChatCustomerRef.getKey());
-        DatabaseReference newMessageThreadSalesRef = database.getReference().child("messages").push();
-        MessageThread threadCustomer = new MessageThread();
-        threadCustomer.setMessageThreadId(newMessageThreadSalesRef.getKey());
-        threadCustomer.setChatId(groupChatCustomer.getChatId());
-        database.getReference().child("messages").child(threadCustomer.getMessageThreadId()).setValue(threadCustomer);
-        groupChatCustomer.setMessageThreadId(threadCustomer.getMessageThreadId());
-        groupChatsReference.child(groupChatCustomer.getChatId()).setValue(groupChatCustomer);
-
         account.setGroupChatSalesId(groupChat.getChatId());
-        account.setGroupChatCustomerId(groupChatCustomer.getChatId());
         accountsReference.child(account.getAccountIdFire()).setValue(account);
 
         List<String> accountIdList = new ArrayList<>();

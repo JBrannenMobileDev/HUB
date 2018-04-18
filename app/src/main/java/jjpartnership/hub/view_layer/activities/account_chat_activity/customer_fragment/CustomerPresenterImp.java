@@ -58,33 +58,33 @@ public class CustomerPresenterImp implements CustomerPresenter {
     }
 
     private void initDataListeners() {
-        AccountRealm account = realm.where(AccountRealm.class).equalTo("accountId", accountId).findFirst();
-        chatId = account.getGroupChatCustomerId();
-        groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", chatId).findFirst();
-        user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
-        messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", groupChat.getMessageThreadId()).findFirst();
-        messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
-        if(messageThread != null) {
-            messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
-                @Override
-                public void onChange(MessageThreadRealm threadRealm) {
-                    fragment.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserNames()));
-                }
-            });
-        }
-        messages.addChangeListener(new RealmChangeListener<RealmResults<MessageRealm>>() {
-            @Override
-            public void onChange(RealmResults<MessageRealm> messagesRealm) {
-                if(messagesRealm.size() > 0) {
-                    fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm), user.getUid().equals(messagesRealm.get(messagesRealm.size() - 1).getUid()));
-                    updateAllMessagesToRead(messagesRealm);
-                }
-            }
-        });
-        if(messages.size() > 0) {
-            fragment.onReceiveMessages(messages, getUsersColors(messages), user.getUid().equals(messages.get(messages.size() - 1).getUid()));
-            updateAllMessagesToRead(messages);
-        }
+//        AccountRealm account = realm.where(AccountRealm.class).equalTo("accountId", accountId).findFirst();
+//        chatId = account.getGroupChatCustomerId();
+//        groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", chatId).findFirst();
+//        user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
+//        messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", groupChat.getMessageThreadId()).findFirst();
+//        messages = realm.where(MessageRealm.class).equalTo("chatId", chatId).findAll().sort("createdDate");
+//        if(messageThread != null) {
+//            messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
+//                @Override
+//                public void onChange(MessageThreadRealm threadRealm) {
+//                    fragment.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserNames()));
+//                }
+//            });
+//        }
+//        messages.addChangeListener(new RealmChangeListener<RealmResults<MessageRealm>>() {
+//            @Override
+//            public void onChange(RealmResults<MessageRealm> messagesRealm) {
+//                if(messagesRealm.size() > 0) {
+//                    fragment.onReceiveMessages(messagesRealm, getUsersColors(messagesRealm), user.getUid().equals(messagesRealm.get(messagesRealm.size() - 1).getUid()));
+//                    updateAllMessagesToRead(messagesRealm);
+//                }
+//            }
+//        });
+//        if(messages.size() > 0) {
+//            fragment.onReceiveMessages(messages, getUsersColors(messages), user.getUid().equals(messages.get(messages.size() - 1).getUid()));
+//            updateAllMessagesToRead(messages);
+//        }
     }
 
     private void updateAllMessagesToRead(RealmResults<MessageRealm> messages) {

@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.account_chat_activity.customer_requests_fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AssignedAgentsRecyclerAdapter;
+import jjpartnership.hub.view_layer.activities.customer_request_chat_activity.CustomerRequestChatActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -57,8 +59,10 @@ public class CustomerRequestsFragment extends Fragment implements CustomerReques
     private void initCallbacks() {
         openRequestSelectedCallback = new BaseCallback<CustomerRequestRealm>() {
             @Override
-            public void onResponse(CustomerRequestRealm object) {
-
+            public void onResponse(CustomerRequestRealm request) {
+                Intent requestChatIntent = new Intent(getContext(), CustomerRequestChatActivity.class);
+                requestChatIntent.putExtra("requestId", request.getRequestId());
+                getActivity().startActivity(requestChatIntent);
             }
 
             @Override
