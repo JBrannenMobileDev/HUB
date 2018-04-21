@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:elevation="1dp">
+            android:elevation="4dp">
 
             <Switch
                 android:id="@+id/new_message_switch"
@@ -32,17 +32,44 @@
                 android:text="Notify new messages for this chat"
                 android:textColor="@color/grey_text" />
 
-            <TextView
-                android:id="@+id/request_message_tv"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:maxLines="3"
-                android:paddingBottom="8dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:text="Can anyone provide glass test tubes? I need 5000 per week and they need to be extreme heat resistant! At least 3,000 degrees F. Does that seem too difficult?"
-                android:textSize="16dp" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/request_message_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="40dp"
+                    android:maxLines="1"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:text="Request Message"
+                    android:textSize="16dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/request_message_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:singleLine="false"
+                    android:textSize="16dp" />
+
+                <ImageView
+                    android:id="@+id/request_expand_arrow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:tint="@color/grey_text"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp" />
+            </LinearLayout>
 
         </FrameLayout>
 

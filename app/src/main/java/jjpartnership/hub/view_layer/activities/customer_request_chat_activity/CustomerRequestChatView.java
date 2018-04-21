@@ -3,6 +3,7 @@ package jjpartnership.hub.view_layer.activities.customer_request_chat_activity;
 import java.util.HashMap;
 
 import io.realm.RealmResults;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 
 /**
@@ -14,5 +15,5 @@ public interface CustomerRequestChatView {
     void onCurrentlyTypingUpdated(String nameToDisplay);
     void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Long> usersColors, boolean equals);
     void onSendCallIntent(String phoneNumber);
-    void onSendEmailIntent(String email);
+    void onReceiveRequest(CustomerRequestRealm request);
 }

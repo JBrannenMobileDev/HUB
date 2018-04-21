@@ -7,8 +7,6 @@ package jjpartnership.hub.view_layer.activities.customer_request_chat_activity;
 public interface CustomerRequestChatPresenter {
     void onSendMessageClicked();
     void onUserInputChanged(CharSequence charSequence);
-    void onSendEmailClicked();
-    void onCallClicked();
     void onProfileClicked();
 }
 

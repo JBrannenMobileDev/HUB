@@ -76,7 +76,7 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    messageSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
+                    if(messageSelectedCallback != null)messageSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
                 }
             });
         }

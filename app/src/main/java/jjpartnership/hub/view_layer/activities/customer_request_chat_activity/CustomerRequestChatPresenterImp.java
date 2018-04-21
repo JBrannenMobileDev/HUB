@@ -61,6 +61,9 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
         if(requester != null) {
             activity.setActivityTitle(requester.getFirstName() + " " + requester.getLastName());
         }
+        if(request != null){
+            activity.onReceiveRequest(request);
+        }
         groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", request.getGroupChatId()).findFirst();
         messageThread = realm.where(MessageThreadRealm.class).equalTo("messageThreadId", groupChat.getMessageThreadId()).findFirst();
         messages = realm.where(MessageRealm.class).equalTo("chatId", groupChat.getChatId()).findAll().sort("createdDate");
@@ -144,16 +147,6 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     public void onUserInputChanged(CharSequence updatedUserInput) {
         userInput = updatedUserInput.toString();
         updateCurrentlyTypingFirebase();
-    }
-
-    @Override
-    public void onSendEmailClicked() {
-        activity.onSendEmailIntent(requester.getEmail());
-    }
-
-    @Override
-    public void onCallClicked() {
-        activity.onSendCallIntent(requester.getPhoneNumber());
     }
 
     @Override

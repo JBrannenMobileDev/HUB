@@ -1,8 +1,7 @@
 package jjpartnership.hub.view_layer.activities.customer_request_chat_activity;
 
-import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -13,17 +12,16 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -34,16 +32,13 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.realm.RealmResults;
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
 import jjpartnership.hub.utils.DpUtil;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_requests_fragment.CustomerRequestPresenter;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.customer_requests_fragment.CustomerRequestView;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentRecyclerAdapter;
-import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessagePresenter;
-import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessagePresenterImp;
-import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageView;
+import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
@@ -59,6 +54,7 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
     @BindView(R.id.new_message_switch)Switch newMessageSwitch;
     @BindView(R.id.request_header_frame_layout)FrameLayout header;
     @BindView(R.id.request_message_tv)TextView requestMessage;
+    @BindView(R.id.request_expand_arrow)ImageView expandArrow;
 
     private CustomerRequestChatPresenter presenter;
     private AdjustableScrollSpeedLayoutManager layoutManager;
@@ -122,19 +118,9 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.direct_chat_menu, menu);
-        MenuItem action_email = menu.findItem(R.id.action_email);
-        Drawable drawable = action_email.getIcon();
-        if (drawable != null) {
-            drawable.mutate();
-            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        }
-        drawable = menu.findItem(R.id.action_call).getIcon();
-        if (drawable != null) {
-            drawable.mutate();
-            drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-        }
-        drawable = menu.findItem(R.id.action_profile).getIcon();
+        getMenuInflater().inflate(R.menu.request_chat_menu, menu);
+
+        Drawable drawable = menu.findItem(R.id.action_profile).getIcon();
         if (drawable != null) {
             drawable.mutate();
             drawable.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
@@ -147,12 +133,6 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
-        }
-        if(item.getItemId() == R.id.action_email){
-            presenter.onSendEmailClicked();
-        }
-        if(item.getItemId() == R.id.action_call){
-            presenter.onCallClicked();
         }
         if(item.getItemId() == R.id.action_profile){
             presenter.onProfileClicked();
@@ -219,11 +199,18 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
     }
 
     private void toggleMessageHeight() {
-            if (requestMessage.getMaxLines() == 3) {
+            if (requestMessage.getMaxLines() == 2) {
+                expandArrow.animate().rotation(180f);
                 requestMessage.setMaxLines(Integer.MAX_VALUE);
             } else {
-                requestMessage.setMaxLines(3);
+                expandArrow.animate().rotation(0);
+                requestMessage.setMaxLines(2);
             }
+    }
+
+    private void setMessageHieghtDefault(){
+        expandArrow.animate().rotation(0);
+        requestMessage.setMaxLines(2);
     }
 
     private void hideKeyboard(){
@@ -298,7 +285,8 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
     }
 
     private void animateHideheader(){
-        header.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -110)).setDuration(250);
+        header.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), -140)).setDuration(250);
+        setMessageHieghtDefault();
     }
 
     private void animateShowheader(){
@@ -333,8 +321,26 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
     }
 
     @Override
-    public void onSendEmailIntent(String email) {
-        CommunicationsUtil.launchEmailIntent(email, getApplicationContext());
+    public void onReceiveRequest(CustomerRequestRealm request) {
+        requestMessage.setText(request.getRequestMessage());
+        ViewTreeObserver vto = requestMessage.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Layout layout = requestMessage.getLayout();
+                if (layout != null) {
+                    int lines = layout.getLineCount();
+                    if (lines > 0)
+                        if (layout.getEllipsisCount(lines-1) > 0)
+                            expandArrow.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    @OnClick(R.id.request_expand_arrow)
+    public void onExpandRequestMessageClicked(){
+        toggleMessageHeight();
     }
 
     @Override
