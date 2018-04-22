@@ -604,6 +604,64 @@ public class FirebaseManager {
         chatMessagesReference.child(newChat.getChatId()).child("message_thread").child(newChat.getMessageThreadId()).addValueEventListener(valueEventListeners.get(valueEventListeners.size()-1));
     }
 
+    private void addGroupChatMessageListener(GroupChat newChat){
+
+        childEventListenersMessageThreads.add(new ChildEventListener() {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Message message = dataSnapshot.getValue(Message.class);
+                if(message != null) {
+                    message.setSavedToFirebase(true);
+                    updateMainAccountModel(message);
+                    DataManager.getInstance().updateRealmMessage(message);
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Message message = dataSnapshot.getValue(Message.class);
+                if(message != null) {
+                    message.setSavedToFirebase(true);
+                    updateMainAccountModel(message);
+                    DataManager.getInstance().updateRealmMessage(message);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        chatMessagesReference.child(newChat.getChatId()).child("messages").addChildEventListener(childEventListenersMessageThreads.get(childEventListenersMessageThreads.size()-1));
+
+        valueEventListeners.add(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                MessageThread thread = dataSnapshot.getValue(MessageThread.class);
+                if(thread!= null){
+                    DataManager.getInstance().insertOrUpdateMessageThread(thread);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        chatMessagesReference.child(newChat.getChatId()).child("message_thread").child(newChat.getMessageThreadId()).addValueEventListener(valueEventListeners.get(valueEventListeners.size()-1));
+    }
+
     private void initChatMessagesListener(List<GroupChat> groupChats, List<DirectChat> directChats) {
         final List<String> messageThreadIds = new ArrayList<>();
         final List<String> chatIds = new ArrayList<>();
@@ -751,6 +809,26 @@ public class FirebaseManager {
                 }
             }
 
+            RealmList<RowItem> requestRowItems = new RealmList<>();
+            for(int i = 0; i < customerRequests.size(); i++){
+                requestRowItems.add(new RowItem());
+            }
+
+            for(int i = 0; i < customerRequests.size(); i++){
+                CustomerRequest request = customerRequests.get(i);
+                if(request != null && request.isOpen()){
+                    requestRowItems.get(i).setMessageContent(request.getRequestMessage());
+                    requestRowItems.get(i).setMessageCreatedAtTime(request.getMostRecentMessageTime());
+                    requestRowItems.get(i).setMessageOwnerName(request.getCustomerName());
+                    if(request.getMostRecentGroupMessage() != null && !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                        requestRowItems.get(i).setNewMessage(true);
+                    }
+                }
+            }
+
+            for(RowItem item : requestRowItems){
+                sortedByMostRecent.add(item);
+            }
 
             DirectChatRealm newDChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
             DirectItem newItem = null;
@@ -1261,6 +1339,39 @@ public class FirebaseManager {
 
     public void loadCompaniesToFirebase(){
 
+    }
+
+    public GroupChat createNewGroupChat(List<String> memberIds, String accountId) {
+        DatabaseReference newGroupChatRef = groupChatsReference.push();
+        GroupChat groupChat = new GroupChat();
+        groupChat.setChatId(newGroupChatRef.getKey());
+        groupChat.setUserIds(createMap(memberIds));
+
+        DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
+        MessageThread thread = new MessageThread();
+        thread.setMessageThreadId(newMessageThreadRef.getKey());
+        thread.setChatId(groupChat.getChatId());
+        database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
+        groupChat.setMessageThreadId(thread.getMessageThreadId());
+        groupChat.setNewChat(true);
+        groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
+
+        for(String id : memberIds){
+            usersReference.child(id).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
+        }
+
+        accountsReference.child(accountId).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
+
+        addGroupChatMessageListener(groupChat);
+        return groupChat;
+    }
+
+    private Map<String, String> createMap(List<String> memberIds) {
+        Map<String, String> userIdsMap = new HashMap<>();
+        for(String id : memberIds){
+            userIdsMap.put(id, id);
+        }
+        return userIdsMap;
     }
 
     public DirectChat createNewDirectChat(String fromUid, String toUid){

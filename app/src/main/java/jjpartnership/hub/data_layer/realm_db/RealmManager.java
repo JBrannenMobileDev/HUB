@@ -65,7 +65,7 @@ public class RealmManager {
         realm.close();
     }
 
-    public void updateDirectChat(final List<DirectChat> chats) {
+    public void updateDirectChats(final List<DirectChat> chats) {
         final RealmList<DirectChatRealm> realmChats = new RealmList<>();
         for(DirectChat chat : chats){
             realmChats.add(new DirectChatRealm(chat));
@@ -75,6 +75,16 @@ public class RealmManager {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmChats);
+            }
+        });
+        realm.close();
+    }
+    public void insertOrUpdateGroupChat(final GroupChat chat) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(new GroupChatRealm(chat));
             }
         });
         realm.close();

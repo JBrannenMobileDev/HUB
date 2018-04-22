@@ -17,6 +17,7 @@ public class GroupChatRealm extends RealmObject{
     private String chatId;
     private RealmList<String> userIds;
     private MessageRealm mostRecentMessage;
+    private Boolean newChat;
     private long messageCreatedTime;
     private String messageThreadId;
     private RealmList<String> customerRequestIds;
@@ -33,6 +34,7 @@ public class GroupChatRealm extends RealmObject{
         this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());
         this.messageThreadId = chat.getMessageThreadId();
         this.customerRequestIds = createCustomerRequsts(chat.getCustomerRequestIds());
+        this.newChat = chat.isNewChat();
     }
 
     private RealmList<String> createCustomerRequsts(Map<String, String> requests){
@@ -70,6 +72,22 @@ public class GroupChatRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public Boolean isNewChat() {
+        return newChat;
+    }
+
+    public void setNewChat(Boolean newChat) {
+        this.newChat = newChat;
+    }
+
+    public RealmList<String> getCustomerRequestIds() {
+        return customerRequestIds;
+    }
+
+    public void setCustomerRequestIds(RealmList<String> customerRequestIds) {
+        this.customerRequestIds = customerRequestIds;
     }
 
     public RealmList<String> getCustomerRequests() {

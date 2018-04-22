@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -22,7 +24,9 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
+import jjpartnership.hub.utils.TwoResponseCallback;
 import jjpartnership.hub.utils.UserPreferences;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.new_group_message_fragment.NewGroupMessageDialogFragment;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 
@@ -30,6 +34,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     @BindView(R.id.account_details_address_tv)TextView addressTv;
     @BindView(R.id.account_details_industries_tv)TextView industriesTv;
     @BindView(R.id.assigned_agents_recycler_view)RecyclerView agentsRecycler;
+    @BindView(R.id.agents_group_chat_tv)TextView sendGroupChat;
 
     private AssignedAgentsRecyclerAdapter agentsAdapter;
     private OnAccountDetailsInteractionListener mListener;
@@ -37,6 +42,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     private BaseCallback<UserRealm> agentSelectedCallback;
     private BaseCallback<UserRealm> agentDirectMessageSelectedCallback;
     private BaseCallback<String> currentUserProfileSelectedCallback;
+    private TwoResponseCallback<UserRealm, Boolean> checkboxSelectedCallback;
     private String currentUserUid;
 
     public AccountDetailsFragment() {
@@ -97,6 +103,18 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
             }
         };
+
+        checkboxSelectedCallback = new TwoResponseCallback<UserRealm, Boolean>() {
+            @Override
+            public void onResponse(UserRealm user, Boolean checked) {
+                presenter.onCheckboxClicked(user, checked);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
     }
 
     private void launchDirectMessageIntent(String uid, String toUid){
@@ -130,8 +148,31 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
 
     @OnClick(R.id.agents_group_chat_tv)
     public void onAgentsGroupChatClicked(){
-        mListener.onSetPagerPage(1);
+        presenter.onNewGroupChatClicked();
     }
+
+    @Override
+    public void showNewGroupDialog(ArrayList<String> agentIds, ArrayList<String> selectedAgentsIds) {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        NewGroupMessageDialogFragment editNameDialogFragment = NewGroupMessageDialogFragment.newInstance(agentIds, selectedAgentsIds);
+        editNameDialogFragment.show(fm, "fragment_new_group");
+    }
+
+    @Override
+    public void showNoAgentsSelectedToast() {
+        Toast.makeText(getActivity(), "Please select at least one Sales Agent.", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void setNewGroupTextDissabled() {
+        sendGroupChat.setTextColor(getActivity().getResources().getColor(R.color.grey_text));
+    }
+
+    @Override
+    public void setNewGroupTextEnabled() {
+        sendGroupChat.setTextColor(getActivity().getResources().getColor(R.color.colorAccent));
+    }
+
 
     @Override
     public void onReceiveCompanyData(String address, String industries) {
@@ -142,7 +183,8 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     @Override
     public void onReceiveSalesAgentData(List<UserRealm> salesAgents) {
         agentsAdapter = new AssignedAgentsRecyclerAdapter(getActivity().getApplicationContext(), salesAgents,
-                agentSelectedCallback, agentDirectMessageSelectedCallback, currentUserProfileSelectedCallback);
+                agentSelectedCallback, agentDirectMessageSelectedCallback, currentUserProfileSelectedCallback,
+                checkboxSelectedCallback);
         agentsRecycler.setAdapter(agentsAdapter);
     }
 

@@ -17,6 +17,7 @@ public class AccountRealm extends RealmObject{
     private String companyCustomerId;
     private String groupChatSalesId;
     private String accountId;
+    private RealmList<String> groupChats;
     private RealmList<String> accountSalesAgentUids;
     private RealmList<String> customerRequestIds;
 
@@ -24,7 +25,7 @@ public class AccountRealm extends RealmObject{
     }
 
     public AccountRealm(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
-                        String accountId, RealmList<String> accountUids, RealmList<String> customerRequestIds) {
+                        String accountId, RealmList<String> accountUids, RealmList<String> customerRequestIds, RealmList<String> groupChats) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
@@ -32,6 +33,7 @@ public class AccountRealm extends RealmObject{
         this.accountId = accountId;
         this.accountSalesAgentUids = accountUids;
         this.customerRequestIds = customerRequestIds;
+        this.groupChats = groupChats;
     }
 
     public AccountRealm(Account account){
@@ -42,6 +44,7 @@ public class AccountRealm extends RealmObject{
         this.accountId = account.getAccountId();
         this.accountSalesAgentUids = createRealmList(account.getAccountUsers());
         this.customerRequestIds = createRealmListRequestIds(account.getCustomerRequestIds());
+        this.groupChats = createRealmList(account.getGroupChats());
     }
 
     private RealmList<String> createRealmList(Map<String, String> accountUsers) {
@@ -64,6 +67,14 @@ public class AccountRealm extends RealmObject{
             return requests;
         }
         return new RealmList<>();
+    }
+
+    public RealmList<String> getGroupChats() {
+        return groupChats;
+    }
+
+    public void setGroupChats(RealmList<String> groupChats) {
+        this.groupChats = groupChats;
     }
 
     public RealmList<String> getCustomerRequestIds() {

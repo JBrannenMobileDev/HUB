@@ -1,10 +1,12 @@
 package jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
@@ -12,6 +14,7 @@ import jjpartnership.hub.data_layer.data_models.CustomerRequest;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserPreferences;
 
 /**
  * Created by Jonathan on 3/26/2018.
@@ -24,6 +27,7 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     private CompanyRealm company;
     private GroupChatRealm chat;
     private List<UserRealm> salesAgents;
+    private List<UserRealm> checkedUsers;
     private String accountName;
     private String accountId;
 
@@ -33,6 +37,7 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
         this.accountName = account_name;
         this.accountId = account_id;
         salesAgents = new ArrayList<>();
+        checkedUsers = new ArrayList<>();
         fetchData();
     }
 
@@ -46,12 +51,15 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
 
             if(account.getAccountSalesAgentUids() != null && account.getAccountSalesAgentUids().size() > 0){
                 for(String uid : account.getAccountSalesAgentUids()){
-                    UserRealm salesAgent = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
-                    if(salesAgent != null)salesAgents.add(salesAgent);
+                    if(!uid.equals(UserPreferences.getInstance().getUid())) {
+                        UserRealm salesAgent = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
+                        if (salesAgent != null) salesAgents.add(salesAgent);
+                    }
                 }
             }
 
             if(salesAgents.size() > 0){
+                Collections.sort(salesAgents);
                 fragment.onReceiveSalesAgentData(salesAgents);
             }
         }
@@ -84,5 +92,33 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     @Override
     public void onDirectionsClicked() {
         fragment.launchDirectionsIntent(company.getAddress());
+    }
+
+    @Override
+    public void onCheckboxClicked(UserRealm user, Boolean checked) {
+        if(checked) {
+            fragment.setNewGroupTextEnabled();
+            checkedUsers.add(user);
+        }else{
+            checkedUsers.remove(user);
+            if(checkedUsers.size() == 0)fragment.setNewGroupTextDissabled();
+        }
+    }
+
+    @Override
+    public void onNewGroupChatClicked() {
+        if(checkedUsers.size() > 0){
+            fragment.showNewGroupDialog(getAgentIds(salesAgents), getAgentIds(checkedUsers));
+        }else{
+            fragment.showNoAgentsSelectedToast();
+        }
+    }
+
+    private ArrayList<String> getAgentIds(List<UserRealm> salesAgents) {
+        ArrayList<String> ids = new ArrayList<>();
+        for(UserRealm user : salesAgents){
+            ids.add(user.getUid());
+        }
+        return ids;
     }
 }

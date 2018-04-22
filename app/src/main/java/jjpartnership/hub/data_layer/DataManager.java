@@ -86,7 +86,7 @@ public class DataManager {
     }
 
     public void updateRealmDirectChats(List<DirectChat> chat) {
-        realmManager.updateDirectChat(chat);
+        realmManager.updateDirectChats(chat);
     }
 
     public void updateRealmGroupChats(List<GroupChat> gChat) {
@@ -156,6 +156,10 @@ public class DataManager {
 
     public void createNewDirectChat(String uid, String toUid) {
         realmManager.insertOrUpdateDirectChat(fbManager.createNewDirectChat(uid, toUid));
+    }
+
+    public void createNewGroupChat(List<String> memberIds, String accountId){
+        realmManager.insertOrUpdateGroupChat(fbManager.createNewGroupChat(memberIds, accountId));
     }
 
     public void insertOrUpdateDirectChat(DirectChatRealm directChat){

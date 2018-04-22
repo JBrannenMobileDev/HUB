@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jjpartnership.hub.data_layer.data_models.UserRealm;
@@ -13,6 +14,10 @@ public interface AccountDetailsView {
     void onReceiveCompanyData(String address, String industries);
     void onReceiveSalesAgentData(List<UserRealm> salesAgents);
     void launchDirectionsIntent(String address);
+    void showNewGroupDialog(ArrayList<String> agentIds, ArrayList<String> selectedAgentsIds);
+    void showNoAgentsSelectedToast();
+    void setNewGroupTextDissabled();
+    void setNewGroupTextEnabled();
 }
 
 

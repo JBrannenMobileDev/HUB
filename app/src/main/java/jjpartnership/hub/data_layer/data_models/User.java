@@ -23,6 +23,7 @@ public class User{
     private String userType;
     private int userColor;
     private Map<String,String> directChats;
+    private Map<String, String> groupChats;
     private List<String> accountIds;
 
     public User() {
@@ -30,7 +31,7 @@ public class User{
 
     public User(String uid, String email, String phoneNumber, String firstName, String lastName,
                 String companyId, String businessUnit, String role, String userType,
-                Map<String,String> directChatIds, List<String> accountIds, int userColor) {
+                Map<String,String> directChatIds, List<String> accountIds, int userColor, Map<String, String> groupChats) {
         this.uid = uid;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -43,6 +44,7 @@ public class User{
         this.directChats = directChatIds;
         this.accountIds = accountIds;
         this.userColor = userColor;
+        this.groupChats = groupChats;
     }
 
     public User(UserRealm realmUser){
@@ -59,15 +61,16 @@ public class User{
             this.directChats = createMap(realmUser.getDirectChatIds());
             this.accountIds = realmUser.getAccountIds();
             this.userColor = realmUser.getUserColor();
+            this.groupChats = createMap(realmUser.getGroupChatIds());
         }
     }
 
-    private Map<String, String> createMap(RealmList<String> directChatIds) {
-        Map<String, String> dChatIdsMap = new HashMap<>();
-        for(String chatId : directChatIds){
-            dChatIdsMap.put(chatId, chatId);
+    private Map<String, String> createMap(RealmList<String> chatIds) {
+        Map<String, String> chatIdsMap = new HashMap<>();
+        for(String chatId : chatIds){
+            chatIdsMap.put(chatId, chatId);
         }
-        return dChatIdsMap;
+        return chatIdsMap;
     }
 
     public void addAccount(String accountId) {
@@ -75,6 +78,14 @@ public class User{
             accountIds = new ArrayList<>();
         }
         accountIds.add(accountId);
+    }
+
+    public Map<String, String> getGroupChats() {
+        return groupChats;
+    }
+
+    public void setGroupChats(Map<String, String> groupChats) {
+        this.groupChats = groupChats;
     }
 
     public int getUserColor() {

@@ -15,6 +15,7 @@ public class Account {
     private String companySalesId;
     private String companyCustomerId;
     private String groupChatSalesId;
+    private Map<String, String> groupChats;
     private Map<String, String> accountUsers;
     private Map<String, String> customerRequestIds;
 
@@ -22,7 +23,7 @@ public class Account {
     }
 
     public Account(String accountIdFire, String companyIdA, String companyIdB, String groupChatId,
-                   String accountId, Map<String, String> accountUsers, Map<String, String> customerRequestIds) {
+                   String accountId, Map<String, String> accountUsers, Map<String, String> customerRequestIds, Map<String, String> groupChats) {
         this.accountIdFire = accountIdFire;
         this.companySalesId = companyIdA;
         this.companyCustomerId = companyIdB;
@@ -30,6 +31,7 @@ public class Account {
         this.accountId = accountId;
         this.accountUsers = accountUsers;
         this.customerRequestIds = customerRequestIds;
+        this.groupChats = groupChats;
     }
 
     public Account(AccountRealm accountRealm){
@@ -40,14 +42,15 @@ public class Account {
         this.accountId = accountRealm.getAccountId();
         this.accountUsers = createMap(accountRealm.getAccountSalesAgentUids());
         this.customerRequestIds = createMapCustomerRequests(accountRealm.getCustomerRequestIds());
+        this.groupChats = createMap(accountRealm.getGroupChats());
     }
 
-    private Map<String, String> createMap(RealmList<String> accountUids) {
-        Map<String, String> usersMap = new HashMap<>();
-        for(String uid : accountUids){
-            usersMap.put(uid,uid);
+    private Map<String, String> createMap(RealmList<String> items) {
+        Map<String, String> itemsMap = new HashMap<>();
+        for(String uid : items){
+            itemsMap.put(uid,uid);
         }
-        return usersMap;
+        return itemsMap;
     }
 
     private Map<String, String> createMapCustomerRequests(RealmList<String> customerRequestUids) {
@@ -56,6 +59,14 @@ public class Account {
             requestsMap.put(uid,uid);
         }
         return requestsMap;
+    }
+
+    public Map<String, String> getGroupChats() {
+        return groupChats;
+    }
+
+    public void setGroupChats(Map<String, String> groupChats) {
+        this.groupChats = groupChats;
     }
 
     public Map<String, String> getAccountUsers() {

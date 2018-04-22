@@ -151,7 +151,7 @@
                     android:id="@+id/textView65"
                     android:layout_width="wrap_content"
                     android:layout_height="24dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="16dp"
                     android:layout_marginTop="32dp"
                     android:gravity="center_vertical"
                     android:text="Assigned Sales Agents"
@@ -176,18 +176,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="48dp"
-                    android:nestedScrollingEnabled="false" />
+                    android:nestedScrollingEnabled="false">
+
+                </android.support.v7.widget.RecyclerView>
+
+                <FrameLayout
+                    android:id="@+id/grey_divider_frame_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="48dp"
+                    android:background="@color/colorPrimaryVeryLight">
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/agents_group_chat_tv"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:layout_gravity="bottom|end"
+                    android:layout_gravity="bottom"
                     android:background="@drawable/rounded_rectangle_orange_stroke"
+                    android:clickable="true"
                     android:gravity="center_vertical"
-                    android:text="SEND GROUP MESSAGE"
+                    android:text="NEW GROUP MESSAGE"
                     android:textAlignment="center"
-                    android:textColor="@color/white"
+                    android:textColor="@color/grey_text"
                     android:textStyle="bold" />
 
             </FrameLayout>

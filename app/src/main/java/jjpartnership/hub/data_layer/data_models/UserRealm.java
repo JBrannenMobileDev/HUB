@@ -1,5 +1,7 @@
 package jjpartnership.hub.data_layer.data_models;
 
+import android.support.annotation.NonNull;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -11,7 +13,7 @@ import io.realm.annotations.PrimaryKey;
  * Created by jbrannen on 2/23/18.
  */
 
-public class UserRealm extends RealmObject{
+public class UserRealm extends RealmObject implements Comparable<UserRealm>{
     public static final String TYPE_SALES = "sales_agent";
     public static final String TYPE_CUSTOMER = "account_rep";
 
@@ -27,6 +29,7 @@ public class UserRealm extends RealmObject{
     private String userType;
     private int userColor;
     private RealmList<String> directChatIds;
+    private RealmList<String> groupChatIds;
     private RealmList<String> accountIds;
 
     public UserRealm() {
@@ -34,7 +37,7 @@ public class UserRealm extends RealmObject{
 
     public UserRealm(String uid, String email, String phoneNumber, String firstName, String lastName,
                      String companyId, String businessUnit, String role, String userType,
-                     RealmList<String> directChatIds, RealmList<String> accountIds, int userColor) {
+                     RealmList<String> directChatIds, RealmList<String> accountIds, int userColor, RealmList<String> groupChatIds) {
         this.uid = uid;
         this.email = email;
         this.phoneNumber = phoneNumber;
@@ -47,6 +50,7 @@ public class UserRealm extends RealmObject{
         this.directChatIds = directChatIds;
         this.accountIds = accountIds;
         this.userColor = userColor;
+        this.groupChatIds = groupChatIds;
     }
 
     public UserRealm(User user) {
@@ -62,6 +66,19 @@ public class UserRealm extends RealmObject{
         if(user.getDirectChats() != null) this.directChatIds = createDirectChats(user.getDirectChats().values());
         this.accountIds = createAccountIdList(user.getAccountIds());
         this.userColor = user.getUserColor();
+        if(user.getGroupChats() != null) this.groupChatIds = createGroupChats(user.getGroupChats().values());
+    }
+
+    private RealmList<String> createGroupChats(Collection<String> groupChatIds) {
+        if(groupChatIds != null) {
+            RealmList<String> groupChatIdsRealm = new RealmList<>();
+            for (String groupChatId : groupChatIds) {
+                groupChatIdsRealm.add(groupChatId);
+            }
+            return groupChatIdsRealm;
+        }else{
+            return new RealmList<>();
+        }
     }
 
     private RealmList<String> createAccountIdList(List<String> accountIds) {
@@ -86,6 +103,14 @@ public class UserRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public RealmList<String> getGroupChatIds() {
+        return groupChatIds;
+    }
+
+    public void setGroupChatIds(RealmList<String> groupChatIds) {
+        this.groupChatIds = groupChatIds;
     }
 
     public int getUserColor() {
@@ -182,5 +207,10 @@ public class UserRealm extends RealmObject{
 
     public void setAccountIds(RealmList<String> accountIds) {
         this.accountIds = accountIds;
+    }
+
+    @Override
+    public int compareTo(@NonNull UserRealm userToCompare) {
+        return getFirstName().compareTo(userToCompare.getFirstName());
     }
 }

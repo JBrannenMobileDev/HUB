@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,6 +16,7 @@ import java.util.List;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.TwoResponseCallback;
 import jjpartnership.hub.utils.UserColorUtil;
 import jjpartnership.hub.utils.UserPreferences;
 
@@ -28,15 +30,19 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
     private BaseCallback<UserRealm> rowSelectedCallback;
     private BaseCallback<UserRealm> directMessageSelectedCallback;
     private BaseCallback<String> currentUserProfileSelectedCallback;
+    private TwoResponseCallback<UserRealm, Boolean> checkboxSelectedCallback;
     private String currentUserId;
 
     public AssignedAgentsRecyclerAdapter(Context context, List<UserRealm> dataModel, BaseCallback<UserRealm> rowSelectedCallback,
-                                         BaseCallback<UserRealm> directMessageSelectedCallback, BaseCallback<String> currentUserProfileSelectedCallback) {
+                                         BaseCallback<UserRealm> directMessageSelectedCallback,
+                                         BaseCallback<String> currentUserProfileSelectedCallback,
+                                         TwoResponseCallback<UserRealm, Boolean> checkboxSelectedCallback) {
         this.dataModel = dataModel;
         this.rowSelectedCallback = rowSelectedCallback;
         this.directMessageSelectedCallback = directMessageSelectedCallback;
         this.currentUserProfileSelectedCallback = currentUserProfileSelectedCallback;
         this.context = context;
+        this.checkboxSelectedCallback = checkboxSelectedCallback;
         currentUserId = UserPreferences.getInstance().getUid();
     }
 
@@ -45,6 +51,7 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
         TextView businessUnit;
         TextView role;
         TextView userIcon;
+        CheckBox groupMessageCheckbox;
         FrameLayout root;
         FrameLayout greyDivider;
         ImageView directMessageIv;
@@ -57,6 +64,7 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
             role = v.findViewById(R.id.info2_tv);
             directMessageIv = v.findViewById(R.id.send_direct_message_iv);
             greyDivider = v.findViewById(R.id.grey_divider_frame_layout);
+            groupMessageCheckbox = v.findViewById(R.id.group_message_checkbox);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -73,6 +81,13 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
                 @Override
                 public void onClick(View view) {
                     directMessageSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
+                }
+            });
+
+            groupMessageCheckbox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    checkboxSelectedCallback.onResponse(dataModel.get(getLayoutPosition()), groupMessageCheckbox.isChecked());
                 }
             });
         }
