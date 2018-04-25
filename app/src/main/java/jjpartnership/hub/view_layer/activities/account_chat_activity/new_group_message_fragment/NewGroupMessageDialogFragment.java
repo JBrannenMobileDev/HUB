@@ -113,15 +113,29 @@ public class NewGroupMessageDialogFragment extends DialogFragment implements Tag
 
     @OnClick(R.id.new_group_message_send)
     public void onSendClicked(){
-        if(!groupName.getText().toString().isEmpty() && groupName.getText().toString().length() > 0){
-            if(!userInput.getText().toString().isEmpty() && userInput.getText().toString().length() > 0){
-                createNewGroupChat();
-            }else{
-                Toast.makeText(getActivity(), "Please provide a message.", Toast.LENGTH_LONG).show();
+        if(tags.getTags().size() > 0) {
+            if (!groupName.getText().toString().isEmpty() && groupName.getText().toString().length() > 0) {
+                if (!userInput.getText().toString().isEmpty() && userInput.getText().toString().length() > 0) {
+                    createNewGroupChat();
+                } else {
+                    Toast.makeText(getActivity(), "Please provide a message.", Toast.LENGTH_LONG).show();
+                    userInput.requestFocus();
+                    showKeyboard();
+                }
+            } else {
+                Toast.makeText(getActivity(), "Please provide a Group Name.", Toast.LENGTH_LONG).show();
+                groupName.requestFocus();
+                showKeyboard();
             }
         }else{
-            Toast.makeText(getActivity(), "Please provide a Group Name.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Please add at least one person to this group.", Toast.LENGTH_SHORT).show();
+            tags.requestFocus();
+            showKeyboard();
         }
+    }
+
+    private void showKeyboard(){
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
     }
 
     private void createNewGroupChat() {

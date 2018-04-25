@@ -14,7 +14,7 @@
         android:layout_height="48dp"
         android:background="@drawable/rounded_rectangle_title"
         android:gravity="center_vertical"
-        android:text="New Group Message"
+        android:text="New Group Chat"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -106,7 +106,7 @@
                 android:backgroundTint="@android:color/transparent"
                 android:ems="10"
                 android:hint="new message"
-                android:inputType="textMultiLine"
+                android:inputType="textCapSentences|textAutoCorrect|textAutoComplete|textMultiLine"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:textColorHint="@color/grey_text"

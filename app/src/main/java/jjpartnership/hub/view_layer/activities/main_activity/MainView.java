@@ -14,4 +14,5 @@ public interface MainView {
     void onDirectMessagesModelReceived(MainDirectMessagesModel directModel);
     void setWelcomeMessage(String typeCustomer);
     void setPageTitle(String title);
+    void setToolbarElevation(float height);
 }

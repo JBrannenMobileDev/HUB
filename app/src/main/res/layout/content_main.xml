@@ -10,6 +10,8 @@
     tools:showIn="@layout/app_bar_main">
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/main_scrollview"
+        android:overScrollMode="never"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -22,8 +24,7 @@
                 android:id="@+id/welcome_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingTop="16dp">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/textView2"

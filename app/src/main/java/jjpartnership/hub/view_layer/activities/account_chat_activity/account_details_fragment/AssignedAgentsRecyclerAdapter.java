@@ -32,6 +32,7 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
     private BaseCallback<String> currentUserProfileSelectedCallback;
     private TwoResponseCallback<UserRealm, Boolean> checkboxSelectedCallback;
     private String currentUserId;
+    private boolean checkAllAgents;
 
     public AssignedAgentsRecyclerAdapter(Context context, List<UserRealm> dataModel, BaseCallback<UserRealm> rowSelectedCallback,
                                          BaseCallback<UserRealm> directMessageSelectedCallback,
@@ -44,6 +45,16 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
         this.context = context;
         this.checkboxSelectedCallback = checkboxSelectedCallback;
         currentUserId = UserPreferences.getInstance().getUid();
+    }
+
+    public void checkAllAgents() {
+        checkAllAgents = true;
+        notifyDataSetChanged();
+    }
+
+    public void uncheckAllAgents() {
+        checkAllAgents = false;
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -102,6 +113,15 @@ public class AssignedAgentsRecyclerAdapter extends RecyclerView.Adapter<Assigned
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        if(checkAllAgents){
+            if(!holder.groupMessageCheckbox.isChecked()){
+                holder.groupMessageCheckbox.performClick();
+            }
+        }else{
+            if(holder.groupMessageCheckbox.isChecked()){
+                holder.groupMessageCheckbox.performClick();
+            }
+        }
         UserRealm user = dataModel.get(position);
         holder.name.setText(user.getFirstName() + " " + user.getLastName());
         if(user.getBusinessUnit() == null){

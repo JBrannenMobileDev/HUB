@@ -1,11 +1,19 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
+import android.animation.ObjectAnimator;
+import android.animation.StateListAnimator;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -17,6 +25,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -39,6 +49,7 @@ import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity;
@@ -60,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.recent_empty_state_layout)LinearLayout recent_empty_layout;
     @BindView(R.id.accounts_empty_state_layout)LinearLayout accounts_empty_layout;
     @BindView(R.id.direc_messages_empty_state_layout)LinearLayout direct_messages_empty_state;
+    @BindView(R.id.main_scrollview)NestedScrollView scrollView;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
@@ -70,17 +82,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BaseCallback<RowItem> accountSelectedCallback;
     private BaseCallback<RowItem> recentSelectedCallback;
     private BaseCallback<DirectItem> directMessageSelectedCallback;
-    private BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback;
+    private Toolbar toolbar;
+    private AppBarLayout mAppBarLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setTitle("");
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.main_title));
         setSupportActionBar(toolbar);
+        mAppBarLayout=findViewById(R.id.mAppBarLayout);
+        mAppBarLayout.setElevation(0);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.colorMainBg));
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -95,19 +122,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         directMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         initAnimations();
         initAdapters();
-        freshInstallDataLoadedToRealmCallback = new BaseCallback<Boolean>() {
-            @Override
-            public void onResponse(Boolean object) {
-                presenter.fetchData();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-        DataManager.getInstance().setFreshInstallCallback(freshInstallDataLoadedToRealmCallback);
+        initScrollViewListener();
         presenter = new MainPresenterImp(this);
+    }
+
+    private void initScrollViewListener() {
+        scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if(scrollView.canScrollVertically(-1)){
+                    setToolbarElevation(4);
+                }else{
+                    setToolbarElevation(0);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void setToolbarElevation(float height){
+        mAppBarLayout.setElevation(DpUtil.pxFromDp(this, height));
     }
 
     @Override
@@ -204,7 +238,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.main, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchItem = menu.findItem(R.id.app_bar_search);
-        BackAwareSearchView searchView = (BackAwareSearchView) searchItem.getActionView();
+        Drawable drawable = searchItem.getIcon();
+        if(drawable != null) {
+            drawable.mutate();
+            drawable.setColorFilter(getResources().getColor(R.color.colorPrimaryLight), PorterDuff.Mode.SRC_ATOP);
+        }        BackAwareSearchView searchView = (BackAwareSearchView) searchItem.getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         initSearchView(searchView);
         return true;

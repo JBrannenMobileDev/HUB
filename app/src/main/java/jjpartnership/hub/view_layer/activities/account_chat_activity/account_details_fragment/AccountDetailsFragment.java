@@ -11,6 +11,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     @BindView(R.id.account_details_address_tv)TextView addressTv;
     @BindView(R.id.account_details_industries_tv)TextView industriesTv;
     @BindView(R.id.assigned_agents_recycler_view)RecyclerView agentsRecycler;
+    @BindView(R.id.select_all_checkbox)CheckBox selectAllCheckBox;
     @BindView(R.id.agents_group_chat_tv)TextView sendGroupChat;
 
     private AssignedAgentsRecyclerAdapter agentsAdapter;
@@ -149,6 +152,15 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     @OnClick(R.id.agents_group_chat_tv)
     public void onAgentsGroupChatClicked(){
         presenter.onNewGroupChatClicked();
+    }
+
+    @OnClick(R.id.select_all_checkbox)
+    public void onSelectAllCeckBoxClicked(){
+        if(selectAllCheckBox.isChecked()){
+            agentsAdapter.checkAllAgents();
+        }else{
+            agentsAdapter.uncheckAllAgents();
+        }
     }
 
     @Override

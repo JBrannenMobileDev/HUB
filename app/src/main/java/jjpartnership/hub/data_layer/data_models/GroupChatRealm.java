@@ -15,6 +15,7 @@ import io.realm.annotations.PrimaryKey;
 public class GroupChatRealm extends RealmObject{
     @PrimaryKey
     private String chatId;
+    private String groupName;
     private RealmList<String> userIds;
     private MessageRealm mostRecentMessage;
     private Boolean newChat;
@@ -35,6 +36,7 @@ public class GroupChatRealm extends RealmObject{
         this.messageThreadId = chat.getMessageThreadId();
         this.customerRequestIds = createCustomerRequsts(chat.getCustomerRequestIds());
         this.newChat = chat.isNewChat();
+        this.groupName = chat.getGroupName();
     }
 
     private RealmList<String> createCustomerRequsts(Map<String, String> requests){
@@ -72,6 +74,14 @@ public class GroupChatRealm extends RealmObject{
         }else{
             return new RealmList<>();
         }
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public Boolean isNewChat() {

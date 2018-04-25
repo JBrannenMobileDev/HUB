@@ -144,19 +144,39 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp">
 
                 <TextView
                     android:id="@+id/textView65"
                     android:layout_width="wrap_content"
-                    android:layout_height="24dp"
-                    android:layout_marginBottom="16dp"
-                    android:layout_marginTop="32dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginLeft="8dp"
                     android:gravity="center_vertical"
                     android:text="Assigned Sales Agents"
                     android:textColor="@color/colorPrimaryLight"
                     android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/select_all_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="62dp"
+                    android:layout_marginTop="42dp"
+                    android:gravity="center_vertical"
+                    android:text="Select All"
+                    android:textColor="@color/colorPrimaryLight" />
+
+                <CheckBox
+                    android:id="@+id/select_all_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginTop="36dp" />
 
             </FrameLayout>
 
@@ -175,7 +195,7 @@
                     android:id="@+id/assigned_agents_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="48dp"
+                    android:layout_marginBottom="49dp"
                     android:nestedScrollingEnabled="false">
 
                 </android.support.v7.widget.RecyclerView>
@@ -198,7 +218,7 @@
                     android:background="@drawable/rounded_rectangle_orange_stroke"
                     android:clickable="true"
                     android:gravity="center_vertical"
-                    android:text="NEW GROUP MESSAGE"
+                    android:text="NEW GROUP CHAT"
                     android:textAlignment="center"
                     android:textColor="@color/grey_text"
                     android:textStyle="bold" />

@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class GroupChat {
     private String chatId;
+    private String groupName;
     private Map<String, String> userIds;
     private Message mostRecentMessage;
     private long messageCreatedTime;
@@ -23,7 +24,8 @@ public class GroupChat {
     }
 
     public GroupChat(String chatId, Map<String, String> userIds, Message messages, long messageCreatedTime,
-                     List<String> currentlyTypingUserNames, String messageThreadId, Map<String, String> customerRequestIds, Boolean newChat) {
+                     List<String> currentlyTypingUserNames, String messageThreadId, Map<String, String> customerRequestIds,
+                     Boolean newChat, String groupName) {
         this.chatId = chatId;
         this.userIds = userIds;
         this.mostRecentMessage = messages;
@@ -32,6 +34,7 @@ public class GroupChat {
         this.messageThreadId = messageThreadId;
         this.customerRequestIds = customerRequestIds;
         this.newChat = newChat;
+        this.groupName = groupName;
     }
 
     public GroupChat(GroupChatRealm realm){
@@ -43,6 +46,7 @@ public class GroupChat {
         this.messageThreadId = realm.getMessageThreadId();
         this.customerRequestIds = createMapRealm(realm.getCustomerRequests());
         this.newChat = realm.isNewChat();
+        this.groupName = realm.getGroupName();
     }
 
     private Map<String, String> createMapRealm(List<String> userIds) {
@@ -51,6 +55,14 @@ public class GroupChat {
             uidMap.put(uid, uid);
         }
         return uidMap;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public Boolean isNewChat() {
