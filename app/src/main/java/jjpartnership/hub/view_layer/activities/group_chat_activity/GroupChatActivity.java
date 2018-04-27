@@ -32,6 +32,7 @@ import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
 import jjpartnership.hub.utils.DpUtil;
+import jjpartnership.hub.view_layer.activities.account_chat_activity.ChatRecyclerAdapter;
 import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentRecyclerAdapter;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessagePresenter;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessagePresenterImp;
@@ -52,7 +53,7 @@ public class GroupChatActivity extends AppCompatActivity implements GroupChatVie
 
     private GroupChatPresenter presenter;
     private AdjustableScrollSpeedLayoutManager layoutManager;
-    private SalesAgentRecyclerAdapter adapter;
+    private ChatRecyclerAdapter adapter;
     private BaseCallback<MessageRealm> messageSelectedCallback;
 
     @Override
@@ -273,7 +274,7 @@ public class GroupChatActivity extends AppCompatActivity implements GroupChatVie
             emptyStateMessage.setVisibility(View.VISIBLE);
         }
         if (adapter == null) {
-            adapter = new SalesAgentRecyclerAdapter(getApplicationContext(), messagesRealm,  messageSelectedCallback, usersColors);
+            adapter = new ChatRecyclerAdapter(getApplicationContext(), messagesRealm,  messageSelectedCallback, usersColors);
             chatRecycler.setAdapter(adapter);
         }
         adapter.notifyDataSetChanged();

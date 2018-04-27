@@ -31,13 +31,10 @@ import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
-        BackAwareAutofillMultiLineEditText.BackPressedListener, CustomerRequestsFragment.OnFragmentInteractionListener,
+        CustomerRequestsFragment.OnFragmentInteractionListener,
         AccountChatView, AccountDetailsFragment.OnAccountDetailsInteractionListener{
     @BindView(R.id.pager)ViewPager pager;
     @BindView(R.id.tabs)TabLayout tabLayout;
-    @BindView(R.id.send_image_view)ImageView sendImage;
-    @BindView(R.id.user_input_layout)FrameLayout userInputLayout;
-    @BindView(R.id.user_message_sales_team_et)BackAwareAutofillMultiLineEditText userInputSalesTeam;
 
     private ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
     private String accountId;
@@ -66,7 +63,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         customerRequestsFragment.setArguments(bundle);
         accountDetailsFragment.setArguments(bundle);
         adapter.addFragment(accountDetailsFragment, "Details");
-        adapter.addFragment(salesAgentFragment, "Sales Team Chat");
+        adapter.addFragment(salesAgentFragment, "Sales Team Chats");
         adapter.addFragment(customerRequestsFragment, "Customer Requests");
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(2);
@@ -85,42 +82,10 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
     @OnClick(R.id.send_image_view)
     public void onSendClicked(){
-        if(userInputSalesTeam.isShown()){
-            salesAgentFragment.onSendMessageClicked();
-        }
+
     }
 
     private void initListeners() {
-        userInputSalesTeam.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-
-                return false;
-            }
-        });
-
-        userInputSalesTeam.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length() > 0){
-                    setSendImageColor(colorOrange);
-                }else{
-                    setSendImageColor(colorGrey);
-                }
-                salesAgentFragment.onUserInputChanged(charSequence);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
         pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -129,7 +94,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
             @Override
             public void onPageSelected(int position) {
-                setEditTextVisible(position);
+
             }
 
             @Override
@@ -137,56 +102,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
             }
         });
-
-        userInputSalesTeam.setBackPressedListener(this);
-    }
-
-    private void setEditTextVisible(int position) {
-        switch(position){
-            case 0:
-                hideKeyboard();
-                animateHideUserInputLayout();
-                break;
-            case 1:
-                if(!userInputLayout.isShown()) animateShowUserInputLayout();
-                hideKeyboard();
-                userInputSalesTeam.setVisibility(View.VISIBLE);
-                if (userInputSalesTeam.getText().length() > 0) {
-                    setSendImageColor(colorOrange);
-                } else {
-                    setSendImageColor(colorGrey);
-                }
-                break;
-            case 2:
-                hideKeyboard();
-                userInputLayout.setVisibility(View.GONE);
-                break;
-        }
-    }
-
-    private void animateShowUserInputLayout(){
-        userInputLayout.setVisibility(View.VISIBLE);
-    }
-
-    private void animateHideUserInputLayout(){
-        userInputLayout.setVisibility(View.GONE);
-    }
-
-    private void setSendImageColor(int color){
-        sendImage.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-    }
-
-    @Override
-    public void onImeBack(BackAwareAutofillMultiLineEditText editText) {
-
-    }
-
-    private void hideKeyboard(){
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     @Override
@@ -202,11 +117,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
     public void finish(){
         super.finish();
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
-    }
-
-    @Override
-    public void resetUserInputSales() {
-        userInputSalesTeam.setText("");
     }
 
     @Override

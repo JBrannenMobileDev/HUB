@@ -11,7 +11,9 @@ import java.util.Map;
 
 public class GroupChat {
     private String chatId;
+    private String accountId;
     private String groupName;
+    private String groupCreatorUid;
     private Map<String, String> userIds;
     private Message mostRecentMessage;
     private long messageCreatedTime;
@@ -21,20 +23,6 @@ public class GroupChat {
     private List<String> currentlyTypingUserNames;
 
     public GroupChat() {
-    }
-
-    public GroupChat(String chatId, Map<String, String> userIds, Message messages, long messageCreatedTime,
-                     List<String> currentlyTypingUserNames, String messageThreadId, Map<String, String> customerRequestIds,
-                     Boolean newChat, String groupName) {
-        this.chatId = chatId;
-        this.userIds = userIds;
-        this.mostRecentMessage = messages;
-        this.messageCreatedTime = messageCreatedTime;
-        this.currentlyTypingUserNames = currentlyTypingUserNames;
-        this.messageThreadId = messageThreadId;
-        this.customerRequestIds = customerRequestIds;
-        this.newChat = newChat;
-        this.groupName = groupName;
     }
 
     public GroupChat(GroupChatRealm realm){
@@ -47,6 +35,8 @@ public class GroupChat {
         this.customerRequestIds = createMapRealm(realm.getCustomerRequests());
         this.newChat = realm.isNewChat();
         this.groupName = realm.getGroupName();
+        this.groupCreatorUid = realm.getGroupCreatorUid();
+        this.accountId = realm.getAccountId();
     }
 
     private Map<String, String> createMapRealm(List<String> userIds) {
@@ -57,8 +47,24 @@ public class GroupChat {
         return uidMap;
     }
 
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+
     public String getGroupName() {
         return groupName;
+    }
+
+    public String getGroupCreatorUid() {
+        return groupCreatorUid;
+    }
+
+    public void setGroupCreatorUid(String groupCreatorUid) {
+        this.groupCreatorUid = groupCreatorUid;
     }
 
     public void setGroupName(String groupName) {

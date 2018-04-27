@@ -1341,11 +1341,12 @@ public class FirebaseManager {
 
     }
 
-    public GroupChat createNewGroupChat(List<String> memberIds, String accountId) {
+    public GroupChat createNewGroupChat(List<String> memberIds, String accountId, String creatorUid) {
         DatabaseReference newGroupChatRef = groupChatsReference.push();
         GroupChat groupChat = new GroupChat();
         groupChat.setChatId(newGroupChatRef.getKey());
         groupChat.setUserIds(createMap(memberIds));
+        groupChat.setGroupCreatorUid(creatorUid);
 
         DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
         MessageThread thread = new MessageThread();

@@ -5,8 +5,6 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agen
  */
 
 public interface SalesAgentPresenter {
-    void onUserInputChanged(String input);
-    void onSendMessageClicked();
     void onDestroy();
     void onStop();
 }
