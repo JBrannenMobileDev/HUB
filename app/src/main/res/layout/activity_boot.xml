@@ -4,46 +4,46 @@
     android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     android:orientation="vertical"
     android:weightSum="4">
+
+    <ImageView
+        android:id="@+id/imageView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:fitsSystemWindows="false"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/boot_bg_image_small" />
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="false"
+        android:cropToPadding="false"
+        android:fitsSystemWindows="false"
+        android:scaleType="centerCrop"
+        app:srcCompat="@drawable/image_gradient" />
 
     <FrameLayout
         android:id="@+id/loading_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
         android:elevation="2dp">
 
         <ImageView
+            android:id="@+id/imageView6"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_marginBottom="60dp"
-            android:rotation="90"
-            android:tint="@color/hub_logo_color"
-            app:srcCompat="@drawable/hub_icon" />
+            android:adjustViewBounds="false"
+            android:cropToPadding="false"
+            android:fitsSystemWindows="false"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/boot_bg_image_small" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="100dp"
-            android:gravity="center_vertical"
-            android:text="ClickField"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="60dp"
-            android:textStyle="bold" />
     </FrameLayout>
-
-    <ImageView
-        android:id="@+id/hub_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:rotation="90"
-        android:tint="@color/hub_logo_color"
-        app:srcCompat="@drawable/hub_icon" />
 
     <TextView
         android:id="@+id/boot_verification_email"
@@ -64,6 +64,10 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="87dp"
         android:capitalize="characters"
+        android:shadowColor="@color/colorPrimaryDark"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="3"
         android:text="ClickField"
         android:textColor="@android:color/background_light"
         android:textSize="56dp"
@@ -83,10 +87,12 @@
             android:id="@+id/boot_title_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
             android:text="Create Account"
+            android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -94,13 +100,16 @@
         <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
             android:id="@+id/field_email"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginBottom="24dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:background="@drawable/rounded_rectangle_user_input_bg"
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
-            android:textColor="@android:color/background_light" />
+            android:paddingLeft="8dp"
+            android:textColor="@color/grey_text"
+            android:textColorHint="@color/colorPrimaryMediumLight" />
 
         <TextView
             android:id="@+id/password_requirements_tv"
@@ -116,12 +125,16 @@
         <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
             android:id="@+id/field_password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:background="@drawable/rounded_rectangle_user_input_bg"
             android:hint="@string/new_password"
+            app:passwordToggleTint="@color/grey_text"
             android:inputType="textPassword"
-            android:textColor="@android:color/background_light" />
+            android:paddingLeft="8dp"
+            android:textColor="@color/grey_text"
+            android:textColorHint="@color/colorPrimaryMediumLight" />
 
         <TextView
             android:id="@+id/account_type_tv"
@@ -130,15 +143,14 @@
             android:layout_marginLeft="26dp"
             android:layout_marginTop="24dp"
             android:text="Account Type:"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@color/white" />
 
         <LinearLayout
             android:id="@+id/account_type_layout"
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_marginLeft="24dp"
-            android:layout_marginRight="24dp"
-            android:background="@color/colorPrimary">
+            android:layout_marginRight="24dp">
 
             <TextView
                 android:id="@+id/sales_agent_tv"
@@ -213,7 +225,7 @@
             android:gravity="center_vertical|center_horizontal"
             android:text="Already have an account?    Sign In"
             android:textAlignment="center"
-            android:textColor="@android:color/background_light" />
+            android:textColor="@color/white" />
 
         <TextView
             android:id="@+id/show_create_account_view_tv"

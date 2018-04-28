@@ -59,6 +59,13 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
                 fragment.onChatsReceived(groupChats, getUsersColors(newGroupChats));
             }
         });
+        groupChat.addChangeListener(new RealmChangeListener<GroupChatRealm>() {
+            @Override
+            public void onChange(GroupChatRealm chatRealm) {
+                fragment.onAllAgentsChatReceived(chatRealm, accountName);
+            }
+        });
+        fragment.onAllAgentsChatReceived(groupChat, accountName);
         fragment.onChatsReceived(groupChats, getUsersColors(groupChats));
     }
 

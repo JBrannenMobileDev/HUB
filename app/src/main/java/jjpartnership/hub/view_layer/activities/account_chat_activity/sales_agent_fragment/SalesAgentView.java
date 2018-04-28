@@ -12,4 +12,5 @@ import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 
 public interface SalesAgentView {
     void onChatsReceived(RealmResults<GroupChatRealm> groupChats, HashMap<String, Long> usersColors);
+    void onAllAgentsChatReceived(GroupChatRealm groupChat, String accountName);
 }

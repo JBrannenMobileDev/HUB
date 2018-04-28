@@ -2,7 +2,6 @@ package jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agen
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,11 +26,14 @@ import jjpartnership.hub.utils.BaseCallback;
  */
 public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     @BindView(R.id.group_chats_recycler_view)RecyclerView chatsRecycler;
+    @BindView(R.id.all_agents_group_chats_recycler_view)RecyclerView allAgentsRecycler;
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
     private RecyclerView.LayoutManager layoutManager;
+    private RecyclerView.LayoutManager allAgentslayoutManager;
     private SalesAgentRecyclerAdapter adapter;
+    private SalesAgentRecyclerAdapter allAgentsAdapter;
     private BaseCallback<GroupChatRealm> chatSelectedCallback;
 
     public SalesAgentsFragment() {
@@ -46,7 +48,9 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         View v = inflater.inflate(R.layout.fragment_sales_agent_chats, container, false);
         ButterKnife.bind(this, v);
         layoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+        allAgentslayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
         chatsRecycler.setLayoutManager(layoutManager);
+        allAgentsRecycler.setLayoutManager(allAgentslayoutManager);
         initCallback();
         presenter = new SalesAgentPresenterImp(this, getArguments().getString("account_name"),
                 getArguments().getString("account_id"));
@@ -107,6 +111,14 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         chatsRecycler.setLayoutManager(layoutManager);
         chatsRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onAllAgentsChatReceived(GroupChatRealm groupChat, String accountName) {
+        allAgentsAdapter = new SalesAgentRecyclerAdapter(getActivity().getApplicationContext(), groupChat, chatSelectedCallback, accountName);
+        allAgentsRecycler.setLayoutManager(allAgentslayoutManager);
+        allAgentsRecycler.setAdapter(allAgentsAdapter);
+        allAgentsAdapter.notifyDataSetChanged();
     }
 
     public interface OnSalesChatFragmentInteractionListener {

@@ -37,14 +37,23 @@ import jjpartnership.hub.utils.UserPreferences;
 public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRecyclerAdapter.ViewHolder> {
     private Context context;
     private List<GroupChatRealm> dataModel;
+    private GroupChatRealm allAgentsChat;
     private HashMap<String, Long> userColorMap;
     private BaseCallback<GroupChatRealm> chatSelectedCallback;
+    private String accountName;
 
     public SalesAgentRecyclerAdapter(@NonNull Context context, List<GroupChatRealm> dataModel, BaseCallback<GroupChatRealm> chatSelectedCallback, HashMap<String, Long> userColorMap) {
         this.context = context;
         this.dataModel = dataModel;
         this.chatSelectedCallback = chatSelectedCallback;
         this.userColorMap = userColorMap;
+    }
+
+    public SalesAgentRecyclerAdapter(Context applicationContext, GroupChatRealm groupChat, BaseCallback<GroupChatRealm> chatSelectedCallback, String accountName) {
+        this.context = applicationContext;
+        this.allAgentsChat = groupChat;
+        this.chatSelectedCallback = chatSelectedCallback;
+        this.accountName = accountName;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -75,16 +84,26 @@ public class SalesAgentRecyclerAdapter extends RecyclerView.Adapter<SalesAgentRe
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.groupName.setText(dataModel.get(position).getGroupName());
-        holder.messageDateTime.setText(createFormattedTime(dataModel.get(position).getMostRecentMessage().getCreatedDate()));
-        holder.iconTv.setText(String.valueOf(dataModel.get(position).getGroupName().charAt(0)));
-        holder.messageContent.setText(dataModel.get(position).getMostRecentMessage().getMessageContent());
-        holder.iconTv.setTextColor(UserColorUtil.getUserColor(userColorMap.get(dataModel.get(position).getGroupCreatorUid()).intValue()));
+        GroupChatRealm chatToUse;
+        if(dataModel == null){
+            chatToUse = allAgentsChat;
+            holder.iconTv.setText(String.valueOf(accountName.charAt(0)));
+            holder.groupName.setText("All Sales Agents");
+        }else{
+            chatToUse = dataModel.get(position);
+            holder.iconTv.setText(String.valueOf(chatToUse.getGroupName().charAt(0)));
+            holder.groupName.setText(chatToUse.getGroupName());
+        }
+        holder.messageDateTime.setText(createFormattedTime(chatToUse.getMostRecentMessage().getCreatedDate()));
+        holder.messageContent.setText(chatToUse.getMostRecentMessage().getMessageContent());
+        if(userColorMap != null){
+            holder.iconTv.setTextColor(UserColorUtil.getUserColor(userColorMap.get(chatToUse.getGroupCreatorUid()).intValue()));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return dataModel.size();
+        return dataModel != null ? dataModel.size() : 1;
     }
 
     private String createFormattedTime(long createdDate) {
