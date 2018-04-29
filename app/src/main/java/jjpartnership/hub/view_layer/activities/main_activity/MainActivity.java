@@ -1,11 +1,8 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
-import android.animation.ObjectAnimator;
-import android.animation.StateListAnimator;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -43,6 +40,7 @@ import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
@@ -52,7 +50,7 @@ import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity;
+import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
@@ -66,11 +64,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.recent_title_tv)TextView recentTitle;
     @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
     @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesRecyclerView;
+    @BindView(R.id.group_messages_recycler_view)RecyclerView groupMessagesRecyclerView;
     @BindView(R.id.welcome_linear_layout)LinearLayout welcomeLayout;
     @BindView(R.id.welcome_message_tv)TextView welcomeMessage;
     @BindView(R.id.recent_empty_state_layout)LinearLayout recent_empty_layout;
     @BindView(R.id.accounts_empty_state_layout)LinearLayout accounts_empty_layout;
     @BindView(R.id.direc_messages_empty_state_layout)LinearLayout direct_messages_empty_state;
+    @BindView(R.id.group_messages_empty_state_layout)LinearLayout group_messages_empty_state;
     @BindView(R.id.main_scrollview)NestedScrollView scrollView;
 
     private boolean searchResultsVisible;
@@ -79,9 +79,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AccountRecyclerAdapter accountsAdapter;
     private RecentRecyclerAdapter recentRecyclerAdapter;
     private DirectMessageRecyclerAdapter directRecyclerAdapter;
+    private GroupMessagesRecyclerAdapter groupRecyclerAdapter;
     private BaseCallback<RowItem> accountSelectedCallback;
     private BaseCallback<RowItem> recentSelectedCallback;
     private BaseCallback<DirectItem> directMessageSelectedCallback;
+    private BaseCallback<GroupChatRealm> groupMessageSelectedCallback;
     private Toolbar toolbar;
     private AppBarLayout mAppBarLayout;
 
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         accountsRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         recentRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         directMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        groupMessagesRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         initAnimations();
         initAdapters();
         initScrollViewListener();
@@ -204,10 +207,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         };
-//        accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<RowItem>()), accountSelectedCallback);
+
+        groupMessageSelectedCallback = new BaseCallback<GroupChatRealm>() {
+            @Override
+            public void onResponse(GroupChatRealm object) {
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
         recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
         directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
-//        accountsRecyclerView.setAdapter(accountsAdapter);
+        groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(),)
         recentRecyclerView.setAdapter(recentRecyclerAdapter);
         directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
     }

@@ -1,7 +1,6 @@
 package jjpartnership.hub.view_layer.activities.customer_request_chat_activity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -37,9 +36,7 @@ import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
 import jjpartnership.hub.utils.DpUtil;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.ChatRecyclerAdapter;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentRecyclerAdapter;
-import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
+import jjpartnership.hub.view_layer.activities.account_activity.ChatRecyclerAdapter;
 import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;

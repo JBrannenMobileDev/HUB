@@ -123,6 +123,25 @@ public class FirebaseManager {
             }
         };
 
+        final ValueEventListener userGroupChatsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                    GroupChat chat = dataSnapshot.getValue(GroupChat.class);
+                    if(chat != null) {
+                        groupChats.add(chat);
+                    }
+                    if(groupChats.size() == currentUser.getGroupChats().size()){
+                        thisUserAccountsReference = database.getReference("users").child(uid).child("accountIds");
+                        thisUserAccountsReference.addListenerForSingleValueEvent(userAccountsListener);
+                    }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadUserGroupChats:onCancelled", databaseError.toException());
+            }
+        };
+
         ValueEventListener userListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -130,9 +149,15 @@ public class FirebaseManager {
                 if(user != null) {
                     currentUser = user;
                     UserPreferences.getInstance().setUserType(user.getUserType());
-                    thisUserAccountsReference = database.getReference("users").child(uid).child("accountIds");
-                    thisUserAccountsReference.addListenerForSingleValueEvent(userAccountsListener);
                     DataManager.getInstance().updateRealmUser(currentUser);
+                    if(currentUser.getGroupChats() != null && currentUser.getGroupChats().size() > 0){
+                        for(String chatId : currentUser.getGroupChats().values()){
+                            groupChatsReference.child(chatId).addListenerForSingleValueEvent(userGroupChatsListener);
+                        }
+                    }else{
+                        thisUserAccountsReference = database.getReference("users").child(uid).child("accountIds");
+                        thisUserAccountsReference.addListenerForSingleValueEvent(userAccountsListener);
+                    }
                 }
             }
 
@@ -143,24 +168,6 @@ public class FirebaseManager {
         };
         thisUserReference = database.getReference("users").child(uid);
         thisUserReference.addListenerForSingleValueEvent(userListener);
-
-        ValueEventListener usersListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot postSnapshot : dataSnapshot.getChildren()){
-                    User user = postSnapshot.getValue(User.class);
-                    if(user != null) {
-                        updateOrCreateUserColor(user.getUserColor(), user.getUid());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-            }
-        };
-//        database.getReference("users").addListenerForSingleValueEvent(usersListener);
     }
 
     private void fetchAccounts(final List<String> accountIds) {
@@ -235,7 +242,9 @@ public class FirebaseManager {
     }
 
     private void getGroupChat(final List<Account> accountList) {
+        final int groupChatInitSize = groupChats.size();
         if(accountList.size() > 0) {
+
             for (Account account : accountList) {
                 ValueEventListener groupChatListener = new ValueEventListener() {
                     @Override
@@ -251,7 +260,7 @@ public class FirebaseManager {
                             }
                             groupChats.add(gChat);
                         }
-                        if (groupChats.size() == accounts.size()) {
+                        if ((groupChats.size() - groupChatInitSize) == accounts.size()) {
                             fetchUserColors(groupChats);
                         }
                     }
@@ -270,6 +279,7 @@ public class FirebaseManager {
     }
 
     private void getGroupChatsFromRequests(final List<CustomerRequest> requestList) {
+        final int initGroupChatSize = groupChats.size();
         if(requestList.size() > 0) {
             for (CustomerRequest request : requestList) {
                 ValueEventListener groupChatListener = new ValueEventListener() {
@@ -286,7 +296,7 @@ public class FirebaseManager {
                             }
                             groupChats.add(gChat);
                         }
-                        if (groupChats.size() == groupChats.size()) {
+                        if (initGroupChatSize + requestList.size() == groupChats.size()) {
                             DataManager.getInstance().updateRealmGroupChats(groupChats);
                             buildUiModels();
                         }
@@ -533,6 +543,11 @@ public class FirebaseManager {
 
         DataManager.getInstance().updateRealmMainModels(accountsModel, filterModel(recentModel), directModel);
         initChatMessagesListener(groupChats, directChats);
+        initGroupChatListener(groupChats, directChats);
+    }
+
+    private void initGroupChatListener(List<GroupChat> groupChatsLocal, List<DirectChat> directChatsLocal) {
+
     }
 
     private MainRecentModel filterModel(MainRecentModel recentModel) {
@@ -901,7 +916,7 @@ public class FirebaseManager {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
-        updateRelatedGroupChatWithUserId(newMessage);
+        chatMessagesReference.child(newMessage.getChatId()).child("message_thread").child(newMessage.getMessageThreadId()).setValue(newMessage);
     }
 
     public void createNewDirectMessage(Message newMessage) {
@@ -1341,12 +1356,14 @@ public class FirebaseManager {
 
     }
 
-    public GroupChat createNewGroupChat(List<String> memberIds, String accountId, String creatorUid) {
+    public GroupChat createNewGroupChat(List<String> memberIds, String accountId, String creatorUid, String groupName, String messageText) {
         DatabaseReference newGroupChatRef = groupChatsReference.push();
         GroupChat groupChat = new GroupChat();
         groupChat.setChatId(newGroupChatRef.getKey());
         groupChat.setUserIds(createMap(memberIds));
         groupChat.setGroupCreatorUid(creatorUid);
+        groupChat.setGroupName(groupName);
+        groupChat.setAccountId(accountId);
 
         DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
         MessageThread thread = new MessageThread();
@@ -1355,11 +1372,28 @@ public class FirebaseManager {
         database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
         groupChat.setMessageThreadId(thread.getMessageThreadId());
         groupChat.setNewChat(true);
+
+        Message message = new Message();
+        message.setChatId(groupChat.getChatId());
+        message.setCreatedByUid(creatorUid);
+        message.setCreatedDate(new Date().getTime());
+        message.setMessageContent(messageText);
+        List<String> readByUids = new ArrayList<>();
+        readByUids.add(creatorUid);
+        message.setReadByUids(readByUids);
+        message.setMessageThreadId(thread.getMessageThreadId());
+        UserRealm user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", creatorUid).findFirst();
+        message.setMessageOwnerName(user.getFirstName() + " " + user.getLastName());
+        groupChat.setMostRecentMessage(message);
+
+        createNewMessage(message);
         groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
+
 
         for(String id : memberIds){
             usersReference.child(id).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
         }
+        usersReference.child(creatorUid).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
 
         accountsReference.child(accountId).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
 

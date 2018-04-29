@@ -158,8 +158,8 @@ public class DataManager {
         realmManager.insertOrUpdateDirectChat(fbManager.createNewDirectChat(uid, toUid));
     }
 
-    public void createNewGroupChat(List<String> memberIds, String accountId, String creatorUid){
-        realmManager.insertOrUpdateGroupChat(fbManager.createNewGroupChat(memberIds, accountId, creatorUid));
+    public void createNewGroupChat(List<String> memberIds, String accountId, String creatorUid, String groupName, String message){
+        realmManager.insertOrUpdateGroupChat(fbManager.createNewGroupChat(memberIds, accountId, creatorUid, groupName, message));
     }
 
     public void insertOrUpdateDirectChat(DirectChatRealm directChat){

@@ -1,6 +1,5 @@
 package jjpartnership.hub.view_layer.activities.direct_message_activity;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -18,9 +17,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -35,8 +32,7 @@ import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
 import jjpartnership.hub.utils.DpUtil;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.ChatRecyclerAdapter;
-import jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentRecyclerAdapter;
+import jjpartnership.hub.view_layer.activities.account_activity.ChatRecyclerAdapter;
 import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;

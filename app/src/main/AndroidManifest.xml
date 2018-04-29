@@ -35,7 +35,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name=".view_layer.activities.account_chat_activity.AccountChatActivity"
+            android:name=".view_layer.activities.account_activity.AccountChatActivity"
             android:parentActivityName=".view_layer.activities.main_activity.MainActivity"
             android:screenOrientation="portrait" />
         <activity

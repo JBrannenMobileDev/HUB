@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryVeryLight"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="jjpartnership.hub.view_layer.activities.account_chat_activity.account_details_fragment.AccountDetailsFragment">
+    tools:context="jjpartnership.hub.view_layer.activities.account_activity.account_details_fragment.AccountDetailsFragment">
 
     <!-- TODO: Update blank fragment layout -->
 
@@ -218,7 +218,7 @@
                     android:background="@drawable/rounded_rectangle_orange_stroke"
                     android:clickable="true"
                     android:gravity="center_vertical"
-                    android:text="NEW GROUP CHAT"
+                    android:text="NEW GROUP MESSAGE"
                     android:textAlignment="center"
                     android:textColor="@color/grey_text"
                     android:textStyle="bold" />

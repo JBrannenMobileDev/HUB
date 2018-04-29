@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryVeryLight"
     android:orientation="vertical"
-    tools:context="jjpartnership.hub.view_layer.activities.account_chat_activity.AccountChatActivity">
+    tools:context="jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity">
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"

@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_marginBottom="64dp"
         android:background="@color/colorPrimaryVeryLight"
-        tools:context="jjpartnership.hub.view_layer.activities.account_chat_activity.sales_agent_fragment.SalesAgentsFragment">
+        tools:context="jjpartnership.hub.view_layer.activities.account_activity.sales_agent_fragment.SalesAgentsFragment">
 
         <!-- TODO: Update blank fragment layout -->
 
