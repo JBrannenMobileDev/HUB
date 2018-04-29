@@ -10,6 +10,7 @@ import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.FilterUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 
 /**
@@ -40,26 +41,16 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
         allAgentsChatId = account.getGroupChatSalesId();
         groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", allAgentsChatId).findFirst();
         resultGroups = realm.where(GroupChatRealm.class).equalTo("accountId", account.getAccountIdFire()).findAll();
-        filterOutRequestChats(resultGroups);
+        groupChats = FilterUtil.filterOutCustomerRequestGroups(resultGroups);
 
         resultGroups.addChangeListener(new RealmChangeListener<RealmResults<GroupChatRealm>>() {
             @Override
             public void onChange(RealmResults<GroupChatRealm> groupChatRealms) {
-                filterOutRequestChats(groupChatRealms);
+                groupChats = FilterUtil.filterOutCustomerRequestGroups(groupChatRealms);
                 fragment.onChatsReceived(groupChats, getUsersColors(groupChats));
             }
         });
         fragment.onChatsReceived(groupChats, getUsersColors(groupChats));
-    }
-
-    private void filterOutRequestChats(RealmResults<GroupChatRealm> groupChats){
-        RealmList<GroupChatRealm> filteredChats = new RealmList<>();
-        for(GroupChatRealm chat : groupChats){
-            if(chat.getCustomerRequestIds() == null || chat.getCustomerRequestIds().size() == 0) {
-                filteredChats.add(chat);
-            }
-        }
-        this.groupChats = filteredChats;
     }
 
     private HashMap<String, Long> getUsersColors(RealmList<GroupChatRealm> groupChats) {

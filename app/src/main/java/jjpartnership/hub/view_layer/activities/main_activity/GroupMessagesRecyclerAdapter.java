@@ -33,15 +33,13 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
     private Context context;
     private List<GroupChatRealm> dataModel;
     private GroupChatRealm allAgentsChat;
-    private HashMap<String, Long> userColorMap;
     private BaseCallback<GroupChatRealm> chatSelectedCallback;
     private String accountName;
 
-    public GroupMessagesRecyclerAdapter(@NonNull Context context, List<GroupChatRealm> dataModel, BaseCallback<GroupChatRealm> chatSelectedCallback, HashMap<String, Long> userColorMap) {
+    public GroupMessagesRecyclerAdapter(@NonNull Context context, List<GroupChatRealm> dataModel, BaseCallback<GroupChatRealm> chatSelectedCallback) {
         this.context = context;
         this.dataModel = dataModel;
         this.chatSelectedCallback = chatSelectedCallback;
-        this.userColorMap = userColorMap;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -74,7 +72,8 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
     public void onBindViewHolder(ViewHolder holder, int position) {
         GroupChatRealm chatToUse;
         chatToUse = dataModel.get(position);
-        AccountRealm groupAccount = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountId", chatToUse.getAccountId()).findFirst(); UserRealm messageUser = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", chatToUse.getMostRecentMessage().getUid()).findFirst();
+        AccountRealm groupAccount = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountIdFire", chatToUse.getAccountId()).findFirst();
+        UserRealm messageUser = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", chatToUse.getMostRecentMessage().getUid()).findFirst();
         CompanyRealm company = RealmUISingleton.getInstance().getRealmInstance().where(CompanyRealm.class).equalTo("companyId", groupAccount.getCompanyCustomerId()).findFirst();
         holder.iconTv.setText(String.valueOf(chatToUse.getGroupName().charAt(0)));
         holder.groupName.setText(chatToUse.getGroupName());

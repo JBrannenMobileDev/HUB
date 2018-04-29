@@ -2,12 +2,17 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
+import io.realm.RealmList;
 import io.realm.RealmModel;
+import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
+import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.FilterUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 
@@ -21,6 +26,7 @@ public class MainPresenterImp implements MainPresenter {
     private MainAccountsModel dataModel;
     private MainRecentModel recentModel;
     private MainDirectMessagesModel directModel;
+    private RealmList<GroupChatRealm> groupChats;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
@@ -69,6 +75,17 @@ public class MainPresenterImp implements MainPresenter {
         }else{
             activity.setWelcomeMessage(UserRealm.TYPE_CUSTOMER);
         }
+
+        RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
+        groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
+        allGroupChats.addChangeListener(new RealmChangeListener<RealmResults<GroupChatRealm>>() {
+            @Override
+            public void onChange(RealmResults<GroupChatRealm> groupChatRealms) {
+                groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(groupChatRealms);
+                activity.onGroupMessagesReceived(groupChats);
+            }
+        });
+        activity.onGroupMessagesReceived(groupChats);
     }
 
     @Override

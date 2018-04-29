@@ -32,6 +32,9 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -221,9 +224,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
         directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
-        groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(),)
+        groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), new ArrayList<GroupChatRealm>(), groupMessageSelectedCallback);
         recentRecyclerView.setAdapter(recentRecyclerAdapter);
         directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
+        groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
     }
 
     @Override
@@ -421,6 +425,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), dataModel, directMessageSelectedCallback);
             directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
             directRecyclerAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onGroupMessagesReceived(List<GroupChatRealm> groupChats){
+        if(groupChats != null && groupChats.size() > 0){
+            group_messages_empty_state.setVisibility(View.GONE);
+            groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), groupChats, groupMessageSelectedCallback);
+            groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
+            groupRecyclerAdapter.notifyDataSetChanged();
         }
     }
 
