@@ -29,6 +29,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -41,6 +42,7 @@ import butterknife.OnClick;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
@@ -56,6 +58,7 @@ import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
+import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
@@ -176,10 +179,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(RowItem rowItem) {
                 if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
-                    Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
-                    accountChatIntent.putExtra("account_id", rowItem.getAccountId());
-                    accountChatIntent.putExtra("account_name", rowItem.getAccountName());
-                    startActivity(accountChatIntent);
+                    AccountRealm account = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountIdFire", rowItem.getAccountId()).findFirst();
+                    if(account != null) {
+                        Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
+                        groupChatIntent.putExtra("chatId", account.getGroupChatSalesId());
+                        startActivity(groupChatIntent);
+                    }else{
+                        Toast.makeText(MainActivity.this, "Oops! Something went wrong.", Toast.LENGTH_SHORT).show();
+                    }
                 }else{
                     Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
                     DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();
@@ -213,8 +220,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         groupMessageSelectedCallback = new BaseCallback<GroupChatRealm>() {
             @Override
-            public void onResponse(GroupChatRealm object) {
-
+            public void onResponse(GroupChatRealm chat) {
+                Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
+                groupChatIntent.putExtra("chatId", chat.getChatId());
+                startActivity(groupChatIntent);
             }
 
             @Override

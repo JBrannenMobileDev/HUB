@@ -12,7 +12,7 @@ import jjpartnership.hub.R;
 
 public class UserColorUtil {
     public static int getRandomUserColorId(){
-        return new Random().nextInt(20) + 1;
+        return new Random().nextInt(17) + 1;
     }
     public static int getUserColor(int colorId){
         switch(colorId){
@@ -46,16 +46,6 @@ public class UserColorUtil {
                 return R.color.user_color_14;
             case 15:
                 return R.color.user_color_15;
-            case 16:
-                return R.color.user_color_16;
-            case 17:
-                return R.color.user_color_17;
-            case 18:
-                return R.color.user_color_18;
-            case 19:
-                return R.color.user_color_19;
-            case 20:
-                return R.color.user_color_20;
         }
         return R.color.colorAccent;
     }
@@ -92,16 +82,6 @@ public class UserColorUtil {
                 return R.color.user_color_14_dark;
             case 15:
                 return R.color.user_color_15_dark;
-            case 16:
-                return R.color.user_color_16_dark;
-            case 17:
-                return R.color.user_color_17_dark;
-            case 18:
-                return R.color.user_color_18_dark;
-            case 19:
-                return R.color.user_color_19_dark;
-            case 20:
-                return R.color.user_color_20_dark;
         }
         return R.color.colorAccent;
     }

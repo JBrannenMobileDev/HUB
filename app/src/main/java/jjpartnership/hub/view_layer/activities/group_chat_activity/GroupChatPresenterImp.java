@@ -126,7 +126,7 @@ public class GroupChatPresenterImp implements GroupChatPresenter{
             newMessage.setSavedToFirebase(false);
             newMessage.setMessageOwnerName(user.getFirstName() + " " + user.getLastName());
             newMessage.setMessageThreadId(groupChat.getMessageThreadId());
-            DataManager.getInstance().createNewDirectMessage(newMessage);
+            DataManager.getInstance().createNewMessage(newMessage);
         }
     }
 

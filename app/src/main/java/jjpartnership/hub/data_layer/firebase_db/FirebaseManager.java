@@ -527,6 +527,7 @@ public class FirebaseManager {
             newRowItem.setNewMessage(item.isNewMessage());
             newRowItem.setMessageContent(item.getMessageContent());
             newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
+            newRowItem.setMessageOwnerName(item.getMessageOwnerName());
             sortedByMostRecent.add(newRowItem);
         }
 
@@ -534,6 +535,7 @@ public class FirebaseManager {
         Collections.reverse(sortedByMostRecent);
         MainRecentModel recentModel = new MainRecentModel();
         RealmList<RowItem> recentRowItems = new RealmList<>();
+
         if(sortedByMostRecent.size() > 3) {
             recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
         }else{
@@ -551,10 +553,13 @@ public class FirebaseManager {
     }
 
     private MainRecentModel filterModel(MainRecentModel recentModel) {
+        String currentUserName = currentUser.getFirstName() + " " + currentUser.getLastName();
         RealmList<RowItem> filteredRowItems = new RealmList<>();
         for(RowItem item : recentModel.getRowItems()){
             if(item.getMessageCreatedAtTime() > 0){
-                filteredRowItems.add(item);
+                if(!item.getMessageOwnerName().equals(currentUserName)){
+                    filteredRowItems.add(item);
+                }
             }
         }
         recentModel.setRowItems(filteredRowItems);
@@ -700,7 +705,7 @@ public class FirebaseManager {
                     if(message != null) {
                         MessageRealm localMessage = RealmUISingleton.getInstance().getRealmInstance().
                                 where(MessageRealm.class).equalTo("messageId", message.getMessageId()).findFirst();
-                        if(localMessage != null && localMessage.getReadByUids().size() == message.getReadByUids().size()) {
+                        if(localMessage != null && localMessage.getReadByUids().size() == message.getReadByUids().size() && localMessage.isSavedToFirebase()) {
                             //Do nothing
                         }else{
                             message.setSavedToFirebase(true);
@@ -893,6 +898,7 @@ public class FirebaseManager {
                 newRowItem.setNewMessage(item.isNewMessage());
                 newRowItem.setMessageContent(item.getMessageContent());
                 newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
+                newRowItem.setMessageOwnerName(item.getMessageOwnerName());
                 sortedByMostRecent.add(newRowItem);
             }
 
@@ -923,6 +929,7 @@ public class FirebaseManager {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
+        chatMessagesReference.child(newMessage.getChatId()).child("message_thread").child(newMessage.getMessageThreadId()).setValue(newMessage);
         DirectChatRealm dChatRealm = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", newMessage.getChatId()).findFirst();
         DirectChatRealm copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(dChatRealm);
         copy.setMessageCreatedTime(newMessage.getCreatedDate());

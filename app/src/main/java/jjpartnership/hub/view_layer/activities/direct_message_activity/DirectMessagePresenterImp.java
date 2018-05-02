@@ -37,11 +37,14 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     private Runnable runnable;
     private MessageThreadRealm messageThread;
     private RealmResults<MessageRealm> messages;
+    private UserRealm userCurrent;
 
     public DirectMessagePresenterImp(DirectMessageView activity, String uid, String toUid) {
         this.activity = activity;
         this.toUid = toUid;
         this.realm = RealmUISingleton.getInstance().getRealmInstance();
+        userCurrent = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
+
         this.uid = uid;
         runnable = new Runnable() {
             @Override
@@ -109,7 +112,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
         String nameToDisplay = null;
         if(currentlyTypingUserNames != null && currentlyTypingUserNames.size() > 0){
             for(int i = currentlyTypingUserNames.size()-1; i >= 0; i--){
-                if(!currentlyTypingUserNames.get(i).equals(user.getFirstName() + " " + user.getLastName())){
+                if(!currentlyTypingUserNames.get(i).equals(userCurrent.getFirstName() + " " + userCurrent.getLastName())){
                     return currentlyTypingUserNames.get(i);
                 }
             }
@@ -120,7 +123,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     @Override
     public void onSendMessageClicked() {
         DataManager.getInstance().updateFirebaseMessageThreadTyping(directChat.getChatId(),
-                directChat.getMessageThreadId(), user.getFirstName() + " " + user.getLastName(), false);
+                directChat.getMessageThreadId(), userCurrent.getFirstName() + " " + userCurrent.getLastName(), false);
         if(userInput != null && !userInput.isEmpty()){
             Message newMessage = new Message();
             List<String> readByUids = new ArrayList<>();
@@ -131,7 +134,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
             newMessage.setCreatedDate(new Date().getTime());
             newMessage.setReadByUids(readByUids);
             newMessage.setSavedToFirebase(false);
-            newMessage.setMessageOwnerName(user.getFirstName() + " " + user.getLastName());
+            newMessage.setMessageOwnerName(userCurrent.getFirstName() + " " + userCurrent.getLastName());
             newMessage.setMessageThreadId(directChat.getMessageThreadId());
             DataManager.getInstance().createNewDirectMessage(newMessage);
         }
@@ -140,7 +143,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     private void updateCurrentlyTypingFirebase() {
         if(handler != null) handler.removeCallbacks(runnable);
         DataManager.getInstance().updateFirebaseMessageThreadTyping(directChat.getChatId(),
-                directChat.getMessageThreadId(), user.getFirstName() + " " + user.getLastName(), true);
+                directChat.getMessageThreadId(), userCurrent.getFirstName() + " " + userCurrent.getLastName(), true);
         handler = new Handler();
         handler.postDelayed(runnable, 3000);
     }

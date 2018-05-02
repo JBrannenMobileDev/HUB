@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/accounts_item_frame_layout"
     android:layout_width="match_parent"
-    android:layout_height="56dp"
+    android:layout_height="54dp"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView

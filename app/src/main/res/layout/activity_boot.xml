@@ -106,7 +106,7 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/rounded_rectangle_user_input_bg"
             android:hint="@string/hint_email"
-            android:inputType="textEmailAddress"
+            android:inputType="textAutoComplete|textEmailAddress"
             android:paddingLeft="8dp"
             android:textColor="@color/grey_text"
             android:textColorHint="@color/colorPrimaryMediumLight" />

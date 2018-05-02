@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/accounts_item_frame_layout"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
+    android:layout_height="54dp"
     android:background="?android:attr/selectableItemBackground">
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="64dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="14dp"
+        android:layout_marginTop="9dp"
         android:orientation="horizontal">
 
         <TextView
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="9dp"
         android:layout_marginLeft="64dp"
         android:layout_marginRight="16dp"
         android:orientation="horizontal">
@@ -77,7 +77,7 @@
     <FrameLayout
         android:id="@+id/direct_message_frame_layout"
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="54dp"
         android:background="@color/white"
         android:visibility="gone">
 
@@ -98,7 +98,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="64dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="9dp"
             android:orientation="horizontal">
 
             <TextView
@@ -124,7 +124,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="14dp"
+            android:layout_marginBottom="9dp"
             android:layout_marginLeft="64dp"
             android:layout_marginRight="16dp"
             android:orientation="horizontal">

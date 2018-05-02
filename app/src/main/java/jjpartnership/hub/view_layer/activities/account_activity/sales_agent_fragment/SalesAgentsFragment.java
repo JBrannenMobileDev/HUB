@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.account_activity.sales_agent_fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,7 +93,9 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         chatSelectedCallback = new BaseCallback<GroupChatRealm>() {
             @Override
             public void onResponse(GroupChatRealm selectedChat) {
-
+                Intent groupChatIntent = new Intent(getActivity().getApplicationContext(), GroupChatActivity.class);
+                groupChatIntent.putExtra("chatId", selectedChat.getChatId());
+                startActivity(groupChatIntent);
             }
 
             @Override

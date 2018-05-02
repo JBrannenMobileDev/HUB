@@ -33,6 +33,7 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     private Realm realm;
     private CustomerRequestRealm request;
     private UserRealm requester;
+    private UserRealm currentUser;
     private GroupChatRealm groupChat;
     private String userInput;
     private Handler handler;
@@ -58,6 +59,7 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     private void fetchData() {
         request = realm.where(CustomerRequestRealm.class).equalTo("requestId", requestId).findFirst();
         requester = realm.where(UserRealm.class).equalTo("uid", request.getCustomerUid()).findFirst();
+        currentUser = realm.where(UserRealm.class).equalTo("uid", currentUserId).findFirst();
         if(requester != null) {
             activity.setActivityTitle(requester.getFirstName() + " " + requester.getLastName());
         }
@@ -107,7 +109,7 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
         String nameToDisplay = null;
         if(currentlyTypingUserNames != null && currentlyTypingUserNames.size() > 0){
             for(int i = currentlyTypingUserNames.size()-1; i >= 0; i--){
-                if(!currentlyTypingUserNames.get(i).equals(requester.getFirstName() + " " + requester.getLastName())){
+                if(!currentlyTypingUserNames.get(i).equals(currentUser.getFirstName() + " " + currentUser.getLastName())){
                     return currentlyTypingUserNames.get(i);
                 }
             }
@@ -118,7 +120,7 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     @Override
     public void onSendMessageClicked() {
         DataManager.getInstance().updateFirebaseMessageThreadTyping(groupChat.getChatId(),
-                groupChat.getMessageThreadId(), requester.getFirstName() + " " + requester.getLastName(), false);
+                groupChat.getMessageThreadId(), currentUser.getFirstName() + " " + currentUser.getLastName(), false);
         if(userInput != null && !userInput.isEmpty()){
             Message newMessage = new Message();
             List<String> readByUids = new ArrayList<>();
@@ -138,7 +140,7 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     private void updateCurrentlyTypingFirebase() {
         if(handler != null) handler.removeCallbacks(runnable);
         DataManager.getInstance().updateFirebaseMessageThreadTyping(groupChat.getChatId(),
-                groupChat.getMessageThreadId(), requester.getFirstName() + " " + requester.getLastName(), true);
+                groupChat.getMessageThreadId(), currentUser.getFirstName() + " " + currentUser.getLastName(), true);
         handler = new Handler();
         handler.postDelayed(runnable, 3000);
     }
