@@ -15,7 +15,7 @@
         android:cropToPadding="false"
         android:fitsSystemWindows="false"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/boot_bg_image_small" />
+        app:srcCompat="@drawable/boot_background_image_resized_1k" />
 
     <ImageView
         android:id="@+id/imageView9"
@@ -41,7 +41,22 @@
             android:cropToPadding="false"
             android:fitsSystemWindows="false"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/boot_bg_image_small" />
+            app:srcCompat="@drawable/boot_background_image_resized_1k" />
+
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@color/black_overlay" />
+
+        <ImageView
+            android:id="@+id/imageView7"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:elevation="4dp"
+            android:tint="@color/white"
+            app:srcCompat="@drawable/logo_icon" />
 
     </FrameLayout>
 
