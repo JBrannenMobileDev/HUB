@@ -54,7 +54,7 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         customerRequestsFragment.setArguments(bundle);
         accountDetailsFragment.setArguments(bundle);
         adapter.addFragment(accountDetailsFragment, "Details");
-        adapter.addFragment(salesAgentFragment, "Group Messages");
+        adapter.addFragment(salesAgentFragment, "Shared Leads");
         adapter.addFragment(customerRequestsFragment, "Customer Requests");
         pager.setAdapter(adapter);
         pager.setOffscreenPageLimit(2);

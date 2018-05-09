@@ -1,12 +1,18 @@
 package jjpartnership.hub.view_layer.activities.boot_activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,6 +21,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,8 +68,10 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     @BindView(R.id.password_requirements_tv)TextView passwrodRequirments;
     @BindView(R.id.boot_title_tv)TextView bootTitle;
     @BindView(R.id.loading_frame_layout)FrameLayout bootLoadingLayout;
-    @BindView(R.id.hub_title)TextView hubTitle;
+    @BindView(R.id.company_logo)LinearLayout hubTitle;
     @BindView(R.id.email_password_fields)LinearLayout inputView;
+//    @BindView(R.id.loading_bg_image)ImageView loadingBg;
+//    @BindView(R.id.login_bg_image)ImageView loginBg;
 
     private FirebaseAuth mAuth;
     private boolean accountJustCreated;
@@ -119,7 +128,50 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
 
         mEmailField.setBackPressedListener(this);
         mPasswordField.setBackPressedListener(this);
+//        loginBg.setBackground(resizeImage(R.drawable.boot_background_image_resized_1k));
+//        loadingBg.setBackground(resizeImage(R.drawable.boot_background_image_resized_1k));
 //        DataManager.getInstance().populateDataBaseFakeData();
+    }
+
+    public Drawable resizeImage(int imageResource) {// R.drawable.icon
+        // Get device dimensions
+        Display display = getWindowManager().getDefaultDisplay();
+        double deviceWidth = display.getWidth();
+
+        BitmapDrawable bd = (BitmapDrawable) this.getResources().getDrawable(
+                imageResource);
+        double imageHeight = bd.getBitmap().getHeight();
+        double imageWidth = bd.getBitmap().getWidth();
+
+        double ratio = deviceWidth / imageWidth;
+        int newImageHeight = (int) (imageHeight * ratio);
+
+        Bitmap bMap = BitmapFactory.decodeResource(getResources(), imageResource);
+        Drawable drawable = new BitmapDrawable(this.getResources(),
+                getResizedBitmap(bMap, newImageHeight, (int) deviceWidth));
+
+        return drawable;
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height,
+                matrix, false);
+
+        return resizedBitmap;
     }
 
     @Override
@@ -187,7 +239,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
         inputView.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-100f));
         hubTitle.animate().scaleY(.5f);
         hubTitle.animate().scaleX(.5f);
-        hubTitle.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),-50f));
+        hubTitle.animate().translationY(DpUtil.pxFromDp(getApplicationContext(),50f));
     }
 
     private void animateTitleExpand(){

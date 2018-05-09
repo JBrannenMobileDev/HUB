@@ -15,7 +15,7 @@
         android:cropToPadding="false"
         android:fitsSystemWindows="false"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/boot_background_image_resized_1k" />
+        app:srcCompat="@drawable/login_bg_image" />
 
     <ImageView
         android:id="@+id/imageView9"
@@ -41,7 +41,7 @@
             android:cropToPadding="false"
             android:fitsSystemWindows="false"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/boot_background_image_resized_1k" />
+            app:srcCompat="@drawable/login_bg_image" />
 
         <ImageView
             android:id="@+id/imageView11"
@@ -49,14 +49,30 @@
             android:layout_height="match_parent"
             app:srcCompat="@color/black_overlay" />
 
-        <ImageView
-            android:id="@+id/imageView7"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:elevation="4dp"
-            android:tint="@color/white"
-            app:srcCompat="@drawable/logo_icon" />
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageVie6w7"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:elevation="4dp"
+                android:tint="@color/white"
+                app:srcCompat="@drawable/logo_icon" />
+
+            <ImageView
+                android:id="@+id/imageVi6ew10"
+                android:layout_width="match_parent"
+                android:layout_height="75dp"
+                app:srcCompat="@drawable/icon_text_white" />
+
+        </LinearLayout>
 
     </FrameLayout>
 
@@ -72,31 +88,42 @@
         android:textColor="@color/colorAccent"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/hub_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="87dp"
-        android:capitalize="characters"
-        android:shadowColor="@color/colorPrimaryDark"
-        android:shadowDx="1"
-        android:shadowDy="1"
-        android:shadowRadius="3"
-        android:text="ClickField"
-        android:textColor="@android:color/background_light"
-        android:textSize="56dp"
-        android:textStyle="bold" />
-
     <LinearLayout
         android:id="@+id/email_password_fields"
         android:layout_width="fill_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
         android:orientation="vertical"
         android:paddingBottom="35dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp">
+
+        <LinearLayout
+            android:id="@+id/company_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:layout_marginTop="25dp"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageVie6w7"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:elevation="4dp"
+                android:tint="@color/white"
+                app:srcCompat="@drawable/logo_icon" />
+
+            <ImageView
+                android:id="@+id/imageVi6ew10"
+                android:layout_width="wrap_content"
+                android:layout_height="65dp"
+                app:srcCompat="@drawable/icon_text_white" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/boot_title_tv"
@@ -106,6 +133,7 @@
             android:layout_marginBottom="10dp"
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
+            android:layout_marginTop="25dp"
             android:text="Create Account"
             android:textAlignment="center"
             android:textColor="@color/white"
@@ -145,18 +173,18 @@
             android:layout_marginRight="24dp"
             android:background="@drawable/rounded_rectangle_user_input_bg"
             android:hint="@string/new_password"
-            app:passwordToggleTint="@color/grey_text"
             android:inputType="textPassword"
             android:paddingLeft="8dp"
             android:textColor="@color/grey_text"
-            android:textColorHint="@color/colorPrimaryMediumLight" />
+            android:textColorHint="@color/colorPrimaryMediumLight"
+            app:passwordToggleTint="@color/grey_text" />
 
         <TextView
             android:id="@+id/account_type_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="26dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="6dp"
             android:text="Account Type:"
             android:textColor="@color/white" />
 
@@ -200,7 +228,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="24dp"
                 android:layout_marginRight="24dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/rounded_rectangle_orange"
                 android:text="@string/sign_in"
                 android:textStyle="bold"
@@ -213,7 +241,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="24dp"
                 android:layout_marginRight="24dp"
-                android:layout_marginTop="48dp"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/rounded_rectangle_orange"
                 android:text="@string/create_account"
                 android:textStyle="bold"
@@ -224,7 +252,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="52dp"
+                android:layout_marginTop="28dp"
                 android:elevation="4dp"
                 android:visibility="gone"
                 app:mk_type="Worm" />

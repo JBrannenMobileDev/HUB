@@ -4,6 +4,7 @@
     <color name="colorPrimaryLight">#a4a4a4</color>
     <color name="colorPrimaryMediumLight">#d9d9d9</color>
     <color name="colorPrimaryDark">#2b2b2b</color>
+    <color name="colorPrimaryAccentDark">#017169</color>
     <color name="colorAccenttest">#3eb395</color>
     <color name="colorAccent">#43b3ab</color>
     <color name="colorAccentDark">#32837d</color>
@@ -24,9 +25,9 @@
 
     <color name="user_color_1">#b92828</color>
     <color name="user_color_1_dark">#871d1d</color>
-    <color name="user_color_2">#256015</color>
+    <color name="user_color_2">#34841e</color>
     <color name="user_color_2_dark">#34841e</color>
-    <color name="user_color_3">#177e23</color>
+    <color name="user_color_3">#177e2d</color>
     <color name="user_color_3_dark">#1e842a</color>
     <color name="user_color_4">#28b35d</color>
     <color name="user_color_4_dark">#1d8444</color>
@@ -44,13 +45,13 @@
     <color name="user_color_10_dark">#6139ff</color>
     <color name="user_color_11">#603caf</color>
     <color name="user_color_11_dark">#9c3aff</color>
-    <color name="user_color_12">#ecd330</color>
+    <color name="user_color_12">#ded11f</color>
     <color name="user_color_12_dark">#751e8b</color>
-    <color name="user_color_13">#e78617</color>
+    <color name="user_color_13">#ff7a14</color>
     <color name="user_color_13_dark">#b16711</color>
-    <color name="user_color_14">#ff414a</color>
-    <color name="user_color_14_dark">#a40d15</color>
-    <color name="user_color_15">#b62951</color>
+    <color name="user_color_14">#f71515</color>
+    <color name="user_color_14_dark">#cc1923</color>
+    <color name="user_color_15">#101d8b</color>
     <color name="user_color_15_dark">#8b1f3d</color>
     <color name="white_overlay">#a4ffffff</color>
 </resources>

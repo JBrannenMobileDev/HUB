@@ -20,35 +20,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/welcome_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginRight="32dp"
-                    android:text="Welcome!"
-                    android:textColor="@color/colorPrimaryLight"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/welcome_message_tv"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginRight="32dp"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/sales_agent_welcome_message"
-                    android:textColor="@color/colorPrimaryLight"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -290,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
-                    android:text="Group Messages"
+                    android:text="Shared Leads Messages"
                     android:textColor="@color/colorPrimaryLight"
                     android:textSize="14sp"
                     android:textStyle="bold" />

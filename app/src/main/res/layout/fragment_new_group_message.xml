@@ -14,7 +14,7 @@
         android:layout_height="48dp"
         android:background="@drawable/rounded_rectangle_title"
         android:gravity="center_vertical"
-        android:text="New Group Chat"
+        android:text="Share Lead Group Chat"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -64,12 +64,12 @@
 
         <TextView
             android:id="@+id/textView3"
-            android:layout_width="90dp"
+            android:layout_width="110dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp"
             android:gravity="center_vertical"
-            android:text="Group Name:"
+            android:text="Opportunity Title:"
             android:textColor="@color/white"
             android:textSize="14sp" />
 
@@ -77,11 +77,11 @@
             android:id="@+id/new_group_message_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="105dp"
+            android:layout_marginLeft="125dp"
             android:layout_marginRight="16dp"
             android:backgroundTint="@android:color/transparent"
             android:ems="10"
-            android:hint="  name"
+            android:hint="title"
             android:inputType="textCapWords"
             android:maxLines="2"
             android:textColor="@color/white"

@@ -71,8 +71,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
     @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesRecyclerView;
     @BindView(R.id.group_messages_recycler_view)RecyclerView groupMessagesRecyclerView;
-    @BindView(R.id.welcome_linear_layout)LinearLayout welcomeLayout;
-    @BindView(R.id.welcome_message_tv)TextView welcomeMessage;
     @BindView(R.id.recent_empty_state_layout)LinearLayout recent_empty_layout;
     @BindView(R.id.accounts_empty_state_layout)LinearLayout accounts_empty_layout;
     @BindView(R.id.direc_messages_empty_state_layout)LinearLayout direct_messages_empty_state;
@@ -403,7 +401,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onRecentModelReceived(MainRecentModel recentModel) {
         if(recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0){
-            welcomeLayout.setVisibility(View.GONE);
             recent_empty_layout.setVisibility(View.GONE);
             if(recentRecyclerAdapter == null){
                 recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
@@ -449,14 +446,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void setWelcomeMessage(String typeCustomer) {
-        switch(typeCustomer){
-            case UserRealm.TYPE_SALES:
-                welcomeMessage.setText(getResources().getString(R.string.sales_agent_welcome_message));
-                break;
-            case UserRealm.TYPE_CUSTOMER:
-                welcomeMessage.setText(getResources().getString(R.string.customer_welcome_message));
-                break;
-        }
+
     }
 
     @Override
