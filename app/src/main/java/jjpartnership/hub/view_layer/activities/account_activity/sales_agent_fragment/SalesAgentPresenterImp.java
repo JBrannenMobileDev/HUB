@@ -64,7 +64,7 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
 
     @Override
     public void onDestroy() {
-
+        resultGroups.removeAllChangeListeners();
     }
 
     @Override

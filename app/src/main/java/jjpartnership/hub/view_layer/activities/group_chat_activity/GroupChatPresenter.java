@@ -8,5 +8,6 @@ public interface GroupChatPresenter {
     void onSendMessageClicked();
     void onUserInputChanged(CharSequence charSequence);
     void onSeeAllMembersClicked();
+    void onDestroy();
 }
 

@@ -148,4 +148,10 @@ public class GroupChatPresenterImp implements GroupChatPresenter{
     public void onSeeAllMembersClicked() {
 
     }
+
+    @Override
+    public void onDestroy() {
+        messages.removeAllChangeListeners();
+        messageThread.removeAllChangeListeners();
+    }
 }

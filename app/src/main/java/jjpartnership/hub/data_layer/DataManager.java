@@ -141,14 +141,15 @@ public class DataManager {
 
     public void updateMessages(RealmResults<MessageRealm> messages) {
         List<Message> messageList = new ArrayList<>();
-        for(MessageRealm realmMessage : messages){
+        for (MessageRealm realmMessage : messages) {
             Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
             String thisUid = UserPreferences.getInstance().getUid();
-            if(!temp.getReadByUids().contains(thisUid)) {
+            if (!temp.getReadByUids().contains(thisUid)) {
                 temp.addReadByUid(thisUid);
                 messageList.add(temp);
             }
-        }if(messageList.size() > 0) {
+        }
+        if (messageList.size() > 0) {
             realmManager.insertOrUpdateMessages(messageList);
             fbManager.updateMessages(messageList);
         }

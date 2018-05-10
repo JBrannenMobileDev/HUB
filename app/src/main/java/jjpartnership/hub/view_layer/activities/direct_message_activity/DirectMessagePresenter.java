@@ -10,5 +10,6 @@ public interface DirectMessagePresenter {
     void onSendEmailClicked();
     void onCallClicked();
     void onProfileClicked();
+    void onDestroy();
 }
 

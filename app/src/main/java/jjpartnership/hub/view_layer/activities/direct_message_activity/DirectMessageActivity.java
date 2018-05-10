@@ -316,4 +316,10 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
         super.finish();
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        presenter.onDestroy();
+    }
 }

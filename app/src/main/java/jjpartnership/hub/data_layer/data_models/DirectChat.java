@@ -10,7 +10,6 @@ public class DirectChat {
     private String chatId;
     private String userIdA;
     private String userIdB;
-    private Message mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
     private String requestMessage;
@@ -22,13 +21,12 @@ public class DirectChat {
     }
 
     public DirectChat(String chatId, String userIdA, String userIdB, List<String> currentlyTypingUserNames,
-                      Message mostRecentMessage, long messageCreatedTime, String messageThreadId,
+                      long messageCreatedTime, String messageThreadId,
                       boolean isFromCustomerRequest, boolean isRequestOpen, String requestMessage) {
         this.chatId = chatId;
         this.userIdA = userIdA;
         this.userIdB = userIdB;
         this.currentlyTypingUserNames = currentlyTypingUserNames;
-        this.mostRecentMessage = mostRecentMessage;
         this.messageCreatedTime = messageCreatedTime;
         this.messageThreadId = messageThreadId;
         this.isFromCustomerRequest = isFromCustomerRequest;
@@ -41,7 +39,6 @@ public class DirectChat {
         this.userIdA = realm.getUserIdA();
         this.userIdB = realm.getUserIdB();
         this.currentlyTypingUserNames = realm.getCurrentlyTypingUserNames();
-        this.mostRecentMessage = new Message(realm.getMostRecentMessage());
         this.messageCreatedTime = realm.getMessageCreatedTime();
         this.messageThreadId = realm.getMessageThreadId();
         this.isFromCustomerRequest = realm.isFromCustomerRequest();
@@ -71,14 +68,6 @@ public class DirectChat {
 
     public void setFromCustomerRequest(boolean fromCustomerRequest) {
         isFromCustomerRequest = fromCustomerRequest;
-    }
-
-    public Message getMostRecentMessage() {
-        return mostRecentMessage;
-    }
-
-    public void setMostRecentMessage(Message mostRecentMessage) {
-        this.mostRecentMessage = mostRecentMessage;
     }
 
     public long getMessageCreatedTime() {

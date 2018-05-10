@@ -56,6 +56,12 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
         fetchData();
     }
 
+    @Override
+    public void onDestroy(){
+        messages.removeAllChangeListeners();
+        messageThread.removeAllChangeListeners();
+    }
+
     private void fetchData() {
         user = realm.where(UserRealm.class).equalTo("uid", toUid).findFirst();
         if(user != null) {

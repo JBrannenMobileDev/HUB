@@ -346,4 +346,10 @@ public class CustomerRequestChatActivity extends AppCompatActivity implements Cu
         super.finish();
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        presenter.onDestroy();
+    }
 }

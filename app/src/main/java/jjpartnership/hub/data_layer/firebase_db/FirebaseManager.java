@@ -12,6 +12,7 @@ import com.google.firebase.database.ValueEventListener;
 
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -242,10 +243,21 @@ public class FirebaseManager {
     }
 
     private void getGroupChat(final List<Account> accountList) {
-        final int groupChatInitSize = groupChats.size();
-        if(accountList.size() > 0) {
+        final List<String> groupChatIds = new ArrayList<>();
+        for(Account account : accountList){
+            if(account.getGroupChats() != null){
+                for(String chatId : account.getGroupChats().values()){
+                    if(chatId != null && !chatId.isEmpty()){
+                        groupChatIds.add(chatId);
+                    }
+                }
+            }
+        }
+        final int groupChatInitSize = groupChatIds.size();
 
-            for (Account account : accountList) {
+        if(groupChatIds.size() > 0) {
+
+            for (String chatId : groupChatIds) {
                 ValueEventListener groupChatListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -260,7 +272,7 @@ public class FirebaseManager {
                             }
                             groupChats.add(gChat);
                         }
-                        if ((groupChats.size() - groupChatInitSize) == accounts.size()) {
+                        if (groupChats.size() == groupChatInitSize) {
                             fetchUserColors(groupChats);
                         }
                     }
@@ -270,7 +282,7 @@ public class FirebaseManager {
 
                     }
                 };
-                groupChatsReference.child(account.getGroupChatSalesId()).addListenerForSingleValueEvent(groupChatListener);
+                groupChatsReference.child(chatId).addListenerForSingleValueEvent(groupChatListener);
             }
         }else{
             DataManager.getInstance().updateRealmGroupChats(groupChats);
@@ -446,12 +458,11 @@ public class FirebaseManager {
     }
 
     private void buildUiModels() {
+        Calendar twoWeeksAgo = Calendar.getInstance();
+        twoWeeksAgo.add(Calendar.DAY_OF_YEAR, -14);
         MainAccountsModel accountsModel = new MainAccountsModel();
         RealmList<RowItem> accountRowItems = new RealmList<>();
         RealmList<RowItem> requestRowItems = new RealmList<>();
-        for(int i = 0; i < accounts.size(); i++){
-            accountRowItems.add(new RowItem());
-        }
 
         for(int i = 0; i < customerRequests.size(); i++){
             requestRowItems.add(new RowItem());
@@ -460,17 +471,10 @@ public class FirebaseManager {
         for(int i = 0; i < accounts.size(); i++){
             Company company = getAccountCompany(accounts.get(i));
             if(company != null) {
-                GroupChat groupChatSales = getGroupChat(accounts.get(i).getGroupChatSalesId());
-                accountRowItems.get(i).setAccountName(company.getName());
-                accountRowItems.get(i).setAccountId(accounts.get(i).getAccountIdFire());
-                if (groupChatSales.getMostRecentMessage() != null) {
-                    accountRowItems.get(i).setMessageContent(groupChatSales.getMostRecentMessage().getMessageContent());
-                    accountRowItems.get(i).setMessageCreatedAtTime(groupChatSales.getMostRecentMessage().getCreatedDate());
-                    accountRowItems.get(i).setMessageOwnerName(groupChatSales.getMostRecentMessage().getMessageOwnerName());
-                    if(!groupChatSales.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
-                        accountRowItems.get(i).setNewMessage(true);
-                    }
-                }
+                RowItem temp = new RowItem();
+                temp.setAccountName(company.getName());
+                temp.setAccountId(accounts.get(i).getAccountIdFire());
+                accountRowItems.add(temp);
             }
         }
 
@@ -490,12 +494,13 @@ public class FirebaseManager {
         accountsModel.setRowItems(accountRowItems);
 
         RealmList<RowItem> sortedByMostRecent = new RealmList<>();
-        for(RowItem item : accountRowItems){
-            sortedByMostRecent.add(item);
-        }
 
         for(RowItem item : requestRowItems){
-            sortedByMostRecent.add(item);
+            if(item.isNewMessage()) {
+                sortedByMostRecent.add(item);
+            }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                sortedByMostRecent.add(item);
+            }
         }
 
 
@@ -503,13 +508,14 @@ public class FirebaseManager {
         RealmList<DirectItem> directItems = new RealmList<>();
         for(DirectChat directChat : directChats){
             DirectItem newItem = new DirectItem();
+            MessageRealm mostRecentMessage = RealmUISingleton.getInstance().getRealmInstance().where(MessageRealm.class).equalTo("createdDate", directChat.getMessageCreatedTime()).findFirst();
             newItem.setDirectChatId(directChat.getChatId());
-            if(directChat.getMostRecentMessage() != null) {
-                newItem.setMessageOwnerName(directChat.getMostRecentMessage().getMessageOwnerName());
-                newItem.setMessageOwnerUid(directChat.getMostRecentMessage().getCreatedByUid());
-                newItem.setMessageContent(directChat.getMostRecentMessage().getMessageContent());
-                newItem.setMessageCreatedAtTime(directChat.getMostRecentMessage().getCreatedDate());
-                if (!directChat.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+            if(mostRecentMessage != null) {
+                newItem.setMessageOwnerName(mostRecentMessage.getMessageOwnerName());
+                newItem.setMessageOwnerUid(mostRecentMessage.getUid());
+                newItem.setMessageContent(mostRecentMessage.getMessageContent());
+                newItem.setMessageCreatedAtTime(mostRecentMessage.getCreatedDate());
+                if (!mostRecentMessage.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
                     newItem.setNewMessage(true);
                 } else {
                     newItem.setNewMessage(false);
@@ -528,7 +534,11 @@ public class FirebaseManager {
             newRowItem.setMessageContent(item.getMessageContent());
             newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
             newRowItem.setMessageOwnerName(item.getMessageOwnerName());
-            sortedByMostRecent.add(newRowItem);
+            if(newRowItem.isNewMessage()) {
+                sortedByMostRecent.add(newRowItem);
+            }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                sortedByMostRecent.add(newRowItem);
+            }
         }
 
         Collections.sort(sortedByMostRecent, RowItem.createdAtComparator);
@@ -536,20 +546,16 @@ public class FirebaseManager {
         MainRecentModel recentModel = new MainRecentModel();
         RealmList<RowItem> recentRowItems = new RealmList<>();
 
-        if(sortedByMostRecent.size() > 3) {
-            recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
-        }else{
-            recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
-        }
+//        if(sortedByMostRecent.size() > 3) {
+//            recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
+//        }else{
+//            recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
+//        }
+        recentRowItems.addAll(sortedByMostRecent);
         recentModel.setRowItems(recentRowItems);
 
-        DataManager.getInstance().updateRealmMainModels(accountsModel, filterModel(recentModel), directModel);
+        DataManager.getInstance().updateRealmMainModels(accountsModel, recentModel, directModel);
         initChatMessagesListener(groupChats, directChats);
-        initGroupChatListener(groupChats, directChats);
-    }
-
-    private void initGroupChatListener(List<GroupChat> groupChatsLocal, List<DirectChat> directChatsLocal) {
-
     }
 
     private MainRecentModel filterModel(MainRecentModel recentModel) {
@@ -558,6 +564,8 @@ public class FirebaseManager {
         for(RowItem item : recentModel.getRowItems()){
             if(item.getMessageCreatedAtTime() > 0){
                 if(!item.getMessageOwnerName().equals(currentUserName)){
+                    filteredRowItems.add(item);
+                }else if(!item.isNewMessage()){
                     filteredRowItems.add(item);
                 }
             }
@@ -802,30 +810,40 @@ public class FirebaseManager {
 
     public void updateMessages(List<Message> messageList) {
         for(Message message : messageList) {
-            chatMessagesReference.child(message.getChatId()).child("messages").child(message.getMessageId()).setValue(message);
+            if(message.getMessageId() != null && !message.getMessageId().isEmpty()) {
+                chatMessagesReference.child(message.getChatId()).child("messages").child(message.getMessageId()).setValue(message);
+            }
         }
     }
 
     private void updateMainAccountModel(Message message) {
+        Calendar twoWeeksAgo = Calendar.getInstance();
+        twoWeeksAgo.add(Calendar.DAY_OF_YEAR, -14);
         MainAccountsModel model = RealmUISingleton.getInstance().getRealmInstance().where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
         if(model != null) {
             MainAccountsModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(model);
             RealmList<RowItem> sortedByMostRecent = new RealmList<>();
             for (int i = 0; i < copy.getRowItems().size(); i++) {
                 AccountRealm account = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountIdFire", copy.getRowItems().get(i).getAccountId()).findFirst();
-                if (account.getGroupChatSalesId().equals(message.getChatId()) &&
-                        message.getCreatedDate() >= copy.getRowItems().get(i).getMessageCreatedAtTime()) {
-                    copy.getRowItems().get(i).setMessageContent(message.getMessageContent());
-                    copy.getRowItems().get(i).setMessageCreatedAtTime(message.getCreatedDate());
-                    copy.getRowItems().get(i).setMessageOwnerName(message.getMessageOwnerName());
-                    if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
-                        copy.getRowItems().get(i).setNewMessage(true);
-                    } else {
-                        copy.getRowItems().get(i).setNewMessage(false);
+                if(account.getGroupChats() != null && !account.getGroupChats().isEmpty()) {
+                    for(String chatId : account.getGroupChats()) {
+                        if (chatId.equals(message.getChatId()) &&
+                                message.getCreatedDate() >= copy.getRowItems().get(i).getMessageCreatedAtTime()) {
+                            copy.getRowItems().get(i).setMessageContent(message.getMessageContent());
+                            copy.getRowItems().get(i).setMessageCreatedAtTime(message.getCreatedDate());
+                            copy.getRowItems().get(i).setMessageOwnerName(message.getMessageOwnerName());
+                            if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+                                copy.getRowItems().get(i).setNewMessage(true);
+                            } else {
+                                copy.getRowItems().get(i).setNewMessage(false);
+                            }
+                        }
+                        if (copy.getRowItems().get(i).isNewMessage()) {
+                            sortedByMostRecent.add(copy.getRowItems().get(i));
+                        } else if (copy.getRowItems().get(i).getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()) {
+                            sortedByMostRecent.add(copy.getRowItems().get(i));
+                        }
                     }
-                    sortedByMostRecent.add(copy.getRowItems().get(i));
-                } else {
-                    sortedByMostRecent.add(copy.getRowItems().get(i));
                 }
             }
 
@@ -847,15 +865,23 @@ public class FirebaseManager {
             }
 
             for(RowItem item : requestRowItems){
-                sortedByMostRecent.add(item);
+                if(item.isNewMessage()) {
+                    sortedByMostRecent.add(item);
+                }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                    sortedByMostRecent.add(item);
+                }
             }
 
-            DirectChatRealm newDChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
+            DirectChatRealm realmChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
             DirectItem newItem = null;
-            if(newDChat != null){
+            if(realmChat != null){
                 newItem = new DirectItem();
                 newItem.setDirectChatId(message.getChatId());
-                newItem.setNewMessage(true);
+                if(!message.getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                    newItem.setNewMessage(true);
+                }else{
+                    newItem.setNewMessage(false);
+                }
                 newItem.setMessageOwnerName(message.getMessageOwnerName());
                 newItem.setMessageOwnerUid(message.getCreatedByUid());
                 newItem.setMessageContent(message.getMessageContent());
@@ -868,7 +894,7 @@ public class FirebaseManager {
             boolean alreadyExists = false;
             for(DirectItem directItem : previousModel.getDirectItems()){
                 DirectItem copyItem = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(directItem);
-                if((message.getCreatedDate() > directItem.getMessageCreatedAtTime()) && (message.getChatId().equals(directItem.getDirectChatId()))){
+                if(message.getChatId().equals(directItem.getDirectChatId())){
                     copyItem.setMessageCreatedAtTime(message.getCreatedDate());
                     copyItem.setMessageContent(message.getMessageContent());
                     copyItem.setMessageOwnerUid(message.getCreatedByUid());
@@ -899,7 +925,11 @@ public class FirebaseManager {
                 newRowItem.setMessageContent(item.getMessageContent());
                 newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
                 newRowItem.setMessageOwnerName(item.getMessageOwnerName());
-                sortedByMostRecent.add(newRowItem);
+                if(item.isNewMessage()) {
+                    sortedByMostRecent.add(newRowItem);
+                }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                    sortedByMostRecent.add(newRowItem);
+                }
             }
 
 
@@ -907,11 +937,13 @@ public class FirebaseManager {
             Collections.reverse(sortedByMostRecent);
             MainRecentModel recentModel = new MainRecentModel();
             RealmList<RowItem> recentRowItems = new RealmList<>();
-            if (sortedByMostRecent.size() > 3) {
-                recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
-            } else {
-                recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
-            }
+//            if (sortedByMostRecent.size() > 3) {
+//                recentRowItems.addAll(sortedByMostRecent.subList(0, 4));
+//            } else {
+//                recentRowItems.addAll(sortedByMostRecent.subList(0, sortedByMostRecent.size()));
+//            }
+
+            recentRowItems.addAll(sortedByMostRecent);
             recentModel.setRowItems(recentRowItems);
 
             DataManager.getInstance().updateRealmMainModels(copy, filterModel(recentModel), newDirectModel);
@@ -922,18 +954,15 @@ public class FirebaseManager {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
-        chatMessagesReference.child(newMessage.getChatId()).child("message_thread").child(newMessage.getMessageThreadId()).setValue(newMessage);
     }
 
     public void createNewDirectMessage(Message newMessage) {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
-        chatMessagesReference.child(newMessage.getChatId()).child("message_thread").child(newMessage.getMessageThreadId()).setValue(newMessage);
         DirectChatRealm dChatRealm = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", newMessage.getChatId()).findFirst();
         DirectChatRealm copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(dChatRealm);
         copy.setMessageCreatedTime(newMessage.getCreatedDate());
-        copy.setMostRecentMessage(new MessageRealm(newMessage));
         DataManager.getInstance().insertOrUpdateDirectChat(copy);
         directChatsReference.child(copy.getChatId()).setValue(new DirectChat(copy));
     }
@@ -947,7 +976,6 @@ public class FirebaseManager {
         copy.setMostRecentGroupMessage(new MessageRealm(newMessage));
         copy.setMostRecentMessageTime(newMessage.getCreatedDate());
         DataManager.getInstance().insertOrUpdateCustomerRequest(copy);
-        customerRequestsReference.child(copy.getRequestId()).setValue(new CustomerRequest(copy));
     }
 
     private void updateRelatedGroupChatWithUserId(Message newMessage) {
@@ -1364,6 +1392,7 @@ public class FirebaseManager {
     }
 
     public GroupChat createNewGroupChat(List<String> memberIds, String accountId, String creatorUid, String groupName, String messageText) {
+        memberIds.add(creatorUid);
         DatabaseReference newGroupChatRef = groupChatsReference.push();
         GroupChat groupChat = new GroupChat();
         groupChat.setChatId(newGroupChatRef.getKey());

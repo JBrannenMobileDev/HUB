@@ -100,7 +100,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                     if (rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
                         holder.messageContent.setText(rowItem.getMessageContent());
                     }
-                    holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
+                    if(rowItem.getAccountName() != null)holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
                     if (rowItem.isNewMessage()) {
                         holder.accountName.setTextColor(Color.BLACK);
                         holder.messageOwnerName.setTextColor(Color.BLACK);
@@ -138,7 +138,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                         holder.userName.setTextColor(context.getResources().getColor(R.color.grey_text));
                     }
 
-                    holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
+                    if(user != null)holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
                 }
     }
 

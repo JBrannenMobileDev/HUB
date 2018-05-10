@@ -261,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="16dp"
-                    android:text="Shared Leads Messages"
+                    android:text="Shared Leads"
                     android:textColor="@color/colorPrimaryLight"
                     android:textSize="14sp"
                     android:textStyle="bold" />

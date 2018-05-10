@@ -8,5 +8,6 @@ public interface CustomerRequestChatPresenter {
     void onSendMessageClicked();
     void onUserInputChanged(CharSequence charSequence);
     void onProfileClicked();
+    void onDestroy();
 }
 

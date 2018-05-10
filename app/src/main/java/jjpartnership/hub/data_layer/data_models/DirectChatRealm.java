@@ -16,7 +16,6 @@ public class DirectChatRealm extends RealmObject{
     private String chatId;
     private String userIdA;
     private String userIdB;
-    private MessageRealm mostRecentMessage;
     private long messageCreatedTime;
     private String messageThreadId;
     private String requestMessage;
@@ -34,7 +33,6 @@ public class DirectChatRealm extends RealmObject{
         this.userIdA = userIdA;
         this.userIdB = userIdB;
         this.currentlyTypingUserNames = currentlyTypingUserNames;
-        this.mostRecentMessage = mostRecentMessage;
         this.messageCreatedTime = messageCreatedTime;
         this.messageThreadId = messageThreadId;
         this.isFromCustomerRequest = isFromCustomerRequest;
@@ -57,7 +55,6 @@ public class DirectChatRealm extends RealmObject{
         this.userIdA = chat.getUserIdA();
         this.userIdB = chat.getUserIdB();
         this.currentlyTypingUserNames = createCurrentlyTypingList(chat.getCurrentlyTypingUserNames());
-        this.mostRecentMessage = new MessageRealm(chat.getMostRecentMessage());
         this.messageCreatedTime = chat.getMessageCreatedTime();
         this.messageThreadId = chat.getMessageThreadId();
         this.isFromCustomerRequest = chat.isFromCustomerRequest();
@@ -99,14 +96,6 @@ public class DirectChatRealm extends RealmObject{
 
     public void setFromCustomerRequest(boolean fromCustomerRequest) {
         isFromCustomerRequest = fromCustomerRequest;
-    }
-
-    public MessageRealm getMostRecentMessage() {
-        return mostRecentMessage;
-    }
-
-    public void setMostRecentMessage(MessageRealm mostRecentMessage) {
-        this.mostRecentMessage = mostRecentMessage;
     }
 
     public long getMessageCreatedTime() {

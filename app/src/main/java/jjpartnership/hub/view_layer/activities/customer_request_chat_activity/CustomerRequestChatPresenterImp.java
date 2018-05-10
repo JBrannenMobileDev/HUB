@@ -155,4 +155,10 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     public void onProfileClicked() {
 
     }
+
+    @Override
+    public void onDestroy() {
+        messages.removeAllChangeListeners();
+        messageThread.removeAllChangeListeners();
+    }
 }
