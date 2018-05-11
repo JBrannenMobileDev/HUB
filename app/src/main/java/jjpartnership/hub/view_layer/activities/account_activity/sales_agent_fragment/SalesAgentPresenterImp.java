@@ -68,7 +68,5 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
     }
 
     @Override
-    public void onStop() {
-        if(groupChats != null) groupChat.removeAllChangeListeners();
-    }
+    public void onStop() {}
 }

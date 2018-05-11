@@ -86,9 +86,6 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
         }else{
             holder.messageContent.setText("Be the first to post a message.");
         }
-        if(messageUser != null) {
-            holder.icon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(messageUser.getUserColor())));
-        }
     }
 
     private void createIconDataLists(GroupChatRealm chatToUse, GroupIcon icon) {

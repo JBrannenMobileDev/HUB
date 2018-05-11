@@ -1,7 +1,6 @@
 package jjpartnership.hub.data_layer.data_models;
 
 import java.util.List;
-import java.util.Map;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
@@ -15,41 +14,15 @@ public class MessageThreadRealm extends RealmObject{
     @PrimaryKey
     private String messageThreadId;
     private String chatId;
-    private RealmList<String> currentlyTypingUserNames;
+    private String currentlyTypingUserName;
 
     public MessageThreadRealm() {
-    }
-
-    public MessageThreadRealm(String messageThreadId, String chatId, List<String> currentlyTypingUserNames) {
-        this.messageThreadId = messageThreadId;
-        this.chatId = chatId;
-        this.currentlyTypingUserNames = createMessageListRealm(currentlyTypingUserNames);
     }
 
     public MessageThreadRealm(MessageThread thread){
         this.messageThreadId = thread.getMessageThreadId();
         this.chatId = thread.getChatId();
-        this.currentlyTypingUserNames = createMessageListRealmFromMap(thread.getCurrentlyTypingUserNames());
-    }
-
-    private RealmList<String> createMessageListRealm(List<String> userNames) {
-        RealmList<String> userNamesRealm = new RealmList<>();
-        if(userNames != null) {
-            for (String name : userNames) {
-                userNamesRealm.add(name);
-            }
-        }
-        return userNamesRealm;
-    }
-
-    private RealmList<String> createMessageListRealmFromMap(Map<String, String> userNames) {
-        RealmList<String> userNamesRealm = new RealmList<>();
-        if(userNames != null) {
-            for (String name : userNames.values()) {
-                userNamesRealm.add(name);
-            }
-        }
-        return userNamesRealm;
+        this.currentlyTypingUserName = thread.getCurrentlyTypingUserName();
     }
 
     public String getMessageThreadId() {
@@ -68,11 +41,11 @@ public class MessageThreadRealm extends RealmObject{
         this.chatId = chatId;
     }
 
-    public RealmList<String> getCurrentlyTypingUserNames() {
-        return currentlyTypingUserNames;
+    public String getCurrentlyTypingUserName() {
+        return currentlyTypingUserName;
     }
 
-    public void setCurrentlyTypingUserNames(RealmList<String> currentlyTypingUserNames) {
-        this.currentlyTypingUserNames = currentlyTypingUserNames;
+    public void setCurrentlyTypingUserName(String currentlyTypingUserName) {
+        this.currentlyTypingUserName = currentlyTypingUserName;
     }
 }

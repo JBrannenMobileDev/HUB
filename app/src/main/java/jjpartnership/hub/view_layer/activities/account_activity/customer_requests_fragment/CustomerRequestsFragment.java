@@ -13,10 +13,12 @@ import android.widget.LinearLayout;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.customer_request_chat_activity.CustomerRequestChatActivity;
 
 /**
@@ -26,11 +28,11 @@ import jjpartnership.hub.view_layer.activities.customer_request_chat_activity.Cu
  * to handle interaction events.
  */
 public class CustomerRequestsFragment extends Fragment implements CustomerRequestView{
-    @BindView(R.id.request_info_linear_layout)LinearLayout requestInfo;
     @BindView(R.id.open_requests_empty_state_layout)LinearLayout openRequestsEmptyStateView;
     @BindView(R.id.open_requests_recycler_view)RecyclerView openRequestsRecycler;
     @BindView(R.id.closed_requests_empty_state_layout)LinearLayout closedRequestEmptyStateView;
     @BindView(R.id.closed_requests_recycler_view)RecyclerView closedRequestsRecycler;
+    @BindView(R.id.request_info_linear_layout)LinearLayout requestInfoLayout;
 
 
     private OnFragmentInteractionListener mListener;
@@ -52,6 +54,9 @@ public class CustomerRequestsFragment extends Fragment implements CustomerReques
         openRequestsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         initCallbacks();
         presenter = new CustomerRequestPresenterImp(this, getArguments().getString("account_id"));
+        if(!UserPreferences.getInstance().getRequestInfoVisibility()){
+            requestInfoLayout.setVisibility(View.GONE);
+        }
         return v;
     }
 
@@ -69,6 +74,12 @@ public class CustomerRequestsFragment extends Fragment implements CustomerReques
 
             }
         };
+    }
+
+    @OnClick(R.id.request_info_close)
+    public void onCloseInfoClicked(){
+        UserPreferences.getInstance().setRequestInfoVisibility(false);
+        requestInfoLayout.setVisibility(View.GONE);
     }
 
     @Override

@@ -2,6 +2,7 @@ package jjpartnership.hub.view_layer.custom_views;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,7 +68,7 @@ public class GroupIcon extends LinearLayout {
         super.onFinishInflate();
         topLeftIv = findViewById(R.id.top_left_image);
         topRightIv = findViewById(R.id.top_right_image);
-        bottomLeftIv = findViewById(R.id.bottom_right_image);
+        bottomLeftIv = findViewById(R.id.bottom_left_image);
         bottomRightIv = findViewById(R.id.bottom_right_image);
         topLeftTv = findViewById(R.id.top_left_tv);
         topRightTv = findViewById(R.id.top_right_tv);
@@ -95,13 +96,19 @@ public class GroupIcon extends LinearLayout {
             } else {
                 switch (names.size()) {
                     case 3:
+                        FrameLayout.LayoutParams paramsBottomRow = (FrameLayout.LayoutParams)bottomRowLayout.getLayoutParams();
+                        paramsBottomRow.topMargin = (int)DpUtil.pxFromDp(getContext(), 17f);
+                        bottomRowLayout.setLayoutParams(paramsBottomRow);
+                        FrameLayout.LayoutParams paramsRoot = (FrameLayout.LayoutParams)this.getLayoutParams();
+                        paramsRoot.leftMargin = (int)DpUtil.pxFromDp(getContext(), 12f);
+                        this.setLayoutParams(paramsRoot);
                         topRightFl.setVisibility(View.GONE);
                         setTopLeftTv(names.get(0));
                         setBottomLeftTv(names.get(1));
                         setBottomRightTv(names.get(2));
                         setTopLeftIconColor(userColors.get(0));
                         setBottomLeftIconColor(userColors.get(1));
-                        setBottomLeftIconColor(userColors.get(2));
+                        setBottomRightIconColor(userColors.get(2));
                         break;
                     case 2:
                         bottomRowLayout.setVisibility(View.GONE);

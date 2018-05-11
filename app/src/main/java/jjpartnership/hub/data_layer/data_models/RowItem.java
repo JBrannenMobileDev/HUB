@@ -20,11 +20,20 @@ public class RowItem extends RealmObject implements Comparable{
     @PrimaryKey
     private String accountId;
     private String accountName;
+    private String chatId;
     private String messageOwnerName;
     private String messageContent;
     private boolean isNewMessage;
     private String itemType;
     private long messageCreatedAtTime;
+
+    public String getChatId() {
+        return chatId;
+    }
+
+    public void setChatId(String chatId) {
+        this.chatId = chatId;
+    }
 
     public RowItem() {
         this.itemType = TYPE_ACCOUNT;

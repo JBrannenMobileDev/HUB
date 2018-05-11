@@ -11,10 +11,13 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
@@ -22,6 +25,7 @@ import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserColorUtil;
 import jjpartnership.hub.utils.UserPreferences;
+import jjpartnership.hub.view_layer.custom_views.GroupIcon;
 
 /**
  * Created by Jonathan on 3/9/2018.
@@ -48,7 +52,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
         TextView messageTime;
         TextView messageOwnerName;
         TextView messageContent;
-        TextView accountIcon;
+        GroupIcon accountIcon;
 
         FrameLayout directMessageLayout;
         TextView userName;
@@ -88,19 +92,29 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
                 RowItem rowItem = dataModel.getRowItems().get(position);
+        UserRealm user;
+                //TYPE_ACCOUNT is actually type SHARED_LEAD
                 if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
+                    GroupChatRealm gChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", rowItem.getChatId()).findFirst();
+                    user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
                     holder.directMessageLayout.setVisibility(View.GONE);
                     holder.accountName.setText(rowItem.getAccountName());
                     if (rowItem.getMessageCreatedAtTime() != 0) {
                         holder.messageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
                     }
                     if (rowItem.getMessageOwnerName() != null && !rowItem.getMessageOwnerName().isEmpty()) {
-                        holder.messageOwnerName.setText(rowItem.getMessageOwnerName() + " - ");
+                        if(rowItem.getMessageOwnerName().equals(user.getFirstName() + " " + user.getLastName())){
+                            holder.messageOwnerName.setText("You: ");
+                        }else {
+                            holder.messageOwnerName.setText(rowItem.getMessageOwnerName() + " - ");
+                        }
                     }
                     if (rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
                         holder.messageContent.setText(rowItem.getMessageContent());
                     }
-                    if(rowItem.getAccountName() != null)holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
+                    GroupChatRealm chatToUse = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", rowItem.getChatId()).findFirst();
+                    createIconDataLists(chatToUse, holder.accountIcon);
+//                    if(rowItem.getAccountName() != null)holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
                     if (rowItem.isNewMessage()) {
                         holder.accountName.setTextColor(Color.BLACK);
                         holder.messageOwnerName.setTextColor(Color.BLACK);
@@ -113,9 +127,9 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                         holder.messageContent.setTextColor(context.getResources().getColor(R.color.grey_text));
                     }
                 }else{
-                    holder.directMessageLayout.setVisibility(View.VISIBLE);
                     DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();
-                    UserRealm user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid())).findFirst();
+                    user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid())).findFirst();
+                    holder.directMessageLayout.setVisibility(View.VISIBLE);
                     if(user != null){
                         holder.userName.setText(user.getFirstName() + " " + user.getLastName());
                         holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));
@@ -125,7 +139,11 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                         holder.directMessageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
                     }
                     if(rowItem.getMessageContent() != null && !rowItem.getMessageContent().isEmpty()) {
-                        holder.directMessageContent.setText(rowItem.getMessageContent());
+                        if(!rowItem.getMessageOwnerName().equals(user.getFirstName() + " " + user.getLastName())){
+                            holder.directMessageContent.setText("You: " + rowItem.getMessageContent());
+                        }else {
+                            holder.directMessageContent.setText(rowItem.getMessageContent());
+                        }
                     }
 
                     if (rowItem.isNewMessage()) {
@@ -140,6 +158,21 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
 
                     if(user != null)holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
                 }
+    }
+
+    private void createIconDataLists(GroupChatRealm chatToUse, GroupIcon icon) {
+        List<String> names = new ArrayList<>();
+        List<Integer> colors = new ArrayList<>();
+        for(String userId : chatToUse.getUserIds()){
+            if(!userId.equals(UserPreferences.getInstance().getUid())) {
+                UserRealm user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", userId).findFirst();
+                if (user != null) {
+                    names.add(user.getFirstName());
+                    colors.add(user.getUserColor());
+                }
+            }
+        }
+        icon.initAllIcons(names, colors);
     }
 
     @Override

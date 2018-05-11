@@ -8,4 +8,5 @@ public class UserPreferenceConstants {
     public static final String VERIFICATION_SENT = "verification_sent";
     public static final String UID = "uid";
     public static final String USER_TYPE = "user_type";
+    public static final String REQUEST_INFO_VISIBILITY = "request_info_visibility";
 }

@@ -11,7 +11,6 @@ public class UserPreferences {
     private static final String APP_SETTINGS = "APP_SETTINGS";
     private static final UserPreferences ourInstance = new UserPreferences();
     public Context context;
-    private Object userType;
 
     public static UserPreferences getInstance() {
         return ourInstance;
@@ -70,5 +69,15 @@ public class UserPreferences {
 
     public String getUserType() {
         return getSharedPreferences(context).getString(UserPreferenceConstants.USER_TYPE, "");
+    }
+
+    public void setRequestInfoVisibility(boolean requestInfoVisibility) {
+        SharedPreferences.Editor editor = getSharedPreferences(context).edit();
+        editor.putBoolean(UserPreferenceConstants.REQUEST_INFO_VISIBILITY, requestInfoVisibility);
+        editor.commit();
+    }
+
+    public Boolean getRequestInfoVisibility(){
+        return getSharedPreferences(context).getBoolean(UserPreferenceConstants.REQUEST_INFO_VISIBILITY, true);
     }
 }

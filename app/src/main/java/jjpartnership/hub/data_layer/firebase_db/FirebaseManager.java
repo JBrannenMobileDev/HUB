@@ -253,7 +253,7 @@ public class FirebaseManager {
                 }
             }
         }
-        final int groupChatInitSize = groupChatIds.size();
+        final int groupChatInitSize = groupChatIds.size() + groupChats.size();
 
         if(groupChatIds.size() > 0) {
 
@@ -484,6 +484,7 @@ public class FirebaseManager {
                 requestRowItems.get(i).setMessageContent(request.getRequestMessage());
                 requestRowItems.get(i).setMessageCreatedAtTime(request.getMostRecentMessageTime());
                 requestRowItems.get(i).setMessageOwnerName(request.getCustomerName());
+                requestRowItems.get(i).setChatId(request.getGroupChatId());
                 if(request.getMostRecentGroupMessage() != null && !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
                     requestRowItems.get(i).setNewMessage(true);
                 }
@@ -531,6 +532,7 @@ public class FirebaseManager {
             newRowItem.setItemType(RowItem.TYPE_DIRECT);
             newRowItem.setAccountId(item.getDirectChatId());
             newRowItem.setNewMessage(item.isNewMessage());
+            newRowItem.setChatId(item.getDirectChatId());
             newRowItem.setMessageContent(item.getMessageContent());
             newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
             newRowItem.setMessageOwnerName(item.getMessageOwnerName());
@@ -832,6 +834,7 @@ public class FirebaseManager {
                             copy.getRowItems().get(i).setMessageContent(message.getMessageContent());
                             copy.getRowItems().get(i).setMessageCreatedAtTime(message.getCreatedDate());
                             copy.getRowItems().get(i).setMessageOwnerName(message.getMessageOwnerName());
+                            copy.getRowItems().get(i).setChatId(message.getChatId());
                             if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
                                 copy.getRowItems().get(i).setNewMessage(true);
                             } else {
@@ -858,6 +861,7 @@ public class FirebaseManager {
                     requestRowItems.get(i).setMessageContent(request.getRequestMessage());
                     requestRowItems.get(i).setMessageCreatedAtTime(request.getMostRecentMessageTime());
                     requestRowItems.get(i).setMessageOwnerName(request.getCustomerName());
+                    requestRowItems.get(i).setChatId(request.getGroupChatId());
                     if(request.getMostRecentGroupMessage() != null && !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
                         requestRowItems.get(i).setNewMessage(true);
                     }
@@ -921,6 +925,7 @@ public class FirebaseManager {
                 RowItem newRowItem = new RowItem();
                 newRowItem.setItemType(RowItem.TYPE_DIRECT);
                 newRowItem.setAccountId(item.getDirectChatId());
+                newRowItem.setChatId(item.getDirectChatId());
                 newRowItem.setNewMessage(item.isNewMessage());
                 newRowItem.setMessageContent(item.getMessageContent());
                 newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
@@ -1498,9 +1503,9 @@ public class FirebaseManager {
                 MessageThread thread = dataSnapshot.getValue(MessageThread.class);
                 if(thread != null){
                     if(isTyping) {
-                        chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).child("currentlyTypingUserNames").child(userName).setValue(userName);
+                        chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).child("currentlyTypingUserNames").setValue(userName);
                     }else{
-                        chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).child("currentlyTypingUserNames").child(userName).removeValue();
+                        chatMessagesReference.child(chatId).child("message_thread").child(messageThreadId).child("currentlyTypingUserNames").removeValue();
                     }
                 }else{
                     List<String> currentlyTypingNames = new ArrayList<>();

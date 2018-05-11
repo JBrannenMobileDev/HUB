@@ -64,7 +64,7 @@ public class CustomerPresenterImp implements CustomerPresenter {
 //            messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
 //                @Override
 //                public void onChange(MessageThreadRealm threadRealm) {
-//                    fragment.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserNames()));
+//                    fragment.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserName()));
 //                }
 //            });
 //        }

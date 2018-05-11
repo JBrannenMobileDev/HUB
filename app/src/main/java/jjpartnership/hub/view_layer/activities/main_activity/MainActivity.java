@@ -177,14 +177,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(RowItem rowItem) {
                 if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
-                    AccountRealm account = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).equalTo("accountIdFire", rowItem.getAccountId()).findFirst();
-                    if(account != null) {
-                        Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
-                        groupChatIntent.putExtra("chatId", account.getGroupChatSalesId());
-                        startActivity(groupChatIntent);
-                    }else{
-                        Toast.makeText(MainActivity.this, "Oops! Something went wrong.", Toast.LENGTH_SHORT).show();
-                    }
+                    Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
+                    groupChatIntent.putExtra("chatId", rowItem.getChatId());
+                    startActivity(groupChatIntent);
                 }else{
                     Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
                     DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();

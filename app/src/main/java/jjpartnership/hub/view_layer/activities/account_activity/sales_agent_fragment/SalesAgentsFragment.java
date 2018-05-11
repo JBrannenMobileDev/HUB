@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import java.util.HashMap;
 
@@ -29,6 +30,7 @@ import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActi
  */
 public class SalesAgentsFragment extends Fragment implements SalesAgentView{
     @BindView(R.id.group_chats_recycler_view)RecyclerView chatsRecycler;
+    @BindView(R.id.empty_state_layout)LinearLayout emptyStateLayout;
 
     private OnSalesChatFragmentInteractionListener mListener;
     private SalesAgentPresenter presenter;
@@ -111,6 +113,9 @@ public class SalesAgentsFragment extends Fragment implements SalesAgentView{
         chatsRecycler.setLayoutManager(layoutManager);
         chatsRecycler.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        if(groupChats != null && groupChats.size() > 0){
+            emptyStateLayout.setVisibility(View.GONE);
+        }
     }
 
     public interface OnSalesChatFragmentInteractionListener {

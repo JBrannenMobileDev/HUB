@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -23,6 +24,16 @@
                 android:orientation="vertical"
                 android:paddingTop="16dp">
 
+                <ImageView
+                    android:id="@+id/request_info_close"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="26dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:src="@drawable/ic_close_black_24dp"
+                    android:tint="@color/colorPrimaryLight" />
+
                 <TextView
                     android:id="@+id/welcome_message_tv2"
                     android:layout_width="match_parent"
@@ -30,7 +41,6 @@
                     android:layout_marginBottom="8dp"
                     android:layout_marginLeft="32dp"
                     android:layout_marginRight="32dp"
-                    android:layout_marginTop="8dp"
                     android:text="Communication with a customer is only available while the customer has an open request."
                     android:textAlignment="center"
                     android:textColor="@color/colorPrimaryLight"
@@ -41,8 +51,8 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:layout_marginTop="24dp">
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp">
 
                 <TextView
                     android:id="@+id/open_requests_title_tv"
@@ -112,7 +122,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="8dp"
                 android:layout_marginTop="40dp">
 
                 <TextView

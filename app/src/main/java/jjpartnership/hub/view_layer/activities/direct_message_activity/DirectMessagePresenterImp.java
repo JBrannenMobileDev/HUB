@@ -9,7 +9,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
@@ -82,7 +81,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
             messageThread.addChangeListener(new RealmChangeListener<MessageThreadRealm>() {
                 @Override
                 public void onChange(MessageThreadRealm threadRealm) {
-                    activity.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserNames()));
+                    activity.onCurrentlyTypingUpdated(getNameToDisplay(threadRealm.getCurrentlyTypingUserName()));
                 }
             });
         }
@@ -114,16 +113,13 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
         DataManager.getInstance().updateMessages(messages);
     }
 
-    private String getNameToDisplay(RealmList<String> currentlyTypingUserNames) {
-        String nameToDisplay = null;
-        if(currentlyTypingUserNames != null && currentlyTypingUserNames.size() > 0){
-            for(int i = currentlyTypingUserNames.size()-1; i >= 0; i--){
-                if(!currentlyTypingUserNames.get(i).equals(userCurrent.getFirstName() + " " + userCurrent.getLastName())){
-                    return currentlyTypingUserNames.get(i);
-                }
+    private String getNameToDisplay(String currentlyTypingUserName) {
+        if(currentlyTypingUserName != null) {
+            if (!currentlyTypingUserName.equals(userCurrent.getFirstName() + " " + userCurrent.getLastName())) {
+                return currentlyTypingUserName;
             }
         }
-        return nameToDisplay;
+        return null;
     }
 
     @Override
