@@ -35,13 +35,10 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
     public class ViewHolder extends RecyclerView.ViewHolder {
         FrameLayout root;
         TextView accountName;
-        TextView accountIcon;
         public ViewHolder(View v) {
             super(v);
             root = v.findViewById(R.id.accounts_item_frame_layout);
             accountName = v.findViewById(R.id.account_name_tv);
-            accountIcon = v.findViewById(R.id.account_icon_tv);
-
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -62,7 +59,6 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
     public void onBindViewHolder(ViewHolder holder, int position) {
         RowItem rowItem = dataModel.getRowItems().get(position);
         holder.accountName.setText(rowItem.getAccountName());
-        holder.accountIcon.setText(String.valueOf(rowItem.getAccountName().charAt(0)));
     }
 
     @Override

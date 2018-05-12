@@ -54,6 +54,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
         TextView messageContent;
         GroupIcon accountIcon;
 
+        FrameLayout accountItemLayout;
         FrameLayout directMessageLayout;
         TextView userName;
         TextView directMessageContent;
@@ -61,7 +62,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
         TextView userIcon;
         public ViewHolder(View v) {
             super(v);
-            root = v.findViewById(R.id.accounts_item_frame_layout);
+            root = v.findViewById(R.id.root);
             accountName = v.findViewById(R.id.account_name_tv);
             messageTime = v.findViewById(R.id.most_recent_message_tv);
             messageOwnerName = v.findViewById(R.id.message_owner_name_tv);
@@ -72,6 +73,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
             directMessageTime = v.findViewById(R.id.message_time_tv);
             directMessageContent = v.findViewById(R.id.direct_message_content_tv);
             directMessageLayout = v.findViewById(R.id.direct_message_frame_layout);
+            accountItemLayout = v.findViewById(R.id.accounts_item_frame_layout);
 
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -84,7 +86,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
 
     @Override
     public RecentRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.account_list_recent_row_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.recent_row_item, parent, false);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -98,7 +100,8 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                     GroupChatRealm gChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", rowItem.getChatId()).findFirst();
                     user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
                     holder.directMessageLayout.setVisibility(View.GONE);
-                    holder.accountName.setText(rowItem.getAccountName());
+                    holder.accountItemLayout.setVisibility(View.VISIBLE);
+                    holder.accountName.setText(gChat.getGroupName());
                     if (rowItem.getMessageCreatedAtTime() != 0) {
                         holder.messageTime.setText(createFormattedTime(rowItem.getMessageCreatedAtTime()));
                     }
@@ -130,6 +133,7 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                     DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();
                     user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid())).findFirst();
                     holder.directMessageLayout.setVisibility(View.VISIBLE);
+                    holder.accountItemLayout.setVisibility(View.GONE);
                     if(user != null){
                         holder.userName.setText(user.getFirstName() + " " + user.getLastName());
                         holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));

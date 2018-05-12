@@ -1,6 +1,5 @@
 package jjpartnership.hub.data_layer.data_models;
 
-import java.util.Collections;
 import java.util.List;
 
 import io.realm.RealmList;

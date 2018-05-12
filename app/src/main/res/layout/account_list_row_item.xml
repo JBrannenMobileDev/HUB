@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/accounts_item_frame_layout"
     android:layout_width="match_parent"
     android:layout_height="54dp"
     android:background="?android:attr/selectableItemBackground">
 
-    <TextView
-        android:id="@+id/account_icon_tv"
+    <ImageView
+        android:id="@+id/account_icon_iv"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="16dp"
-        android:background="@drawable/rounded_rectangle_blue_sharp"
-        android:gravity="center"
-        android:text="C"
-        android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:tint="@color/colorAccentVeryDark"
+        app:srcCompat="@drawable/ic_location_city_black_24dp" />
 
     <LinearLayout
         android:layout_width="match_parent"

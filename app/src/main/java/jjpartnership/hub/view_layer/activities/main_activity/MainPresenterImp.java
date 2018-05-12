@@ -1,5 +1,7 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
+import android.os.Handler;
+
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
@@ -27,14 +29,21 @@ public class MainPresenterImp implements MainPresenter {
     private MainRecentModel recentModel;
     private MainDirectMessagesModel directModel;
     private RealmList<GroupChatRealm> groupChats;
+    private Runnable r;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
         realm = RealmUISingleton.getInstance().getRealmInstance();
-        initDataListeners();
+        fetchInitData();
+        r = new Runnable() {
+            public void run() {
+                initDataListeners();
+            }
+        };
+        new Handler().postDelayed(r, 4000);
     }
 
-    private void initDataListeners() {
+    private void fetchInitData() {
         dataModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
         recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
         directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
@@ -44,6 +53,22 @@ public class MainPresenterImp implements MainPresenter {
             if(company != null) activity.setPageTitle(company.getName());
         }
         if(dataModel != null) {
+            activity.onAccountModelReceived(dataModel);
+        }
+        if(recentModel != null){
+            activity.onRecentModelReceived(recentModel);
+        }
+        if(directModel != null){
+            activity.onDirectMessagesModelReceived(directModel);
+        }
+
+        RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
+        groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
+        activity.onGroupMessagesReceived(groupChats);
+    }
+
+    private void initDataListeners() {
+        if(dataModel != null) {
             dataModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
                 @Override
                 public void onChange(MainAccountsModel updatedModel) {
@@ -51,6 +76,17 @@ public class MainPresenterImp implements MainPresenter {
                 }
             });
             activity.onAccountModelReceived(dataModel);
+        }else{
+            dataModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
+            if(dataModel != null) {
+                dataModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
+                    @Override
+                    public void onChange(MainAccountsModel updatedModel) {
+                        activity.onAccountModelReceived(updatedModel);
+                    }
+                });
+                activity.onAccountModelReceived(dataModel);
+            }
         }
         if(recentModel != null){
             recentModel.addChangeListener(new RealmChangeListener<MainRecentModel>() {
@@ -60,6 +96,17 @@ public class MainPresenterImp implements MainPresenter {
                 }
             });
             activity.onRecentModelReceived(recentModel);
+        }else{
+            recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+            if(recentModel != null) {
+                recentModel.addChangeListener(new RealmChangeListener<MainRecentModel>() {
+                    @Override
+                    public void onChange(MainRecentModel updatedRecent) {
+                        activity.onRecentModelReceived(updatedRecent);
+                    }
+                });
+                activity.onRecentModelReceived(recentModel);
+            }
         }
         if(directModel != null){
             directModel.addChangeListener(new RealmChangeListener<MainDirectMessagesModel>() {
@@ -69,23 +116,31 @@ public class MainPresenterImp implements MainPresenter {
                 }
             });
             activity.onDirectMessagesModelReceived(directModel);
-        }
-        if(UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)){
-            activity.setWelcomeMessage(UserRealm.TYPE_SALES);
         }else{
-            activity.setWelcomeMessage(UserRealm.TYPE_CUSTOMER);
+            directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
+            if(directModel != null) {
+                directModel.addChangeListener(new RealmChangeListener<MainDirectMessagesModel>() {
+                    @Override
+                    public void onChange(MainDirectMessagesModel updatedModel) {
+                        activity.onDirectMessagesModelReceived(updatedModel);
+                    }
+                });
+                activity.onDirectMessagesModelReceived(directModel);
+            }
         }
 
         RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
         groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
-        allGroupChats.addChangeListener(new RealmChangeListener<RealmResults<GroupChatRealm>>() {
-            @Override
-            public void onChange(RealmResults<GroupChatRealm> groupChatRealms) {
-                groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(groupChatRealms);
-                activity.onGroupMessagesReceived(groupChats);
-            }
-        });
-        activity.onGroupMessagesReceived(groupChats);
+        if(allGroupChats != null) {
+            allGroupChats.addChangeListener(new RealmChangeListener<RealmResults<GroupChatRealm>>() {
+                @Override
+                public void onChange(RealmResults<GroupChatRealm> groupChatRealms) {
+                    groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(groupChatRealms);
+                    activity.onGroupMessagesReceived(groupChats);
+                }
+            });
+            activity.onGroupMessagesReceived(groupChats);
+        }
     }
 
     @Override

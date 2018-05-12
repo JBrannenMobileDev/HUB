@@ -93,15 +93,18 @@ public class GroupIcon extends LinearLayout {
                 setTopRightIconColor(userColors.get(1));
                 setBottomLeftIconColor(userColors.get(2));
                 setBottomRightIconColor(userColors.get(3));
+                FrameLayout.LayoutParams paramsRoot4 = (FrameLayout.LayoutParams)this.getLayoutParams();
+                paramsRoot4.leftMargin = (int)DpUtil.pxFromDp(getContext(), 12f);
+                this.setLayoutParams(paramsRoot4);
             } else {
                 switch (names.size()) {
                     case 3:
                         FrameLayout.LayoutParams paramsBottomRow = (FrameLayout.LayoutParams)bottomRowLayout.getLayoutParams();
                         paramsBottomRow.topMargin = (int)DpUtil.pxFromDp(getContext(), 17f);
                         bottomRowLayout.setLayoutParams(paramsBottomRow);
-                        FrameLayout.LayoutParams paramsRoot = (FrameLayout.LayoutParams)this.getLayoutParams();
-                        paramsRoot.leftMargin = (int)DpUtil.pxFromDp(getContext(), 12f);
-                        this.setLayoutParams(paramsRoot);
+                        FrameLayout.LayoutParams paramsRoot3 = (FrameLayout.LayoutParams)this.getLayoutParams();
+                        paramsRoot3.leftMargin = (int)DpUtil.pxFromDp(getContext(), 12f);
+                        this.setLayoutParams(paramsRoot3);
                         topRightFl.setVisibility(View.GONE);
                         setTopLeftTv(names.get(0));
                         setBottomLeftTv(names.get(1));
@@ -116,6 +119,9 @@ public class GroupIcon extends LinearLayout {
                         setTopRightTv(names.get(1));
                         setTopLeftIconColor(userColors.get(0));
                         setTopRightIconColor(userColors.get(1));
+                        FrameLayout.LayoutParams paramsRoot2 = (FrameLayout.LayoutParams)this.getLayoutParams();
+                        paramsRoot2.leftMargin = (int)DpUtil.pxFromDp(getContext(), 12f);
+                        this.setLayoutParams(paramsRoot2);
                         break;
                     case 1:
                         bottomRowLayout.setVisibility(View.GONE);
