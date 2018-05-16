@@ -54,6 +54,7 @@ public class DataManager {
     }
 
     public void syncFirebaseToRealmDb(){
+        realmManager.initInitialDataIfDBisEmpty();
         fbManager.initDataListeners();
     }
 
@@ -123,8 +124,8 @@ public class DataManager {
         realmManager.nukeDb();
     }
 
-    public void setFreshInstallCallback(BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback) {
-        realmManager.setFreshInstallCallback(freshInstallDataLoadedToRealmCallback);
+    public void setOnDataSyncedCallback(BaseCallback<Boolean> dataSyncedCallback) {
+        realmManager.setOnDataSyncSuccessCallback(dataSyncedCallback);
     }
 
     public void updateRealmUserColor(long color, String uid) {
@@ -137,6 +138,9 @@ public class DataManager {
 
     public void updateFirebaseMessageThreadTyping(String chatId, String messageThreadId, String userName, boolean isTyping) {
         fbManager.updateFirebaseMessageThreadTyping(chatId, messageThreadId, userName, isTyping);
+    }
+    public void initChatMessageListeners(){
+        fbManager.initChatMessagesListener();
     }
 
     public void updateMessages(RealmResults<MessageRealm> messages) {

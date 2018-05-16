@@ -6,6 +6,7 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.Company;
@@ -34,7 +35,7 @@ import jjpartnership.hub.utils.RealmUISingleton;
  */
 
 public class RealmManager {
-    private BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback;
+    private BaseCallback<Boolean> onSyncSuccess;
 
     public RealmManager() {
     }
@@ -150,6 +151,24 @@ public class RealmManager {
         realm.close();
     }
 
+    public void initInitialDataIfDBisEmpty() {
+        Realm realm = Realm.getDefaultInstance();
+        MainAccountsModel accounts = realm.where(MainAccountsModel.class).findFirst();
+        MainDirectMessagesModel directMessages = realm.where(MainDirectMessagesModel.class).findFirst();
+        MainRecentModel recentMessages = realm.where(MainRecentModel.class).findFirst();
+        if(accounts == null && directMessages == null && recentMessages == null){
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    bgRealm.copyToRealmOrUpdate(new MainAccountsModel());
+                    bgRealm.copyToRealmOrUpdate(new MainDirectMessagesModel());
+                    bgRealm.copyToRealmOrUpdate(new MainRecentModel());
+                }
+            });
+        }
+        realm.close();
+    }
+
     public void updateMainAccountsModel(final MainAccountsModel accountsModel, final MainRecentModel recentModel, final MainDirectMessagesModel directModel) {
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
@@ -159,14 +178,21 @@ public class RealmManager {
                 bgRealm.copyToRealmOrUpdate(recentModel);
                 bgRealm.copyToRealmOrUpdate(directModel);
             }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                DataManager.getInstance().initChatMessageListeners();
+                if(onSyncSuccess != null){
+                    onSyncSuccess.onResponse(true);
+                }
+            }
+        }, new Realm.Transaction.OnError(){
+            @Override
+            public void onError(Throwable error){
+                onSyncSuccess.onFailure(new Exception(error.getMessage()));
+            }
         });
         realm.close();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(freshInstallDataLoadedToRealmCallback != null) freshInstallDataLoadedToRealmCallback.onResponse(true);
-            }
-        }, 1000);
     }
 
     public void insertOrUpdateMessage(final MessageRealm messageRealm) {
@@ -185,8 +211,8 @@ public class RealmManager {
         Realm.deleteRealm(Realm.getDefaultConfiguration());
     }
 
-    public void setFreshInstallCallback(BaseCallback<Boolean> freshInstallDataLoadedToRealmCallback) {
-        this.freshInstallDataLoadedToRealmCallback = freshInstallDataLoadedToRealmCallback;
+    public void setOnDataSyncSuccessCallback(BaseCallback<Boolean> onSyncSuccess) {
+        this.onSyncSuccess = onSyncSuccess;
     }
 
     public void insertOrUpdateUserColor(final long color, final String uid) {

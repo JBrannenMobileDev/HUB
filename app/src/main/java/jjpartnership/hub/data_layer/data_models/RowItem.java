@@ -12,7 +12,7 @@ import io.realm.annotations.PrimaryKey;
  */
 
 public class RowItem extends RealmObject implements Comparable{
-    public static final String TYPE_ACCOUNT = "type_account";
+    public static final String TYPE_GROUP_CHAT = "type_group_chat";
     public static final String TYPE_DIRECT = "type_direct";
     public static final String TYPE_REQUEST = "type_request";
     public static final String TYPE_DIRECT_REQUEST = "type_direct_request";
@@ -36,7 +36,7 @@ public class RowItem extends RealmObject implements Comparable{
     }
 
     public RowItem() {
-        this.itemType = TYPE_ACCOUNT;
+        this.itemType = TYPE_GROUP_CHAT;
     }
 
     public String getItemType() {

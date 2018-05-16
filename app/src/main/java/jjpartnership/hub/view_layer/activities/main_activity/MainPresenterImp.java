@@ -7,6 +7,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmResults;
+import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
@@ -14,6 +15,7 @@ import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.FilterUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
@@ -29,18 +31,24 @@ public class MainPresenterImp implements MainPresenter {
     private MainRecentModel recentModel;
     private MainDirectMessagesModel directModel;
     private RealmList<GroupChatRealm> groupChats;
-    private Runnable r;
+    private BaseCallback<Boolean> onSyncSuccessCallback;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
         realm = RealmUISingleton.getInstance().getRealmInstance();
         fetchInitData();
-        r = new Runnable() {
-            public void run() {
+        onSyncSuccessCallback = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean object) {
                 initDataListeners();
             }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
         };
-        new Handler().postDelayed(r, 4000);
+        DataManager.getInstance().setOnDataSyncedCallback(onSyncSuccessCallback);
     }
 
     private void fetchInitData() {

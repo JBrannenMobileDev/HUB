@@ -3,8 +3,6 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -29,7 +27,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -42,7 +39,6 @@ import butterknife.OnClick;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
-import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
@@ -50,7 +46,6 @@ import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
-import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
@@ -173,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recentSelectedCallback = new BaseCallback<RowItem>() {
             @Override
             public void onResponse(RowItem rowItem) {
-                if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
+                if(rowItem.getItemType().equals(RowItem.TYPE_GROUP_CHAT)) {
                     Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
                     groupChatIntent.putExtra("chatId", rowItem.getChatId());
                     startActivity(groupChatIntent);

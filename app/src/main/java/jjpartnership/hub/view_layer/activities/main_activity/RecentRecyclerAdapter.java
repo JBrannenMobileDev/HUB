@@ -95,8 +95,8 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
     public void onBindViewHolder(ViewHolder holder, int position) {
                 RowItem rowItem = dataModel.getRowItems().get(position);
         UserRealm user;
-                //TYPE_ACCOUNT is actually type SHARED_LEAD
-                if(rowItem.getItemType().equals(RowItem.TYPE_ACCOUNT)) {
+                //TYPE_GROUP_CHAT is actually type SHARED_LEAD
+                if(rowItem.getItemType().equals(RowItem.TYPE_GROUP_CHAT)) {
                     GroupChatRealm gChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", rowItem.getChatId()).findFirst();
                     user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
                     holder.directMessageLayout.setVisibility(View.GONE);

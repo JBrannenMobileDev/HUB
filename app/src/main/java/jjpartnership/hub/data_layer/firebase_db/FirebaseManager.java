@@ -197,49 +197,34 @@ public class FirebaseManager {
     }
 
     private void getCustomerIds(final List<Account> accountList) {
-        ValueEventListener companySalesListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Company company = dataSnapshot.getValue(Company.class);
-                if (company != null) {
-                    companies.add(company);
-                }
-                for(Account account : accountList) {
-                    String companyId;
-                    if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
-                        companyId = account.getCompanyCustomerId();
-                    } else {
-                        companyId = account.getCompanySalesId();
+        for(Account account : accountList) {
+            String companyId;
+            if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
+                companyId = account.getCompanyCustomerId();
+            } else {
+                companyId = account.getCompanySalesId();
+            }
+
+            ValueEventListener companyListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Company company = dataSnapshot.getValue(Company.class);
+                    if (company != null) {
+                        companies.add(company);
                     }
-
-                    ValueEventListener companyListener = new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Company company = dataSnapshot.getValue(Company.class);
-                            if (company != null) {
-                                companies.add(company);
-                            }
-                            if(companies.size() - 1 == accounts.size()){
-                                DataManager.getInstance().updateRealmCompanys(companies);
-                                getGroupChat(accounts);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    };
-                    companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
+                    if(companies.size() - 1 == accounts.size()){
+                        DataManager.getInstance().updateRealmCompanys(companies);
+                        getGroupChat(accounts);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        };
-        companiesReference.child(accountList.get(0).getCompanySalesId()).addListenerForSingleValueEvent(companySalesListener);
+                }
+            };
+            companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
+        }
     }
 
     private void getGroupChat(final List<Account> accountList) {
@@ -524,6 +509,8 @@ public class FirebaseManager {
                 directItems.add(newItem);
             }
         }
+
+
         Collections.sort(directItems);
         directModel.setDirectItems(directItems);
 
@@ -557,7 +544,6 @@ public class FirebaseManager {
         recentModel.setRowItems(recentRowItems);
 
         DataManager.getInstance().updateRealmMainModels(accountsModel, recentModel, directModel);
-        initChatMessagesListener(groupChats, directChats);
     }
 
     private MainRecentModel filterModel(MainRecentModel recentModel) {
@@ -692,7 +678,7 @@ public class FirebaseManager {
         chatMessagesReference.child(newChat.getChatId()).child("message_thread").child(newChat.getMessageThreadId()).addValueEventListener(valueEventListeners.get(valueEventListeners.size()-1));
     }
 
-    private void initChatMessagesListener(List<GroupChat> groupChats, List<DirectChat> directChats) {
+    public void initChatMessagesListener() {
         final List<String> messageThreadIds = new ArrayList<>();
         final List<String> chatIds = new ArrayList<>();
         for(GroupChat chat : groupChats){
