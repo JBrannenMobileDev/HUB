@@ -18,15 +18,18 @@ import java.util.Map;
 import java.util.Set;
 
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CustomerRequest;
+import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
@@ -416,6 +419,7 @@ public class FirebaseSyncManager {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             Message message = data.getValue(Message.class);
+                            message.setSavedToFirebase(true);
                             allMessages.add(message);
                         }
                         count++;
@@ -475,6 +479,8 @@ public class FirebaseSyncManager {
             recentRow.setMessageContent(chat.getMostRecentMessage().getMessageContent());
             recentRow.setChatId(chat.getChatId());
             recentRow.setAccountId(chat.getAccountId());
+            recentRow.setAccountName(chat.getGroupName());
+            recentRow.setMessageContent(chat.getMostRecentMessage().getMessageContent());
             recentRow.setMessageOwnerName(chat.getMostRecentMessage().getMessageOwnerName());
             recentRow.setMessageCreatedAtTime(chat.getMostRecentMessage().getCreatedDate());
             if(!chat.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
@@ -482,7 +488,11 @@ public class FirebaseSyncManager {
             }else{
                 recentRow.setNewMessage(false);
             }
-            recentRowItems.add(recentRow);
+            if(recentRow.isNewMessage()) {
+                recentRowItems.add(recentRow);
+            }else if(recentRow.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                recentRowItems.add(recentRow);
+            }
         }
 
 
@@ -697,9 +707,11 @@ public class FirebaseSyncManager {
         Calendar twoWeeksAgo = Calendar.getInstance();
         twoWeeksAgo.add(Calendar.DAY_OF_YEAR, -14);
 
+
+        List<CustomerRequestRealm> customerRequestsRealm = RealmUISingleton.getInstance().getRealmInstance().where(CustomerRequestRealm.class).findAll();
         RealmList<RowItem> recentRowItems = new RealmList<>();
-        for(int i = 0; i < customerRequests.size(); i++){
-            CustomerRequest request = customerRequests.get(i);
+        for(int i = 0; i < customerRequestsRealm.size(); i++){
+            CustomerRequestRealm request = customerRequestsRealm.get(i);
             if(request != null && request.isOpen()){
                 RowItem temp = new RowItem();
                 temp.setMessageContent(request.getRequestMessage());
@@ -770,22 +782,75 @@ public class FirebaseSyncManager {
             newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
             newRowItem.setMessageOwnerName(item.getMessageOwnerName());
             if(item.isNewMessage()) {
-                sortedByMostRecent.add(newRowItem);
+                recentRowItems.add(newRowItem);
             }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
-                sortedByMostRecent.add(newRowItem);
+                recentRowItems.add(newRowItem);
             }
         }
 
+        List<GroupChatRealm> allRealmGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
+        MainRecentModel currentRecentModel = RealmUISingleton.getInstance().getRealmInstance().where(MainRecentModel.class).
+                                                equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+        if(currentRecentModel != null) {
+            for (GroupChatRealm groupChat : allRealmGroupChats) {
+                if (groupChat.getChatId().equals(message.getChatId())){
+                    RowItem newRecentItem = new RowItem();
+                    newRecentItem.setItemType(RowItem.TYPE_GROUP_CHAT);
+                    newRecentItem.setChatId(message.getChatId());
+                    newRecentItem.setMessageCreatedAtTime(message.getCreatedDate());
+                    newRecentItem.setMessageOwnerName(message.getMessageOwnerName());
+                    newRecentItem.setNewMessage(!message.getReadByUids().contains(UserPreferences.getInstance().getUid()));
+                    newRecentItem.setMessageContent(message.getMessageContent());
+                    newRecentItem.setAccountId(groupChat.getAccountId());
+                    recentRowItems.add(newRecentItem);
+                }else{
+                    RowItem newRecentItem = new RowItem();
+                    newRecentItem.setItemType(RowItem.TYPE_GROUP_CHAT);
+                    newRecentItem.setChatId(groupChat.getChatId());
+                    newRecentItem.setMessageCreatedAtTime(groupChat.getMostRecentMessage().getCreatedDate());
+                    newRecentItem.setMessageOwnerName(groupChat.getMostRecentMessage().getMessageOwnerName());
+                    newRecentItem.setNewMessage(!groupChat.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid()));
+                    newRecentItem.setMessageContent(groupChat.getMostRecentMessage().getMessageContent());
+                    newRecentItem.setAccountId(groupChat.getAccountId());
+                    recentRowItems.add(newRecentItem);
+                }
+            }
+        }else{
+            RowItem newRecentItem = new RowItem();
+            newRecentItem.setMessageCreatedAtTime(message.getCreatedDate());
+            newRecentItem.setMessageContent(message.getMessageContent());
+            newRecentItem.setItemType(RowItem.TYPE_GROUP_CHAT);
+            newRecentItem.setMessageOwnerName(message.getMessageOwnerName());
+            if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+                newRecentItem.setNewMessage(true);
+            } else {
+                newRecentItem.setNewMessage(false);
+            }
+            recentRowItems.add(newRecentItem);
+        }
 
-        Collections.sort(sortedByMostRecent, RowItem.createdAtComparator);
-        Collections.reverse(sortedByMostRecent);
+
+
+
+
+        Collections.sort(recentRowItems, RowItem.createdAtComparator);
+        Collections.reverse(recentRowItems);
         MainRecentModel recentModel = new MainRecentModel();
-        RealmList<RowItem> recentRowItems = new RealmList<>();
-
-        recentRowItems.addAll(sortedByMostRecent);
         recentModel.setRowItems(recentRowItems);
 
-        DataManager.getInstance().updateRealmMainModels(copy, recentModel, newDirectModel);
+        BaseCallback<Boolean> onMainModelsUpdatedListener = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean object) {
+
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+
+        DataManager.getInstance().updateRealmMainModels(null, recentModel, newDirectModel, onMainModelsUpdatedListener);
     }
 
     private Company getAccountCompany(Account account) {

@@ -121,7 +121,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-                    updateMainAccountModel(message);
+//                    updateMainAccountModel(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -131,7 +131,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-                    updateMainAccountModel(message);
+//                    updateMainAccountModel(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -179,7 +179,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-                    updateMainAccountModel(message);
+//                    updateMainAccountModel(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -189,7 +189,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-                    updateMainAccountModel(message);
+//                    updateMainAccountModel(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -257,7 +257,7 @@ public class FirebaseManager {
                             //Do nothing
                         }else{
                             message.setSavedToFirebase(true);
-                            updateMainAccountModel(message);
+//                            updateMainAccountModel(message);
                             DataManager.getInstance().updateRealmMessage(message);
                         }
                     }
@@ -268,7 +268,7 @@ public class FirebaseManager {
                     Message message = dataSnapshot.getValue(Message.class);
                     if(message != null) {
                         message.setSavedToFirebase(true);
-                        updateMainAccountModel(message);
+//                        updateMainAccountModel(message);
                         DataManager.getInstance().updateRealmMessage(message);
                     }
                 }
@@ -361,18 +361,24 @@ public class FirebaseManager {
     public void createNewMessage(Message newMessage) {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
+        GroupChatRealm groupChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", newMessage.getChatId()).findFirst();
+        GroupChatRealm copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(groupChat);
+        copy.setMessageCreatedTime(newMessage.getCreatedDate());
+        copy.setMostRecentMessage(new MessageRealm(newMessage));
+        DataManager.getInstance().insertOrUpdateGroupChat(copy);
+        groupChatsReference.child(copy.getChatId()).setValue(new GroupChat(copy));
         chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
     }
 
     public void createNewDirectMessage(Message newMessage) {
         DatabaseReference messageRef = chatMessagesReference.child(newMessage.getChatId()).child("messages").push();
         newMessage.setMessageId(messageRef.getKey());
-        chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
         DirectChatRealm dChatRealm = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", newMessage.getChatId()).findFirst();
         DirectChatRealm copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(dChatRealm);
         copy.setMessageCreatedTime(newMessage.getCreatedDate());
         DataManager.getInstance().insertOrUpdateDirectChat(copy);
         directChatsReference.child(copy.getChatId()).setValue(new DirectChat(copy));
+        chatMessagesReference.child(newMessage.getChatId()).child("messages").child(newMessage.getMessageId()).setValue(newMessage);
     }
 
     public void createNewRequestMessage(Message newMessage) {

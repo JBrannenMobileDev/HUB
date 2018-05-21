@@ -14,6 +14,7 @@ import jjpartnership.hub.data_layer.data_models.CustomerRequestRealm;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
@@ -163,6 +164,10 @@ public class DataManager {
 
     public void insertOrUpdateDirectChat(DirectChatRealm directChat){
         realmManager.insertOrUpdateDirectChatRealm(directChat);
+    }
+
+    public void insertOrUpdateGroupChat(GroupChatRealm groupChatRealm){
+        realmManager.insertOrUpdateGroupChatRealm(groupChatRealm);
     }
 
     public void createNewCustomerRequest(AccountRealm account, CompanyRealm company, String requestMessage, String createdByUid) {

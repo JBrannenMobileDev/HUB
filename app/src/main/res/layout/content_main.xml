@@ -30,6 +30,7 @@
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
                     android:layout_weight="1">
 
                     <TextView
@@ -42,7 +43,7 @@
                         android:layout_marginRight="16dp"
                         android:layout_weight="1"
                         android:text="View All"
-                        android:textColor="@color/white"
+                        android:textColor="@color/colorAccentVeryDark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 

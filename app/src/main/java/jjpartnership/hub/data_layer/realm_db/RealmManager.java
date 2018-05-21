@@ -176,9 +176,9 @@ public class RealmManager {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
-                bgRealm.copyToRealmOrUpdate(accountsModel);
-                bgRealm.copyToRealmOrUpdate(recentModel);
-                bgRealm.copyToRealmOrUpdate(directModel);
+                if(accountsModel != null) bgRealm.copyToRealmOrUpdate(accountsModel);
+                if(recentModel != null) bgRealm.copyToRealmOrUpdate(recentModel);
+                if(directModel != null) bgRealm.copyToRealmOrUpdate(directModel);
             }
         }, new Realm.Transaction.OnSuccess() {
             @Override
@@ -264,6 +264,17 @@ public class RealmManager {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(directChat);
+            }
+        });
+        realm.close();
+    }
+
+    public void insertOrUpdateGroupChatRealm(final GroupChatRealm groupChatRealm) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(groupChatRealm);
             }
         });
         realm.close();
