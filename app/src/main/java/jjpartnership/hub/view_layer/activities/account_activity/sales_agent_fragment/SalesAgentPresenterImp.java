@@ -20,7 +20,6 @@ import jjpartnership.hub.utils.RealmUISingleton;
 public class SalesAgentPresenterImp implements SalesAgentPresenter {
     private SalesAgentView fragment;
     private Realm realm;
-    private String allAgentsChatId;
     private String accountName;
     private String accountId;
     private UserRealm createdByUser;
@@ -38,8 +37,6 @@ public class SalesAgentPresenterImp implements SalesAgentPresenter {
 
     private void initDataListeners() {
         AccountRealm account = realm.where(AccountRealm.class).equalTo("accountIdFire", accountId).findFirst();
-        allAgentsChatId = account.getGroupChatSalesId();
-        groupChat = realm.where(GroupChatRealm.class).equalTo("chatId", allAgentsChatId).findFirst();
         resultGroups = realm.where(GroupChatRealm.class).equalTo("accountId", account.getAccountIdFire()).findAll();
         groupChats = FilterUtil.filterOutCustomerRequestGroups(resultGroups);
 

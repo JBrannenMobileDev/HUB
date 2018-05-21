@@ -39,6 +39,7 @@ import butterknife.OnClick;
 import io.realm.RealmList;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
 import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RecentRecyclerAdapter recentRecyclerAdapter;
     private DirectMessageRecyclerAdapter directRecyclerAdapter;
     private GroupMessagesRecyclerAdapter groupRecyclerAdapter;
-    private BaseCallback<RowItem> accountSelectedCallback;
+    private BaseCallback<AccountRowItem> accountSelectedCallback;
     private BaseCallback<RowItem> recentSelectedCallback;
     private BaseCallback<DirectItem> directMessageSelectedCallback;
     private BaseCallback<GroupChatRealm> groupMessageSelectedCallback;
@@ -150,11 +151,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initAdapters() {
-        accountSelectedCallback = new BaseCallback<RowItem>() {
+        accountSelectedCallback = new BaseCallback<AccountRowItem>() {
             @Override
-            public void onResponse(RowItem rowItem) {
+            public void onResponse(AccountRowItem rowItem) {
                 Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
-                accountChatIntent.putExtra("account_id", rowItem.getAccountId());
+                accountChatIntent.putExtra("account_id", rowItem.getAccountIdFire());
                 accountChatIntent.putExtra("account_name", rowItem.getAccountName());
                 startActivity(accountChatIntent);
             }

@@ -57,8 +57,8 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
 
     @Override
     public void onDestroy(){
-        messages.removeAllChangeListeners();
-        messageThread.removeAllChangeListeners();
+        if(messages != null) messages.removeAllChangeListeners();
+        if(messageThread != null) messageThread.removeAllChangeListeners();
     }
 
     private void fetchData() {

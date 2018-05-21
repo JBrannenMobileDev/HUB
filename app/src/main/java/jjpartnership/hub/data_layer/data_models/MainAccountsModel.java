@@ -12,22 +12,22 @@ public class MainAccountsModel extends RealmObject{
     public static final String PERM_ID = "main_account_model";
     @PrimaryKey
     private String permanentId;
-    private RealmList<RowItem> rowItems;
+    private RealmList<AccountRowItem> rowItems;
 
     public MainAccountsModel() {
         permanentId = PERM_ID;
     }
 
-    public MainAccountsModel(RealmList<RowItem> rowItems) {
+    public MainAccountsModel(RealmList<AccountRowItem> rowItems) {
         this.rowItems = rowItems;
         permanentId = PERM_ID;
     }
 
-    public RealmList<RowItem> getRowItems() {
+    public RealmList<AccountRowItem> getRowItems() {
         return rowItems;
     }
 
-    public void setRowItems(RealmList<RowItem> rowItems) {
+    public void setRowItems(RealmList<AccountRowItem> rowItems) {
         this.rowItems = rowItems;
     }
 }

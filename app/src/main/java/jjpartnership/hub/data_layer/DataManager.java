@@ -21,6 +21,7 @@ import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.User;
+import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
 import jjpartnership.hub.data_layer.realm_db.RealmManager;
 import jjpartnership.hub.utils.BaseCallback;
@@ -53,9 +54,9 @@ public class DataManager {
         fbManager.loadCompaniesToFirebase();
     }
 
-    public void syncFirebaseToRealmDb(){
+    public void syncFirebaseToRealmDb(BaseCallback<Boolean> syncCompleteListener){
         realmManager.initInitialDataIfDBisEmpty();
-        fbManager.initDataListeners();
+        fbManager.initBootSync(syncCompleteListener);
     }
 
     public void createNewUser(String uid, String email){
@@ -106,8 +107,8 @@ public class DataManager {
         realmManager.updateRealmMessage(message);
     }
 
-    public void updateRealmMainModels(MainAccountsModel accountsModel, MainRecentModel recentModel, MainDirectMessagesModel directModel) {
-        realmManager.updateMainAccountsModel(accountsModel, recentModel, directModel);
+    public void updateRealmMainModels(MainAccountsModel accountsModel, MainRecentModel recentModel, MainDirectMessagesModel directModel, BaseCallback<Boolean> mainModelsSaveCompleteListener) {
+        realmManager.updateMainAccountsModel(accountsModel, recentModel, directModel, mainModelsSaveCompleteListener);
     }
 
     public void createNewMessage(Message newMessage) {
@@ -124,10 +125,6 @@ public class DataManager {
         realmManager.nukeDb();
     }
 
-    public void setOnDataSyncedCallback(BaseCallback<Boolean> dataSyncedCallback) {
-        realmManager.setOnDataSyncSuccessCallback(dataSyncedCallback);
-    }
-
     public void updateRealmUserColor(long color, String uid) {
         realmManager.insertOrUpdateUserColor(color, uid);
     }
@@ -138,9 +135,6 @@ public class DataManager {
 
     public void updateFirebaseMessageThreadTyping(String chatId, String messageThreadId, String userName, boolean isTyping) {
         fbManager.updateFirebaseMessageThreadTyping(chatId, messageThreadId, userName, isTyping);
-    }
-    public void initChatMessageListeners(){
-        fbManager.initChatMessagesListener();
     }
 
     public void updateMessages(RealmResults<MessageRealm> messages) {
@@ -181,5 +175,12 @@ public class DataManager {
 
     public void insertOrUpdateCustomerRequest(CustomerRequestRealm request) {
         realmManager.insertOrUpdateCustomerRequest(request);
+    }
+
+    public void syncBootDataToLocal(List<User> users, List<Account> userAccounts, List<CustomerRequest> customerRequests,
+                                    List<Company> companies, List<GroupChat> allGroupChats, List<DirectChat> directChats,
+                                    List<UserColor> userColors, List<Message> allMessages, BaseCallback<Boolean> syncCompleteListener) {
+        realmManager.saveBootData(users, userAccounts, customerRequests, companies, allGroupChats, directChats, userColors,
+                                    allMessages, syncCompleteListener);
     }
 }

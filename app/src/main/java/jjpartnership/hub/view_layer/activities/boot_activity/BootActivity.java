@@ -195,7 +195,6 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
         userAccountExistsCallback = new BaseCallback<String>() {
             @Override
             public void onResponse(String uid) {
-                hideLoadingState();
                 if(uid != null) {
                     if(currentUser.isEmailVerified()) {
                         launchNextActivity(currentUser);
@@ -382,10 +381,22 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
     }
 
     private void launchNextActivity(FirebaseUser user) {
+        BaseCallback<Boolean> syncCompleteListener = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean success) {
+                bootLoadingLayout.setVisibility(View.VISIBLE);
+                currentUser = mAuth.getCurrentUser();
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(BootActivity.this, "Sync failed", Toast.LENGTH_SHORT).show();
+            }
+        };
+
         if(user.isEmailVerified()) {
-            DataManager.getInstance().syncFirebaseToRealmDb();
-            currentUser = mAuth.getCurrentUser();
-            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            DataManager.getInstance().syncFirebaseToRealmDb(syncCompleteListener);
         }else{
             if(!accountJustCreated) {
                 Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();

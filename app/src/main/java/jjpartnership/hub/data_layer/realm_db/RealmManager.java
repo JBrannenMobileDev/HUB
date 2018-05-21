@@ -2,10 +2,12 @@ package jjpartnership.hub.data_layer.realm_db;
 
 import android.os.Handler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmModel;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
@@ -24,6 +26,7 @@ import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.MessageThreadRealm;
+import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
@@ -35,7 +38,6 @@ import jjpartnership.hub.utils.RealmUISingleton;
  */
 
 public class RealmManager {
-    private BaseCallback<Boolean> onSyncSuccess;
 
     public RealmManager() {
     }
@@ -169,7 +171,7 @@ public class RealmManager {
         realm.close();
     }
 
-    public void updateMainAccountsModel(final MainAccountsModel accountsModel, final MainRecentModel recentModel, final MainDirectMessagesModel directModel) {
+    public void updateMainAccountsModel(final MainAccountsModel accountsModel, final MainRecentModel recentModel, final MainDirectMessagesModel directModel, final BaseCallback<Boolean> mainModelsSaveCompleteListener) {
         Realm realm = Realm.getDefaultInstance();
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
@@ -181,15 +183,12 @@ public class RealmManager {
         }, new Realm.Transaction.OnSuccess() {
             @Override
             public void onSuccess() {
-                DataManager.getInstance().initChatMessageListeners();
-                if(onSyncSuccess != null){
-                    onSyncSuccess.onResponse(true);
-                }
+                mainModelsSaveCompleteListener.onResponse(true);
             }
         }, new Realm.Transaction.OnError(){
             @Override
             public void onError(Throwable error){
-                onSyncSuccess.onFailure(new Exception(error.getMessage()));
+                mainModelsSaveCompleteListener.onFailure(new Exception(error.getMessage()));
             }
         });
         realm.close();
@@ -209,10 +208,6 @@ public class RealmManager {
     public void nukeDb() {
         RealmUISingleton.getInstance().closeRealmInstance();
         Realm.deleteRealm(Realm.getDefaultConfiguration());
-    }
-
-    public void setOnDataSyncSuccessCallback(BaseCallback<Boolean> onSyncSuccess) {
-        this.onSyncSuccess = onSyncSuccess;
     }
 
     public void insertOrUpdateUserColor(final long color, final String uid) {
@@ -298,5 +293,93 @@ public class RealmManager {
             }
         });
         realm.close();
+    }
+
+    public void saveBootData(final List<User> users, final List<Account> userAccounts,
+                             final List<CustomerRequest> customerRequests, final List<Company> companies,
+                             final List<GroupChat> allGroupChats, final List<DirectChat> directChats,
+                             final List<UserColor> userColors, final List<Message> allMessages,
+                             final BaseCallback<Boolean> syncCompleteListener) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(createRealmUserList(users));
+                bgRealm.copyToRealmOrUpdate(createRealmAccountList(userAccounts));
+                bgRealm.copyToRealmOrUpdate(createRealmCustomerRequestList(customerRequests));
+                bgRealm.copyToRealmOrUpdate(createRealmCompaniesList(companies));
+                bgRealm.copyToRealmOrUpdate(createRealmAllGroupChatsList(allGroupChats));
+                bgRealm.copyToRealmOrUpdate(createRealmDirectChatsList(directChats));
+                bgRealm.copyToRealmOrUpdate(userColors);
+                bgRealm.copyToRealmOrUpdate(createRealmALlMessagesList(allMessages));
+            }
+        }, new Realm.Transaction.OnSuccess() {
+            @Override
+            public void onSuccess() {
+                syncCompleteListener.onResponse(true);
+            }
+        }, new Realm.Transaction.OnError() {
+            @Override
+            public void onError(Throwable error) {
+                syncCompleteListener.onFailure(new Exception(error.getMessage()));
+            }
+        });
+        realm.close();
+    }
+
+    private List<UserRealm> createRealmUserList(List<User> users) {
+        List<UserRealm> realmUserList = new ArrayList<>();
+        for(User user : users){
+            realmUserList.add(new UserRealm(user));
+        }
+        return realmUserList;
+    }
+
+    private List<AccountRealm> createRealmAccountList(List<Account> accounts) {
+        List<AccountRealm> realmAccountList = new ArrayList<>();
+        for(Account account : accounts){
+            realmAccountList.add(new AccountRealm(account));
+        }
+        return realmAccountList;
+    }
+
+    private List<CustomerRequestRealm> createRealmCustomerRequestList(List<CustomerRequest> requests) {
+        List<CustomerRequestRealm> realmRequestList = new ArrayList<>();
+        for(CustomerRequest request : requests){
+            realmRequestList.add(new CustomerRequestRealm(request));
+        }
+        return realmRequestList;
+    }
+
+    private List<CompanyRealm> createRealmCompaniesList(List<Company> companies) {
+        List<CompanyRealm> realmCompanyList = new ArrayList<>();
+        for(Company company : companies){
+            realmCompanyList.add(new CompanyRealm(company));
+        }
+        return realmCompanyList;
+    }
+
+    private List<GroupChatRealm> createRealmAllGroupChatsList(List<GroupChat> groupChats) {
+        List<GroupChatRealm> realmGroupChatList = new ArrayList<>();
+        for(GroupChat chat : groupChats){
+            realmGroupChatList.add(new GroupChatRealm(chat));
+        }
+        return realmGroupChatList;
+    }
+
+    private List<DirectChatRealm> createRealmDirectChatsList(List<DirectChat> directChats) {
+        List<DirectChatRealm> realmDirectChatList = new ArrayList<>();
+        for(DirectChat chat : directChats){
+            realmDirectChatList.add(new DirectChatRealm(chat));
+        }
+        return realmDirectChatList;
+    }
+
+    private List<MessageRealm> createRealmALlMessagesList(List<Message> messages) {
+        List<MessageRealm> realmMessageList = new ArrayList<>();
+        for(Message message : messages){
+            realmMessageList.add(new MessageRealm(message));
+        }
+        return realmMessageList;
     }
 }

@@ -1,21 +1,15 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
-import android.os.Handler;
-
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
-import io.realm.RealmModel;
 import io.realm.RealmResults;
-import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
-import jjpartnership.hub.data_layer.data_models.GroupChat;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
-import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.FilterUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
@@ -27,32 +21,19 @@ import jjpartnership.hub.utils.UserPreferences;
 public class MainPresenterImp implements MainPresenter {
     private MainView activity;
     private Realm realm;
-    private MainAccountsModel dataModel;
+    private MainAccountsModel accountModel;
     private MainRecentModel recentModel;
     private MainDirectMessagesModel directModel;
     private RealmList<GroupChatRealm> groupChats;
-    private BaseCallback<Boolean> onSyncSuccessCallback;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
         realm = RealmUISingleton.getInstance().getRealmInstance();
         fetchInitData();
-        onSyncSuccessCallback = new BaseCallback<Boolean>() {
-            @Override
-            public void onResponse(Boolean object) {
-                initDataListeners();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-        DataManager.getInstance().setOnDataSyncedCallback(onSyncSuccessCallback);
     }
 
     private void fetchInitData() {
-        dataModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
+        accountModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
         recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
         directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
         UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
@@ -60,8 +41,8 @@ public class MainPresenterImp implements MainPresenter {
             CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
             if(company != null) activity.setPageTitle(company.getName());
         }
-        if(dataModel != null) {
-            activity.onAccountModelReceived(dataModel);
+        if(accountModel != null) {
+            activity.onAccountModelReceived(accountModel);
         }
         if(recentModel != null){
             activity.onRecentModelReceived(recentModel);
@@ -73,27 +54,28 @@ public class MainPresenterImp implements MainPresenter {
         RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
         groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
         activity.onGroupMessagesReceived(groupChats);
+        initDataListeners();
     }
 
     private void initDataListeners() {
-        if(dataModel != null) {
-            dataModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
+        if(accountModel != null) {
+            accountModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
                 @Override
                 public void onChange(MainAccountsModel updatedModel) {
                     activity.onAccountModelReceived(updatedModel);
                 }
             });
-            activity.onAccountModelReceived(dataModel);
+            activity.onAccountModelReceived(accountModel);
         }else{
-            dataModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
-            if(dataModel != null) {
-                dataModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
+            accountModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
+            if(accountModel != null) {
+                accountModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
                     @Override
                     public void onChange(MainAccountsModel updatedModel) {
                         activity.onAccountModelReceived(updatedModel);
                     }
                 });
-                activity.onAccountModelReceived(dataModel);
+                activity.onAccountModelReceived(accountModel);
             }
         }
         if(recentModel != null){
@@ -158,7 +140,7 @@ public class MainPresenterImp implements MainPresenter {
 
     @Override
     public void onDestroy() {
-        if(dataModel != null) dataModel.removeAllChangeListeners();
+        if(accountModel != null) accountModel.removeAllChangeListeners();
         if(recentModel != null) recentModel.removeAllChangeListeners();
         if(directModel != null) directModel.removeAllChangeListeners();
     }

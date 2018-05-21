@@ -2,6 +2,7 @@ package jjpartnership.hub.data_layer.firebase_db;
 
 import android.util.Log;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -9,18 +10,30 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import io.realm.RealmResults;
+import io.realm.RealmList;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
+import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
 import jjpartnership.hub.data_layer.data_models.CustomerRequest;
 import jjpartnership.hub.data_layer.data_models.DirectChat;
+import jjpartnership.hub.data_layer.data_models.DirectChatRealm;
+import jjpartnership.hub.data_layer.data_models.DirectItem;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
+import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
+import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
+import jjpartnership.hub.data_layer.data_models.MessageThread;
+import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
@@ -59,9 +72,32 @@ public class FirebaseSyncManager {
     private List<GroupChat> allGroupChats;
     private List<DirectChat> directChats;
     private List<UserColor> userColors;
+    private List<Message> allMessages;
     private BaseCallback<Boolean> syncCompleteCallback;
+    private MainRecentModel mainRecentModel;
+    private MainAccountsModel mainAccountsModel;
+    private MainDirectMessagesModel mainDirectMessagesModel;
 
-    public FirebaseSyncManager(BaseCallback<Boolean> syncCompleteCallback) {
+    private List<ChildEventListener> childEventListenersChatMessages;
+    private List<ValueEventListener> valueEventListeners;
+
+    public FirebaseSyncManager() {
+
+    }
+
+    private void initData(){
+        users = new ArrayList<>();
+        accountIds = new ArrayList<>();
+        userAccounts = new ArrayList<>();
+        customerRequests = new ArrayList<>();
+        companies = new ArrayList<>();
+        allGroupChats = new ArrayList<>();
+        directChats = new ArrayList<>();
+        userColors = new ArrayList<>();
+        allMessages = new ArrayList<>();
+        childEventListenersChatMessages = new ArrayList<>();
+        valueEventListeners = new ArrayList<>();
+        database = FirebaseDatabase.getInstance();
         thisUserReference = database.getReference("users").child(UserPreferences.getInstance().getUid());
         thisUserAccountsReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("accountIds");
         thisUserDirectMessagesReference = database.getReference("users").child(UserPreferences.getInstance().getUid()).child("directChatIds");
@@ -74,21 +110,13 @@ public class FirebaseSyncManager {
         industriesReference = database.getReference("industries");
         userColorsReference = database.getReference("user_colors");
         customerRequestsReference = database.getReference("customer_requests");
-        users = new ArrayList<>();
-        accountIds = new ArrayList<>();
-        userAccounts = new ArrayList<>();
-        customerRequests = new ArrayList<>();
-        companies = new ArrayList<>();
-        allGroupChats = new ArrayList<>();
-        directChats = new ArrayList<>();
-        userColors = new ArrayList<>();
         currentUid = UserPreferences.getInstance().getUid();
-        this.syncCompleteCallback = syncCompleteCallback;
     }
 
-    public void syncFirebaseToLocalDb(){
+    public void syncFirebaseToLocalDb(BaseCallback<Boolean> syncCompleteCallback){
+        initData();
+        this.syncCompleteCallback = syncCompleteCallback;
         getThisUser();
-        saveAllDataToLocalDb();
     }
 
     private void getThisUser() {
@@ -172,7 +200,7 @@ public class FirebaseSyncManager {
                     if (company != null) {
                         companies.add(company);
                     }
-                    if(companies.size() - 1 == userAccounts.size()){
+                    if(companies.size() == userAccounts.size()){
                         getAccountRequests();
                     }
                 }
@@ -299,28 +327,484 @@ public class FirebaseSyncManager {
     }
 
     private void getUsers() {
+        final Set<String> uids = new HashSet<>();
+        for(GroupChat chat : allGroupChats){
+            if(chat.getUserIdsList() != null) uids.addAll(chat.getUserIdsList());
+        }
 
+        if(companies != null && companies.size() > 0){
+            for(Company company : companies) {
+                uids.addAll(company.getEmployeeList());
+            }
+        }
+
+        if(directChats != null && directChats.size() > 0){
+            for(DirectChat chat : directChats){
+                if(chat.getUserIdA().equals(UserPreferences.getInstance().getUid())){
+                    uids.add(chat.getUserIdB());
+                }else{
+                    uids.add(chat.getUserIdA());
+                }
+            }
+        }
+
+        if(uids.size() > 0) {
+            for (String uid : uids) {
+                ValueEventListener usersListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if(user != null){
+                            users.add(user);
+                        }
+                        if(users.size() == uids.size()){
+                            getUserColors(new ArrayList<>(uids));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                usersReference.child(uid).addListenerForSingleValueEvent(usersListener);
+            }
+        }else{
+            getUserColors(new ArrayList<>(uids));
+        }
     }
 
-    private void getUserColors() {
+    private void getUserColors(final List<String> uids) {
+        if(uids != null && uids.size() > 0) {
+            for (final String uid : uids) {
+                ValueEventListener userColorsListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        long color = (long) dataSnapshot.getValue();
+                        userColors.add(new UserColor(uid, color));
+                        if (userColors.size() == uids.size()) {
+                            getAllUserMessages();
+                        }
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                database.getReference("user_colors").child(uid).addListenerForSingleValueEvent(userColorsListener);
+            }
+        }else{
+            getAllUserMessages();
+        }
     }
 
+    private int count;
     private void getAllUserMessages() {
+        final List<String> chatIds = new ArrayList<>();
+        for(GroupChat chat : allGroupChats){
+            chatIds.add(chat.getChatId());
+        }
+        for(DirectChat chat : directChats){
+            chatIds.add(chat.getChatId());
+        }
+        count = 0;
+        if(chatIds != null && chatIds.size() > 0) {
+            for (String chatId : chatIds) {
+                ValueEventListener chatMessagesListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            Message message = data.getValue(Message.class);
+                            allMessages.add(message);
+                        }
+                        count++;
+                        if (chatIds.size() == count) {
+                            saveAllDataToLocalDb();
+                        }
+                    }
 
-    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-    private void addMessageDataToGroupChats(){
-        RealmResults<MessageRealm> realmMessages = RealmUISingleton.getInstance().getRealmInstance().where(MessageRealm.class).equalTo("chatId", gChat.getChatId()).findAll();
-        if (realmMessages != null && realmMessages.size() > 0) {
-            MessageRealm mostRecentMessage = realmMessages.get(realmMessages.size() - 1);
-            gChat.setMostRecentMessage(new Message(mostRecentMessage));
-            gChat.setMessageCreatedTime(mostRecentMessage.getCreatedDate());
-            gChat.setMessageThreadId(mostRecentMessage.getMessageThreadId());
+                    }
+                };
+                if (chatId != null) {
+                    chatMessagesReference.child(chatId).child("messages").addListenerForSingleValueEvent(chatMessagesListener);
+                }
+            }
+        }else{
+            saveAllDataToLocalDb();
         }
     }
 
     private void saveAllDataToLocalDb() {
+        users.add(currentUser);
+        BaseCallback<Boolean> syncCompleteListener = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean object) {
+                buildMainModels();
+            }
 
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+        DataManager.getInstance().syncBootDataToLocal(users, userAccounts, customerRequests, companies,
+                allGroupChats, directChats, userColors, allMessages, syncCompleteListener);
+    }
+
+    private void buildMainModels() {
+        Calendar twoWeeksAgo = Calendar.getInstance();
+        twoWeeksAgo.add(Calendar.DAY_OF_YEAR, -14);
+        mainRecentModel = new MainRecentModel();
+        mainAccountsModel = new MainAccountsModel();
+        mainDirectMessagesModel = new MainDirectMessagesModel();
+
+        RealmList<RowItem> requestRowItems = new RealmList<>();
+        RealmList<RowItem> recentRowItems = new RealmList<>();
+
+
+        //Creates all the groupChatRowItems.
+        for(GroupChat chat : allGroupChats){
+            RowItem recentRow = new RowItem();
+            if(chat.getCustomerRequestIds() == null || chat.getCustomerRequestIds().size() == 0){
+                recentRow.setItemType(RowItem.TYPE_GROUP_CHAT);
+            }
+            recentRow.setMessageContent(chat.getMostRecentMessage().getMessageContent());
+            recentRow.setChatId(chat.getChatId());
+            recentRow.setAccountId(chat.getAccountId());
+            recentRow.setMessageOwnerName(chat.getMostRecentMessage().getMessageOwnerName());
+            recentRow.setMessageCreatedAtTime(chat.getMostRecentMessage().getCreatedDate());
+            if(!chat.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+                recentRow.setNewMessage(true);
+            }else{
+                recentRow.setNewMessage(false);
+            }
+            recentRowItems.add(recentRow);
+        }
+
+
+        //Creates all request row items for the request tab on the account activity.
+        for(CustomerRequest request : customerRequests){
+            if(request != null && request.isOpen()){
+                RowItem requestItem = new RowItem();
+                requestItem.setMessageContent(request.getRequestMessage());
+                requestItem.setMessageCreatedAtTime(request.getMostRecentMessageTime());
+                requestItem.setMessageOwnerName(request.getCustomerName());
+                requestItem.setChatId(request.getGroupChatId());
+                if(request.getMostRecentGroupMessage() != null &&
+                        !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                    requestItem.setNewMessage(true);
+                }
+                requestRowItems.add(requestItem);
+            }
+        }
+
+        //adds the recent request items to the recent model.
+        for(RowItem item : requestRowItems){
+            if(item.isNewMessage()) {
+                recentRowItems.add(item);
+            }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                recentRowItems.add(item);
+            }
+        }
+
+        RealmList<AccountRowItem> accountRowItems = new RealmList<>();
+        for(int i = 0; i < userAccounts.size(); i++) {
+            Company company = getAccountCompany(userAccounts.get(i));
+            if (company != null) {
+                AccountRowItem temp = new AccountRowItem();
+                temp.setAccountName(company.getName());
+                temp.setAccountIdFire(userAccounts.get(i).getAccountIdFire());
+                accountRowItems.add(temp);
+            }
+        }
+        Collections.sort(accountRowItems);
+        mainAccountsModel.setRowItems(accountRowItems);
+
+
+        //create all directChat items
+        RealmList<DirectItem> directItems = new RealmList<>();
+        for(DirectChat directChat : directChats){
+            DirectItem newItem = new DirectItem();
+            MessageRealm mostRecentMessage = RealmUISingleton.getInstance().getRealmInstance().where(MessageRealm.class).equalTo("createdDate", directChat.getMessageCreatedTime()).findFirst();
+            newItem.setDirectChatId(directChat.getChatId());
+            if(mostRecentMessage != null) {
+                newItem.setMessageOwnerName(mostRecentMessage.getMessageOwnerName());
+                newItem.setMessageOwnerUid(mostRecentMessage.getUid());
+                newItem.setMessageContent(mostRecentMessage.getMessageContent());
+                newItem.setMessageCreatedAtTime(mostRecentMessage.getCreatedDate());
+                if (!mostRecentMessage.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+                    newItem.setNewMessage(true);
+                } else {
+                    newItem.setNewMessage(false);
+                }
+                directItems.add(newItem);
+            }
+        }
+        Collections.sort(directItems);
+        mainDirectMessagesModel.setDirectItems(directItems);
+
+
+        //add direct chat items to recent items
+        for(DirectItem item : directItems){
+            RowItem newRowItem = new RowItem();
+            newRowItem.setItemType(RowItem.TYPE_DIRECT);
+            newRowItem.setAccountId(item.getDirectChatId());
+            newRowItem.setNewMessage(item.isNewMessage());
+            newRowItem.setChatId(item.getDirectChatId());
+            newRowItem.setMessageContent(item.getMessageContent());
+            newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
+            newRowItem.setMessageOwnerName(item.getMessageOwnerName());
+            if(newRowItem.isNewMessage()) {
+                recentRowItems.add(newRowItem);
+            }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                recentRowItems.add(newRowItem);
+            }
+        }
+        Collections.sort(recentRowItems, RowItem.createdAtComparator);
+        Collections.reverse(recentRowItems);
+        mainRecentModel.setRowItems(recentRowItems);
+
+        BaseCallback<Boolean> mainModelsSaveCompleteListener = new BaseCallback<Boolean>() {
+            @Override
+            public void onResponse(Boolean success) {
+                syncCompleteCallback.onResponse(success);
+                initDataListeners();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                syncCompleteCallback.onFailure(e);
+            }
+        };
+
+        DataManager.getInstance().updateRealmMainModels(mainAccountsModel, mainRecentModel, mainDirectMessagesModel, mainModelsSaveCompleteListener);
+    }
+
+    private void initDataListeners() {
+        initChatMessageListeners();
+        initGroupChatListeners();
+        initDirectChatListeners();
+        initRequestListeners();
+        initAccountListeners();
+    }
+
+    private void initChatMessageListeners() {
+        final List<String> messageThreadIds = new ArrayList<>();
+        final List<String> chatIds = new ArrayList<>();
+        for(GroupChat chat : allGroupChats){
+            if(chat.getMessageThreadId() != null) {
+                messageThreadIds.add(chat.getMessageThreadId());
+                chatIds.add(chat.getChatId());
+            }
+        }
+        for(DirectChat chat : directChats){
+            if(chat.getMessageThreadId() != null) {
+                messageThreadIds.add(chat.getMessageThreadId());
+                chatIds.add(chat.getChatId());
+            }
+        }
+
+        for(int i = 0; i < chatIds.size(); i++){
+            childEventListenersChatMessages.add(new ChildEventListener() {
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    Message message = dataSnapshot.getValue(Message.class);
+                    if(message != null) {
+                        MessageRealm localMessage = RealmUISingleton.getInstance().getRealmInstance().
+                                where(MessageRealm.class).equalTo("messageId", message.getMessageId()).findFirst();
+                        if(localMessage != null && localMessage.getReadByUids().size() == message.getReadByUids().size() && localMessage.isSavedToFirebase()) {
+                            //Do nothing
+                        }else{
+                            message.setSavedToFirebase(true);
+                            updateMainModels(message);
+                            DataManager.getInstance().updateRealmMessage(message);
+                        }
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Message message = dataSnapshot.getValue(Message.class);
+                    if(message != null) {
+                        message.setSavedToFirebase(true);
+                        updateMainModels(message);
+                        DataManager.getInstance().updateRealmMessage(message);
+                    }
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        for(int i = 0; i < messageThreadIds.size(); i++){
+            chatMessagesReference.child(chatIds.get(i)).child("messages").addChildEventListener(childEventListenersChatMessages.get(i));
+        }
+
+        for(int i = 0; i < messageThreadIds.size(); i++){
+            valueEventListeners.add(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    MessageThread thread = dataSnapshot.getValue(MessageThread.class);
+                    if(thread!= null){
+                        DataManager.getInstance().insertOrUpdateMessageThread(thread);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+
+        for(int i = 0; i < messageThreadIds.size(); i++){
+            chatMessagesReference.child(chatIds.get(i)).child("message_thread").child(messageThreadIds.get(i)).addValueEventListener(valueEventListeners.get(i));
+        }
+    }
+
+    private void initGroupChatListeners() {
+
+    }
+
+    private void initDirectChatListeners() {
+
+    }
+
+    private void initRequestListeners() {
+
+    }
+
+    private void initAccountListeners() {
+
+    }
+
+    private void updateMainModels(Message message) {
+        Calendar twoWeeksAgo = Calendar.getInstance();
+        twoWeeksAgo.add(Calendar.DAY_OF_YEAR, -14);
+
+        RealmList<RowItem> recentRowItems = new RealmList<>();
+        for(int i = 0; i < customerRequests.size(); i++){
+            CustomerRequest request = customerRequests.get(i);
+            if(request != null && request.isOpen()){
+                RowItem temp = new RowItem();
+                temp.setMessageContent(request.getRequestMessage());
+                temp.setMessageCreatedAtTime(request.getMostRecentMessageTime());
+                temp.setMessageOwnerName(request.getCustomerName());
+                temp.setChatId(request.getGroupChatId());
+                if(request.getMostRecentGroupMessage() != null && !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                    temp.setNewMessage(true);
+                }
+                if(temp.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                    recentRowItems.add(temp);
+                }
+            }
+        }
+
+        DirectChatRealm realmChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
+        DirectItem newItem = null;
+        if(realmChat != null){
+            newItem = new DirectItem();
+            newItem.setDirectChatId(message.getChatId());
+            if(!message.getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                newItem.setNewMessage(true);
+            }else{
+                newItem.setNewMessage(false);
+            }
+            newItem.setMessageOwnerName(message.getMessageOwnerName());
+            newItem.setMessageOwnerUid(message.getCreatedByUid());
+            newItem.setMessageContent(message.getMessageContent());
+            newItem.setMessageCreatedAtTime(message.getCreatedDate());
+        }
+
+        MainDirectMessagesModel previousModel = RealmUISingleton.getInstance().getRealmInstance().where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
+        MainDirectMessagesModel newDirectModel = new MainDirectMessagesModel();
+        RealmList<DirectItem> directItems = new RealmList<>();
+        boolean alreadyExists = false;
+        for(DirectItem directItem : previousModel.getDirectItems()){
+            DirectItem copyItem = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(directItem);
+            if(message.getChatId().equals(directItem.getDirectChatId())){
+                copyItem.setMessageCreatedAtTime(message.getCreatedDate());
+                copyItem.setMessageContent(message.getMessageContent());
+                copyItem.setMessageOwnerUid(message.getCreatedByUid());
+                copyItem.setMessageOwnerName(message.getMessageOwnerName());
+                if (!message.getReadByUids().contains(UserPreferences.getInstance().getUid())) {
+                    copyItem.setNewMessage(true);
+                } else {
+                    copyItem.setNewMessage(false);
+                }
+                directItems.add(copyItem);
+            }else{
+                directItems.add(copyItem);
+            }
+            if(newItem != null && newItem.getDirectChatId().equals(directItem.getDirectChatId())){
+                alreadyExists = true;
+            }
+        }
+
+        if(newItem != null && !alreadyExists) directItems.add(newItem);
+        Collections.sort(directItems);
+        newDirectModel.setDirectItems(directItems);
+
+        for(DirectItem item : directItems){
+            RowItem newRowItem = new RowItem();
+            newRowItem.setItemType(RowItem.TYPE_DIRECT);
+            newRowItem.setAccountId(item.getDirectChatId());
+            newRowItem.setChatId(item.getDirectChatId());
+            newRowItem.setNewMessage(item.isNewMessage());
+            newRowItem.setMessageContent(item.getMessageContent());
+            newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
+            newRowItem.setMessageOwnerName(item.getMessageOwnerName());
+            if(item.isNewMessage()) {
+                sortedByMostRecent.add(newRowItem);
+            }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
+                sortedByMostRecent.add(newRowItem);
+            }
+        }
+
+
+        Collections.sort(sortedByMostRecent, RowItem.createdAtComparator);
+        Collections.reverse(sortedByMostRecent);
+        MainRecentModel recentModel = new MainRecentModel();
+        RealmList<RowItem> recentRowItems = new RealmList<>();
+
+        recentRowItems.addAll(sortedByMostRecent);
+        recentModel.setRowItems(recentRowItems);
+
+        DataManager.getInstance().updateRealmMainModels(copy, recentModel, newDirectModel);
+    }
+
+    private Company getAccountCompany(Account account) {
+        Company company = null;
+        if(UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)){
+            for(Company companyLoop : companies){
+                if(companyLoop.getCompanyId().equalsIgnoreCase(account.getCompanyCustomerId())){
+                    company = companyLoop;
+                    break;
+                }
+            }
+        }else{
+            for(Company companyLoop : companies){
+                if(companyLoop.getCompanyId().equalsIgnoreCase(account.getCompanySalesId())){
+                    company = companyLoop;
+                    break;
+                }
+            }
+        }
+        return company;
     }
 }

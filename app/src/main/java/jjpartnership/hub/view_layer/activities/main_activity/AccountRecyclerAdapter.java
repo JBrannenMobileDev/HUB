@@ -13,9 +13,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.data_models.AccountRealm;
+import jjpartnership.hub.data_layer.data_models.AccountRowItem;
+import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.RowItem;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserPreferences;
 
 /**
  * Created by Jonathan on 3/9/2018.
@@ -24,9 +30,9 @@ import jjpartnership.hub.utils.BaseCallback;
 public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecyclerAdapter.ViewHolder> {
     private Context context;
     private MainAccountsModel dataModel;
-    private BaseCallback<RowItem> rowSelectedCallback;
+    private BaseCallback<AccountRowItem> rowSelectedCallback;
 
-    public AccountRecyclerAdapter(@NonNull Context context, MainAccountsModel dataModel, BaseCallback<RowItem> rowSelectedCallback) {
+    public AccountRecyclerAdapter(@NonNull Context context, MainAccountsModel dataModel, BaseCallback<AccountRowItem> rowSelectedCallback) {
         this.context = context;
         this.dataModel = dataModel;
         this.rowSelectedCallback = rowSelectedCallback;
@@ -57,7 +63,7 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        RowItem rowItem = dataModel.getRowItems().get(position);
+        AccountRowItem rowItem = dataModel.getRowItems().get(position);
         holder.accountName.setText(rowItem.getAccountName());
     }
 
