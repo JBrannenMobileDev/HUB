@@ -627,17 +627,19 @@ public class FirebaseSyncManager {
                     if(message != null) {
                         MessageRealm localMessage = RealmUISingleton.getInstance().getRealmInstance().
                                 where(MessageRealm.class).equalTo("messageId", message.getMessageId()).findFirst();
-                        if(!message.getCreatedByUid().equals(UserPreferences.getInstance().getUid())){
+                        if(!message.getCreatedByUid().equals(UserPreferences.getInstance().getUid())
+                                && !message.getReadByUids().contains(UserPreferences.getInstance().getUid())){
                             NewMessageNotification newMessageNotification = new NewMessageNotification();
                             newMessageNotification.setNewMessage(message.getMessageId());
                             DataManager.getInstance().updateOrInsertNewMessageNotification(newMessageNotification);
                         }
-                        if(localMessage != null && localMessage.getReadByUids().size() == message.getReadByUids().size() && localMessage.isSavedToFirebase()) {
+                        if(localMessage != null && localMessage.isSavedToFirebase()) {
                             //Do nothing
                         }else{
                             message.setSavedToFirebase(true);
-                            updateMainModels(message);
                             DataManager.getInstance().updateRealmMessage(message);
+
+                            updateMainModels(message);
                         }
                     }
                 }

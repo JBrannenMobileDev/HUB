@@ -17,9 +17,9 @@ public class RowItem extends RealmObject implements Comparable{
     public static final String TYPE_REQUEST = "type_request";
     public static final String TYPE_DIRECT_REQUEST = "type_direct_request";
 
-    @PrimaryKey
     private String accountId;
     private String accountName;
+    @PrimaryKey
     private String chatId;
     private String messageOwnerName;
     private String messageContent;

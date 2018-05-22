@@ -1,6 +1,7 @@
 package jjpartnership.hub.data_layer.realm_db;
 
 import android.os.Handler;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,14 +85,16 @@ public class RealmManager {
         realm.close();
     }
     public void insertOrUpdateGroupChat(final GroupChat chat) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm bgRealm) {
-                bgRealm.copyToRealmOrUpdate(new GroupChatRealm(chat));
-            }
-        });
-        realm.close();
+        if(chat != null) {
+            Realm realm = Realm.getDefaultInstance();
+            realm.executeTransactionAsync(new Realm.Transaction() {
+                @Override
+                public void execute(Realm bgRealm) {
+                    bgRealm.copyToRealmOrUpdate(new GroupChatRealm(chat));
+                }
+            });
+            realm.close();
+        }
     }
 
     public void updateGroupChat(final List<GroupChat> gChats) {

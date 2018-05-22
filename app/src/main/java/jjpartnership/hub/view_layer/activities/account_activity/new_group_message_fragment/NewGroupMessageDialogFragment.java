@@ -26,6 +26,7 @@ import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.GroupChat;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
@@ -148,7 +149,12 @@ public class NewGroupMessageDialogFragment extends DialogFragment implements Tag
 
     private void createNewGroupChat() {
         DataManager.getInstance().createNewGroupChat(selectedAgentIds, accountId, UserPreferences.getInstance().getUid(), groupName.getText().toString(), userInput.getText().toString());
-        Toast.makeText(getActivity(), "Group Created", Toast.LENGTH_SHORT).show();
+        GroupChatRealm createdChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("groupName", groupName.getText().toString()).findFirst();
+        if(createdChat != null) {
+            Toast.makeText(getActivity(), "Group Created", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getActivity(), "Unable to create Group. Check internet connection and try again.", Toast.LENGTH_LONG).show();
+        }
         dismiss();
     }
 

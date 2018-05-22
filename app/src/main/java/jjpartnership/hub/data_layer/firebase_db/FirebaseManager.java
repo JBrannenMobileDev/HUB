@@ -808,47 +808,52 @@ public class FirebaseManager {
     public GroupChat createNewGroupChat(List<String> memberIds, String accountId, String creatorUid, String groupName, String messageText) {
         memberIds.add(creatorUid);
         DatabaseReference newGroupChatRef = groupChatsReference.push();
-        GroupChat groupChat = new GroupChat();
-        groupChat.setChatId(newGroupChatRef.getKey());
-        groupChat.setUserIds(createMap(memberIds));
-        groupChat.setGroupCreatorUid(creatorUid);
-        groupChat.setGroupName(groupName);
-        groupChat.setAccountId(accountId);
+        if(newGroupChatRef != null) {
+            GroupChat groupChat = new GroupChat();
+            groupChat.setChatId(newGroupChatRef.getKey());
+            groupChat.setUserIds(createMap(memberIds));
+            groupChat.setGroupCreatorUid(creatorUid);
+            groupChat.setGroupName(groupName);
+            groupChat.setAccountId(accountId);
 
-        DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
-        MessageThread thread = new MessageThread();
-        thread.setMessageThreadId(newMessageThreadRef.getKey());
-        thread.setChatId(groupChat.getChatId());
-        database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
-        groupChat.setMessageThreadId(thread.getMessageThreadId());
-        groupChat.setNewChat(true);
+            DatabaseReference newMessageThreadRef = database.getReference().child("messages").push();
+            MessageThread thread = new MessageThread();
+            thread.setMessageThreadId(newMessageThreadRef.getKey());
+            thread.setChatId(groupChat.getChatId());
+            database.getReference().child("messages").child(thread.getMessageThreadId()).setValue(thread);
+            groupChat.setMessageThreadId(thread.getMessageThreadId());
+            groupChat.setNewChat(true);
 
-        Message message = new Message();
-        message.setChatId(groupChat.getChatId());
-        message.setCreatedByUid(creatorUid);
-        message.setCreatedDate(new Date().getTime());
-        message.setMessageContent(messageText);
-        List<String> readByUids = new ArrayList<>();
-        readByUids.add(creatorUid);
-        message.setReadByUids(readByUids);
-        message.setMessageThreadId(thread.getMessageThreadId());
-        UserRealm user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", creatorUid).findFirst();
-        message.setMessageOwnerName(user.getFirstName() + " " + user.getLastName());
-        groupChat.setMostRecentMessage(message);
+            Message message = new Message();
+            message.setChatId(groupChat.getChatId());
+            message.setCreatedByUid(creatorUid);
+            message.setCreatedDate(new Date().getTime());
+            message.setMessageContent(messageText);
+            List<String> readByUids = new ArrayList<>();
+            readByUids.add(creatorUid);
+            message.setReadByUids(readByUids);
+            message.setMessageThreadId(thread.getMessageThreadId());
+            UserRealm user = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", creatorUid).findFirst();
+            message.setMessageOwnerName(user.getFirstName() + " " + user.getLastName());
+            groupChat.setMostRecentMessage(message);
 
-        createNewMessage(message);
-        groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
+            DataManager.getInstance().insertOrUpdateGroupChat(new GroupChatRealm(groupChat));
+            createNewMessage(message);
+            groupChatsReference.child(groupChat.getChatId()).setValue(groupChat);
 
 
-        for(String id : memberIds){
-            usersReference.child(id).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
+            for (String id : memberIds) {
+                usersReference.child(id).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
+            }
+            usersReference.child(creatorUid).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
+
+            accountsReference.child(accountId).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
+
+            addGroupChatMessageListener(groupChat);
+            return groupChat;
+        }else{
+            return null;
         }
-        usersReference.child(creatorUid).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
-
-        accountsReference.child(accountId).child("groupChats").child(groupChat.getChatId()).setValue(groupChat.getChatId());
-
-        addGroupChatMessageListener(groupChat);
-        return groupChat;
     }
 
     private Map<String, String> createMap(List<String> memberIds) {

@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BaseCallback<GroupChatRealm> groupMessageSelectedCallback;
     private Toolbar toolbar;
     private AppBarLayout mAppBarLayout;
+    private boolean isVisible;
 
 
     @Override
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
         mAppBarLayout=findViewById(R.id.mAppBarLayout);
         mAppBarLayout.setElevation(0);
+        isVisible = true;
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -147,13 +150,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void VibratePhone() {
-        NewMessageVibrateUtil.vibratePhone(this);
+        if(isVisible) NewMessageVibrateUtil.vibratePhone(this);
+    }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        isVisible = true;
+    }
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        isVisible = false;
     }
 
     @Override
     public void onDestroy(){
         presenter.onDestroy();
+        isVisible = false;
         super.onDestroy();
     }
 
@@ -397,7 +412,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
                 recentRecyclerView.setAdapter(recentRecyclerAdapter);
             }else{
-                recentRecyclerAdapter.onDataSetChanged(recentModel);
+                if(recentModel.getRowItems().size() > 5) {
+                    List<RowItem> newList = recentModel.getRowItems().subList(0,4);
+                    RealmList<RowItem> newRealmList = new RealmList<>();
+                    for(RowItem item : newList){
+                        newRealmList.add(item);
+                    }
+                    MainRecentModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(recentModel);
+                    copy.setRowItems(newRealmList);
+                    recentRecyclerAdapter.onDataSetChanged(copy);
+
+                }else{
+                    recentRecyclerAdapter.onDataSetChanged(recentModel);
+                }
             }
             recentRecyclerAdapter.notifyDataSetChanged();
         }
