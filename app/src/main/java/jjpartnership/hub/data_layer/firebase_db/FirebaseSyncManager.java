@@ -36,6 +36,7 @@ import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
+import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
@@ -488,6 +489,7 @@ public class FirebaseSyncManager {
             }else{
                 recentRow.setNewMessage(false);
             }
+
             if(recentRow.isNewMessage()) {
                 recentRowItems.add(recentRow);
             }else if(recentRow.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
@@ -625,6 +627,11 @@ public class FirebaseSyncManager {
                     if(message != null) {
                         MessageRealm localMessage = RealmUISingleton.getInstance().getRealmInstance().
                                 where(MessageRealm.class).equalTo("messageId", message.getMessageId()).findFirst();
+                        if(!message.getCreatedByUid().equals(UserPreferences.getInstance().getUid())){
+                            NewMessageNotification newMessageNotification = new NewMessageNotification();
+                            newMessageNotification.setNewMessage(message.getMessageId());
+                            DataManager.getInstance().updateOrInsertNewMessageNotification(newMessageNotification);
+                        }
                         if(localMessage != null && localMessage.getReadByUids().size() == message.getReadByUids().size() && localMessage.isSavedToFirebase()) {
                             //Do nothing
                         }else{
@@ -804,15 +811,15 @@ public class FirebaseSyncManager {
                     newRecentItem.setAccountId(groupChat.getAccountId());
                     recentRowItems.add(newRecentItem);
                 }else{
-                    RowItem newRecentItem = new RowItem();
-                    newRecentItem.setItemType(RowItem.TYPE_GROUP_CHAT);
-                    newRecentItem.setChatId(groupChat.getChatId());
-                    newRecentItem.setMessageCreatedAtTime(groupChat.getMostRecentMessage().getCreatedDate());
-                    newRecentItem.setMessageOwnerName(groupChat.getMostRecentMessage().getMessageOwnerName());
-                    newRecentItem.setNewMessage(!groupChat.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid()));
-                    newRecentItem.setMessageContent(groupChat.getMostRecentMessage().getMessageContent());
-                    newRecentItem.setAccountId(groupChat.getAccountId());
-                    recentRowItems.add(newRecentItem);
+                    RowItem sameItem = new RowItem();
+                    sameItem.setItemType(RowItem.TYPE_GROUP_CHAT);
+                    sameItem.setChatId(groupChat.getChatId());
+                    sameItem.setMessageCreatedAtTime(groupChat.getMostRecentMessage().getCreatedDate());
+                    sameItem.setMessageOwnerName(groupChat.getMostRecentMessage().getMessageOwnerName());
+                    sameItem.setNewMessage(!groupChat.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid()));
+                    sameItem.setMessageContent(groupChat.getMostRecentMessage().getMessageContent());
+                    sameItem.setAccountId(groupChat.getAccountId());
+                    recentRowItems.add(sameItem);
                 }
             }
         }else{

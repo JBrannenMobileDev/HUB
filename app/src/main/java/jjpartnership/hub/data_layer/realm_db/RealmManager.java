@@ -26,6 +26,7 @@ import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.MessageThreadRealm;
+import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
@@ -165,6 +166,7 @@ public class RealmManager {
                     bgRealm.copyToRealmOrUpdate(new MainAccountsModel());
                     bgRealm.copyToRealmOrUpdate(new MainDirectMessagesModel());
                     bgRealm.copyToRealmOrUpdate(new MainRecentModel());
+                    bgRealm.copyToRealmOrUpdate(new NewMessageNotification());
                 }
             });
         }
@@ -392,5 +394,16 @@ public class RealmManager {
             realmMessageList.add(new MessageRealm(message));
         }
         return realmMessageList;
+    }
+
+    public void updateOrInserNewMessageNotification(final NewMessageNotification newMessageNotification) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                bgRealm.copyToRealmOrUpdate(newMessageNotification);
+            }
+        });
+        realm.close();
     }
 }

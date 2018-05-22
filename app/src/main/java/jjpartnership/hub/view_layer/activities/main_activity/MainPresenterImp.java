@@ -3,14 +3,18 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmList;
+import io.realm.RealmModel;
 import io.realm.RealmResults;
+import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.CompanyRealm;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
+import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.FilterUtil;
+import jjpartnership.hub.utils.NewMessageVibrateUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 
@@ -25,6 +29,7 @@ public class MainPresenterImp implements MainPresenter {
     private MainRecentModel recentModel;
     private MainDirectMessagesModel directModel;
     private RealmList<GroupChatRealm> groupChats;
+    private NewMessageNotification newMessageNotification;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
@@ -36,6 +41,7 @@ public class MainPresenterImp implements MainPresenter {
         accountModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
         recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
         directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
+        newMessageNotification = realm.where(NewMessageNotification.class).equalTo("newMessageId", NewMessageNotification.PERM_ID).findFirst();
         UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
         if(user != null){
             CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
@@ -130,6 +136,20 @@ public class MainPresenterImp implements MainPresenter {
                 }
             });
             activity.onGroupMessagesReceived(groupChats);
+        }
+
+        if(newMessageNotification != null){
+            newMessageNotification.addChangeListener(new RealmChangeListener<RealmModel>() {
+                @Override
+                public void onChange(RealmModel realmModel) {
+                    if(!newMessageNotification.hasBeenViewed() && newMessageNotification.getNewMessage() != null){
+                        activity.VibratePhone();
+                        NewMessageNotification copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(newMessageNotification);
+                        copy.setHasBeenViewed(true);
+                        DataManager.getInstance().updateOrInsertNewMessageNotification(copy);
+                    }
+                }
+            });
         }
     }
 

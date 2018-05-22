@@ -49,6 +49,7 @@ import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
+import jjpartnership.hub.utils.NewMessageVibrateUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity;
@@ -142,6 +143,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void setToolbarElevation(float height){
         mAppBarLayout.setElevation(DpUtil.pxFromDp(this, height));
+    }
+
+    @Override
+    public void VibratePhone() {
+        NewMessageVibrateUtil.vibratePhone(this);
+
     }
 
     @Override

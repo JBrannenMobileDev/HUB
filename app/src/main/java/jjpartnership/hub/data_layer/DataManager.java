@@ -21,6 +21,7 @@ import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
+import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
@@ -187,5 +188,9 @@ public class DataManager {
                                     List<UserColor> userColors, List<Message> allMessages, BaseCallback<Boolean> syncCompleteListener) {
         realmManager.saveBootData(users, userAccounts, customerRequests, companies, allGroupChats, directChats, userColors,
                                     allMessages, syncCompleteListener);
+    }
+
+    public void updateOrInsertNewMessageNotification(NewMessageNotification newMessageNotification) {
+        realmManager.updateOrInserNewMessageNotification(newMessageNotification);
     }
 }

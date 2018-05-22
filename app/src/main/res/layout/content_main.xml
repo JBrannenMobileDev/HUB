@@ -34,7 +34,7 @@
                     android:layout_weight="1">
 
                     <TextView
-                        android:id="@+id/view_all_recent_tv"
+                        android:id="@+id/show_all_recent_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|end"
@@ -42,7 +42,7 @@
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
                         android:layout_weight="1"
-                        android:text="View All"
+                        android:text="Show All"
                         android:textColor="@color/colorAccentVeryDark"
                         android:textSize="14sp"
                         android:textStyle="bold" />

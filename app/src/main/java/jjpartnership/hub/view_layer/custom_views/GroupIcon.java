@@ -102,6 +102,7 @@ public class GroupIcon extends LinearLayout {
                         FrameLayout.LayoutParams paramsBottomRow = (FrameLayout.LayoutParams)bottomRowLayout.getLayoutParams();
                         paramsBottomRow.topMargin = (int)DpUtil.pxFromDp(getContext(), 17f);
                         bottomRowLayout.setLayoutParams(paramsBottomRow);
+                        bottomRowLayout.setVisibility(View.VISIBLE);
                         FrameLayout.LayoutParams paramsRoot3 = (FrameLayout.LayoutParams)this.getLayoutParams();
                         paramsRoot3.leftMargin = (int)DpUtil.pxFromDp(getContext(), 12f);
                         this.setLayoutParams(paramsRoot3);
@@ -115,6 +116,7 @@ public class GroupIcon extends LinearLayout {
                         break;
                     case 2:
                         bottomRowLayout.setVisibility(View.GONE);
+                        topRightFl.setVisibility(View.VISIBLE);
                         setTopLeftTv(names.get(0));
                         setTopRightTv(names.get(1));
                         setTopLeftIconColor(userColors.get(0));

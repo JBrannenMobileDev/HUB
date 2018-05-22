@@ -19,4 +19,5 @@ public interface MainView {
     void setWelcomeMessage(String typeCustomer);
     void setPageTitle(String title);
     void setToolbarElevation(float height);
+    void VibratePhone();
 }
