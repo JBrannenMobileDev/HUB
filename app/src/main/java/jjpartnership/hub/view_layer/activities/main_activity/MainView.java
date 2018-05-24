@@ -20,4 +20,5 @@ public interface MainView {
     void setPageTitle(String title);
     void setToolbarElevation(float height);
     void VibratePhone();
+    void onShowAll(MainRecentModel recentModel);
 }

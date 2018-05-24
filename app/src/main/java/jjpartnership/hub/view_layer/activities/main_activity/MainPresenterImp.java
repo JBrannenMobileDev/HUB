@@ -38,29 +38,31 @@ public class MainPresenterImp implements MainPresenter {
     }
 
     private void fetchInitData() {
-        accountModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
-        recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
-        directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
-        newMessageNotification = realm.where(NewMessageNotification.class).equalTo("newMessageId", NewMessageNotification.PERM_ID).findFirst();
-        UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
-        if(user != null){
-            CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
-            if(company != null) activity.setPageTitle(company.getName());
-        }
-        if(accountModel != null) {
-            activity.onAccountModelReceived(accountModel);
-        }
-        if(recentModel != null){
-            activity.onRecentModelReceived(recentModel);
-        }
-        if(directModel != null){
-            activity.onDirectMessagesModelReceived(directModel);
-        }
+        if(realm != null) {
+            accountModel = realm.where(MainAccountsModel.class).equalTo("permanentId", MainAccountsModel.PERM_ID).findFirst();
+            recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+            directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
+            newMessageNotification = realm.where(NewMessageNotification.class).equalTo("newMessageId", NewMessageNotification.PERM_ID).findFirst();
+            UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
+            if (user != null) {
+                CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
+                if (company != null) activity.setPageTitle(company.getName());
+            }
+            if (accountModel != null) {
+                activity.onAccountModelReceived(accountModel);
+            }
+            if (recentModel != null) {
+                activity.onRecentModelReceived(recentModel);
+            }
+            if (directModel != null) {
+                activity.onDirectMessagesModelReceived(directModel);
+            }
 
-        RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
-        groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
-        activity.onGroupMessagesReceived(groupChats);
-        initDataListeners();
+            RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
+            groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
+            activity.onGroupMessagesReceived(groupChats);
+            initDataListeners();
+        }
     }
 
     private void initDataListeners() {
@@ -168,5 +170,15 @@ public class MainPresenterImp implements MainPresenter {
     @Override
     public void fetchData() {
         initDataListeners();
+    }
+
+    @Override
+    public void onShowAllClicked() {
+        activity.onShowAll(recentModel);
+    }
+
+    @Override
+    public void onRestoreRecentModel() {
+        activity.onRecentModelReceived(recentModel);
     }
 }

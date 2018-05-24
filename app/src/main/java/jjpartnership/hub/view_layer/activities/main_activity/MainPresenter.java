@@ -8,4 +8,6 @@ public interface MainPresenter {
     void onSearchQuery(String newText);
     void onDestroy();
     void fetchData();
+    void onShowAllClicked();
+    void onRestoreRecentModel();
 }

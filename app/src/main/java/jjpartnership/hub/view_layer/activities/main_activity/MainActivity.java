@@ -3,8 +3,10 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -24,6 +26,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,7 +34,6 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -74,6 +76,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.direc_messages_empty_state_layout)LinearLayout direct_messages_empty_state;
     @BindView(R.id.group_messages_empty_state_layout)LinearLayout group_messages_empty_state;
     @BindView(R.id.main_scrollview)NestedScrollView scrollView;
+    @BindView(R.id.show_all_recent_tv)TextView showAllTv;
+    @BindView(R.id.new_message_icon)FrameLayout newMessagesIcon;
+    @BindView(R.id.new_message_count_tv)TextView newMessageCountTv;
+    @BindView(R.id.hide_recent_tv)TextView hideTv;
+    @BindView(R.id.recent_frame_layout)FrameLayout recentFrameLayout;
 
     private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
@@ -89,6 +96,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private AppBarLayout mAppBarLayout;
     private boolean isVisible;
+    private RealmList<RowItem> newRealmList;
+    private boolean recentExpanded;
+    private int[] hideBtLocation;
+
 
 
     @Override
@@ -104,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mAppBarLayout=findViewById(R.id.mAppBarLayout);
         mAppBarLayout.setElevation(0);
         isVisible = true;
+        hideBtLocation = new int[2];
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -135,8 +147,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 if(scrollView.canScrollVertically(-1)){
+                    hideTv.setElevation(4);
                     setToolbarElevation(4);
+                    if(recentExpanded) {
+                        recentFrameLayout.getLocationOnScreen(hideBtLocation);
+                        if (hideBtLocation[1] + recentFrameLayout.getHeight() - 54 <= 0) {
+                            animateHideBottonHide();
+                        } else {
+                            animateHideButtonShow();
+                        }
+                    }
                 }else{
+                    if(recentExpanded) hideTv.setElevation(0);
                     setToolbarElevation(0);
                 }
             }
@@ -403,30 +425,108 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
+    @OnClick(R.id.show_all_recent_tv)
+    public void onShowAllClicked(){
+        recentExpanded = true;
+        if(scrollView.getScrollY() == 0){
+            hideTv.setElevation(0);
+        }
+        presenter.onShowAllClicked();
+        animateHideButtonShow();
+        showAllTv.setVisibility(View.GONE);
+    }
+
+    @OnClick(R.id.hide_recent_tv)
+    public void onHideClicked(){
+        recentExpanded = false;
+        presenter.onRestoreRecentModel();
+        animateHideBottonHide();
+        showAllTv.setVisibility(View.VISIBLE);
+        scrollView.scrollTo(0,0);
+        hideTv.setElevation(0);
+    }
 
     @Override
-    public void onRecentModelReceived(MainRecentModel recentModel) {
+    public void onShowAll(MainRecentModel recentModel){
         if(recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0){
             recent_empty_layout.setVisibility(View.GONE);
             if(recentRecyclerAdapter == null){
                 recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
                 recentRecyclerView.setAdapter(recentRecyclerAdapter);
             }else{
-                if(recentModel.getRowItems().size() > 5) {
-                    List<RowItem> newList = recentModel.getRowItems().subList(0,4);
-                    RealmList<RowItem> newRealmList = new RealmList<>();
-                    for(RowItem item : newList){
-                        newRealmList.add(item);
-                    }
-                    MainRecentModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(recentModel);
-                    copy.setRowItems(newRealmList);
-                    recentRecyclerAdapter.onDataSetChanged(copy);
-
-                }else{
-                    recentRecyclerAdapter.onDataSetChanged(recentModel);
-                }
+                recentRecyclerAdapter.onDataSetChanged(recentModel);
             }
-            recentRecyclerAdapter.notifyDataSetChanged();
+            if(newRealmList.size() > recentModel.getRowItems().size()){
+                recentRecyclerAdapter.notifyItemRangeInserted(newRealmList.size(), recentModel.getRowItems().size() - newRealmList.size());
+            }else {
+                recentRecyclerAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    private void animateHideButtonShow(){
+        hideTv.animate().scaleX(0).setDuration(0);
+        hideTv.animate().scaleY(0).setDuration(0);
+        hideTv.setVisibility(View.VISIBLE);
+        hideTv.animate().scaleY(1).setDuration(100);
+        hideTv.animate().scaleX(1).setDuration(100);
+    }
+
+    private void animateHideBottonHide(){
+        hideTv.animate().scaleX(0).setDuration(100);
+        hideTv.animate().scaleY(0).setDuration(100);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideTv.setVisibility(View.GONE);
+            }
+        }, 100);
+    }
+
+
+    @Override
+    public void onRecentModelReceived(MainRecentModel recentModel) {
+        if(recentExpanded){
+            onShowAll(recentModel);
+        }else {
+            int newMessagesCount = 0;
+            if (recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0) {
+                recent_empty_layout.setVisibility(View.GONE);
+                if (recentRecyclerAdapter == null) {
+                    recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
+                    recentRecyclerView.setAdapter(recentRecyclerAdapter);
+                } else {
+                    if (recentModel.getRowItems().size() > 5) {
+                        for (int i = 0; i < recentModel.getRowItems().size(); i++) {
+                            if (recentModel.getRowItems().get(i).isNewMessage()) {
+                                newMessagesCount++;
+                            }
+                        }
+                        List<RowItem> newList = recentModel.getRowItems().subList(0, 5);
+                        newRealmList = new RealmList<>();
+                        for (RowItem item : newList) {
+                            newRealmList.add(item);
+                        }
+                        MainRecentModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(recentModel);
+                        copy.setRowItems(newRealmList);
+                        recentRecyclerAdapter.onDataSetChanged(copy);
+                        if (newMessagesCount > 0) {
+                            showAllTv.setTextColor(Color.WHITE);
+                            showAllTv.setEnabled(true);
+                        }
+                    } else {
+                        recentRecyclerAdapter.onDataSetChanged(recentModel);
+                    }
+                    if (newMessagesCount > 0) {
+                        newMessagesIcon.setVisibility(View.VISIBLE);
+                        newMessageCountTv.setText(String.valueOf(newMessagesCount));
+                    } else {
+                        newMessagesIcon.setVisibility(View.GONE);
+                    }
+                }
+                recentRecyclerAdapter.notifyDataSetChanged();
+            }
         }
     }
 
