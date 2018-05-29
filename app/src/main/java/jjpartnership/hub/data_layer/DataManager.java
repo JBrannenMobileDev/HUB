@@ -22,11 +22,13 @@ import jjpartnership.hub.data_layer.data_models.Message;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
 import jjpartnership.hub.data_layer.data_models.MessageThread;
 import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
+import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
 import jjpartnership.hub.data_layer.realm_db.RealmManager;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 
 /**
@@ -139,7 +141,25 @@ public class DataManager {
         fbManager.updateFirebaseMessageThreadTyping(chatId, messageThreadId, userName, isTyping);
     }
 
-    public void updateMessages(RealmResults<MessageRealm> messages) {
+    public void updateMessages(RealmResults<MessageRealm> messages, GroupChatRealm groupChat) {
+        List<Message> messageList = new ArrayList<>();
+        for (MessageRealm realmMessage : messages) {
+            Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
+            String thisUid = UserPreferences.getInstance().getUid();
+            if (!temp.getReadByUids().contains(thisUid)) {
+                temp.addReadByUid(thisUid);
+                messageList.add(temp);
+            }
+        }
+        if (messageList.size() > 0) {
+            realmManager.insertOrUpdateMessages(messageList);
+            fbManager.updateMessages(messageList);
+        }
+
+        updateMainRelatedMainModel(messages.last(), groupChat);
+    }
+
+    public void updateMessages(RealmResults<MessageRealm> messages, DirectChatRealm directChat) {
         List<Message> messageList = new ArrayList<>();
         for (MessageRealm realmMessage : messages) {
             Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
@@ -192,5 +212,22 @@ public class DataManager {
 
     public void updateOrInsertNewMessageNotification(NewMessageNotification newMessageNotification) {
         realmManager.updateOrInserNewMessageNotification(newMessageNotification);
+    }
+
+    public void updateMainRelatedMainModel(MessageRealm message, GroupChatRealm groupChat) {
+//        RowItem recentRowItem = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(RealmUISingleton.getInstance().getRealmInstance().where(RowItem.class).equalTo("chatId", chatId).findFirst());
+//        recentRowItem.setMessageContent(message.getMessageContent());
+//        recentRowItem.setMessageOwnerName(message.getMessageOwnerName());
+//        recentRowItem.setMessageCreatedAtTime(message.getCreatedDate());
+//        recentRowItem.setNewMessage(false);
+//        realmManager.inserOrUpdateRowItem(recentRowItem);
+
+//        GroupChat chat = new GroupChat(groupChat);
+//        chat.setMostRecentMessage(new Message(message));
+//        chat.setMessageCreatedTime(message.getCreatedDate());
+//        realmManager.insertOrUpdateGroupChat(chat);
+//        fbManager.updateGroupChat(chat);
+
+        //update Main models here i think.
     }
 }

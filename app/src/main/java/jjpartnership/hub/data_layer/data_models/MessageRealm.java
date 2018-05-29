@@ -21,6 +21,7 @@ public class MessageRealm extends RealmObject{
     private String messageContent;
     private String messageOwnerName;
     private RealmList<String> readByUids;
+    private RealmList<String> receivedByUids;
 
     public MessageRealm(Message message) {
         if(message != null) {
@@ -31,6 +32,7 @@ public class MessageRealm extends RealmObject{
             this.chatId = message.getChatId();
             this.messageOwnerName = message.getMessageOwnerName();
             this.readByUids = createReadByUidList(message.getReadByUids());
+            this.receivedByUids = createReceivedByUidList(message.getReceivedByUids());
             this.savedToFirebase = message.isSavedToFirebase();
             this.messageThreadId = message.getMessageThreadId();
         }
@@ -44,7 +46,25 @@ public class MessageRealm extends RealmObject{
         return realmReadByUids;
     }
 
+    private RealmList<String> createReceivedByUidList(List<String> receivedByUids) {
+        RealmList<String> realmRecievedByUids = new RealmList<>();
+        if(receivedByUids != null) {
+            for (String uid : receivedByUids) {
+                realmRecievedByUids.add(uid);
+            }
+        }
+        return realmRecievedByUids;
+    }
+
     public MessageRealm() {
+    }
+
+    public RealmList<String> getReceivedByUids() {
+        return receivedByUids;
+    }
+
+    public void setReceivedByUids(RealmList<String> receivedByUids) {
+        this.receivedByUids = receivedByUids;
     }
 
     public String getMessageThreadId() {

@@ -990,4 +990,8 @@ public class FirebaseManager {
     private void updateAccount(Account accountFire) {
         accountsReference.child(accountFire.getAccountIdFire()).setValue(accountFire);
     }
+
+    public void updateGroupChat(GroupChat chat) {
+        groupChatsReference.child(chat.getChatId()).setValue(chat);
+    }
 }

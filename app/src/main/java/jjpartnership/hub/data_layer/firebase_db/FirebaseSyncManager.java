@@ -20,6 +20,7 @@ import java.util.Set;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
+import jjpartnership.hub.data_layer.RealmMessageBatchUtil;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.Company;
@@ -65,6 +66,7 @@ public class FirebaseSyncManager {
     private DatabaseReference chatMessagesReference;
     private DatabaseReference customerRequestsReference;
     private FirebaseDatabase database;
+    private RealmMessageBatchUtil batchUtil;
 
     private String currentUid;
     private User currentUser;
@@ -115,6 +117,7 @@ public class FirebaseSyncManager {
         userColorsReference = database.getReference("user_colors");
         customerRequestsReference = database.getReference("customer_requests");
         currentUid = UserPreferences.getInstance().getUid();
+        batchUtil = new RealmMessageBatchUtil();
     }
 
     public void syncFirebaseToLocalDb(BaseCallback<Boolean> syncCompleteCallback){
@@ -445,7 +448,7 @@ public class FirebaseSyncManager {
 
     private void saveAllDataToLocalDb() {
         users.add(currentUser);
-        BaseCallback<Boolean> syncCompleteListener = new BaseCallback<Boolean>() {
+        final BaseCallback<Boolean> syncCompleteListener = new BaseCallback<Boolean>() {
             @Override
             public void onResponse(Boolean object) {
                 buildMainModels();
@@ -453,7 +456,7 @@ public class FirebaseSyncManager {
 
             @Override
             public void onFailure(Exception e) {
-
+                syncCompleteCallback.onFailure(e);
             }
         };
         DataManager.getInstance().syncBootDataToLocal(users, userAccounts, customerRequests, companies,
@@ -625,21 +628,35 @@ public class FirebaseSyncManager {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Message message = dataSnapshot.getValue(Message.class);
                     if(message != null) {
+                        boolean needsToBeUpdated = false;
                         MessageRealm localMessage = RealmUISingleton.getInstance().getRealmInstance().
                                 where(MessageRealm.class).equalTo("messageId", message.getMessageId()).findFirst();
                         if(!message.getCreatedByUid().equals(UserPreferences.getInstance().getUid())
-                                && !message.getReadByUids().contains(UserPreferences.getInstance().getUid())){
+                                && !message.getReadByUids().contains(UserPreferences.getInstance().getUid())
+                                && (message.getReceivedByUids() == null || (message.getReceivedByUids() != null && !message.getReceivedByUids().contains(UserPreferences.getInstance().getUid())))){
                             NewMessageNotification newMessageNotification = new NewMessageNotification();
                             newMessageNotification.setNewMessage(message.getMessageId());
                             DataManager.getInstance().updateOrInsertNewMessageNotification(newMessageNotification);
                         }
+
+                        if(message.getReceivedByUids() == null || !message.getReceivedByUids().contains(UserPreferences.getInstance().getUid())){
+                            if(message.getReceivedByUids() == null){
+                                message.setReceivedByUids(new ArrayList<String>());
+                            }
+                            message.getReceivedByUids().add(UserPreferences.getInstance().getUid());
+                            needsToBeUpdated = true;
+                        }
+
                         if(localMessage != null && localMessage.isSavedToFirebase()) {
                             //Do nothing
                         }else{
                             message.setSavedToFirebase(true);
-                            DataManager.getInstance().updateRealmMessage(message);
-
+                            needsToBeUpdated = true;
                             updateMainModels(message);
+                        }
+
+                        if(needsToBeUpdated){
+                            batchUtil.updateMessageRealm(message);
                         }
                     }
                 }
@@ -650,7 +667,7 @@ public class FirebaseSyncManager {
                     if(message != null) {
                         message.setSavedToFirebase(true);
                         updateMainModels(message);
-                        DataManager.getInstance().updateRealmMessage(message);
+                        batchUtil.updateMessageRealm(message);
                     }
                 }
 

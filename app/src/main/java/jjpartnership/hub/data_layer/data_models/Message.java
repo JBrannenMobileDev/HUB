@@ -18,6 +18,7 @@ public class Message implements Comparable<Message>{
     private String messageContent;
     private String messageOwnerName;
     private List<String> readByUids;
+    private List<String> receivedByUids;
 
     public Message() {
     }
@@ -32,11 +33,20 @@ public class Message implements Comparable<Message>{
         this.readByUids = realmMessage.getReadByUids();
         this.savedToFirebase = realmMessage.isSavedToFirebase();
         this.messageThreadId = realmMessage.getMessageThreadId();
+        this.receivedByUids = realmMessage.getReceivedByUids();
     }
 
     @Override
     public int compareTo(@NonNull Message message) {
         return (int) (this.createdDate - message.getCreatedDate());
+    }
+
+    public List<String> getReceivedByUids() {
+        return receivedByUids;
+    }
+
+    public void setReceivedByUids(List<String> receivedByUids) {
+        this.receivedByUids = receivedByUids;
     }
 
     public String getMessageThreadId() {

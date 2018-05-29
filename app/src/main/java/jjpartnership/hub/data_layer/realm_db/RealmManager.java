@@ -85,12 +85,13 @@ public class RealmManager {
         realm.close();
     }
     public void insertOrUpdateGroupChat(final GroupChat chat) {
+        final GroupChatRealm realmChat = new GroupChatRealm(chat);
         if(chat != null) {
-            Realm realm = Realm.getDefaultInstance();
+            final Realm realm = Realm.getDefaultInstance();
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
-                    bgRealm.copyToRealmOrUpdate(new GroupChatRealm(chat));
+                    bgRealm.copyToRealmOrUpdate(realmChat);
                 }
             });
             realm.close();
@@ -320,14 +321,14 @@ public class RealmManager {
         realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
-                bgRealm.copyToRealmOrUpdate(createRealmUserList(users));
-                bgRealm.copyToRealmOrUpdate(createRealmAccountList(userAccounts));
-                bgRealm.copyToRealmOrUpdate(createRealmCustomerRequestList(customerRequests));
-                bgRealm.copyToRealmOrUpdate(createRealmCompaniesList(companies));
-                bgRealm.copyToRealmOrUpdate(createRealmAllGroupChatsList(allGroupChats));
-                bgRealm.copyToRealmOrUpdate(createRealmDirectChatsList(directChats));
-                bgRealm.copyToRealmOrUpdate(userColors);
-                bgRealm.copyToRealmOrUpdate(createRealmALlMessagesList(allMessages));
+                if(users != null)bgRealm.copyToRealmOrUpdate(createRealmUserList(users));
+                if(userAccounts != null)bgRealm.copyToRealmOrUpdate(createRealmAccountList(userAccounts));
+                if(customerRequests != null)bgRealm.copyToRealmOrUpdate(createRealmCustomerRequestList(customerRequests));
+                if(companies != null)bgRealm.copyToRealmOrUpdate(createRealmCompaniesList(companies));
+                if(allGroupChats != null)bgRealm.copyToRealmOrUpdate(createRealmAllGroupChatsList(allGroupChats));
+                if(directChats != null)bgRealm.copyToRealmOrUpdate(createRealmDirectChatsList(directChats));
+                if(userColors != null)bgRealm.copyToRealmOrUpdate(userColors);
+                if(allMessages != null)bgRealm.copyToRealmOrUpdate(createRealmALlMessagesList(allMessages));
             }
         }, new Realm.Transaction.OnSuccess() {
             @Override
@@ -401,10 +402,28 @@ public class RealmManager {
 
     public void updateOrInserNewMessageNotification(final NewMessageNotification newMessageNotification) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(newMessageNotification);
+            }
+        });
+        realm.close();
+    }
+
+    public void inserOrUpdateRowItem(final RowItem recentRowItem) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                MainRecentModel recentModel = bgRealm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+                bgRealm.copyToRealmOrUpdate(recentRowItem);
+                for(int i = 0; i < recentModel.getRowItems().size(); i++){
+                    if(recentRowItem.getChatId().equals(recentModel.getRowItems().get(i).getChatId())){
+                        recentModel.getRowItems().set(i, recentRowItem);
+                    }
+                }
+                bgRealm.copyToRealmOrUpdate(recentModel);
             }
         });
         realm.close();

@@ -110,7 +110,7 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
     }
 
     private void updateAllMessagesToRead(RealmResults<MessageRealm> messages) {
-        DataManager.getInstance().updateMessages(messages);
+        DataManager.getInstance().updateMessages(messages, directChat);
     }
 
     private String getNameToDisplay(String currentlyTypingUserName) {

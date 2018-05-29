@@ -101,7 +101,7 @@ public class CustomerRequestChatPresenterImp implements CustomerRequestChatPrese
     }
 
     private void updateAllMessagesToRead(RealmResults<MessageRealm> messages) {
-        DataManager.getInstance().updateMessages(messages);
+        DataManager.getInstance().updateMessages(messages, groupChat);
     }
 
     private String getNameToDisplay(String currentlyTypingUserName) {
