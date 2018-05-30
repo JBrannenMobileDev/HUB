@@ -88,7 +88,7 @@ public class RealmManager {
         final GroupChatRealm realmChat = new GroupChatRealm(chat);
         if(chat != null) {
             final Realm realm = Realm.getDefaultInstance();
-            realm.executeTransactionAsync(new Realm.Transaction() {
+            realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm bgRealm) {
                     bgRealm.copyToRealmOrUpdate(realmChat);

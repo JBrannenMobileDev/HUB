@@ -141,25 +141,42 @@ public class DataManager {
         fbManager.updateFirebaseMessageThreadTyping(chatId, messageThreadId, userName, isTyping);
     }
 
-    public void updateMessages(RealmResults<MessageRealm> messages, GroupChatRealm groupChat) {
+    public void updateMessages(RealmResults<MessageRealm> messages, GroupChatRealm chatRealm) {
         List<Message> messageList = new ArrayList<>();
+        String thisUid = UserPreferences.getInstance().getUid();
         for (MessageRealm realmMessage : messages) {
             Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
-            String thisUid = UserPreferences.getInstance().getUid();
             if (!temp.getReadByUids().contains(thisUid)) {
                 temp.addReadByUid(thisUid);
                 messageList.add(temp);
             }
         }
+
+        MainRecentModel recentModel = RealmUISingleton.getInstance().getRealmInstance().where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+        if(recentModel != null){
+            for(RowItem item : recentModel.getRowItems()){
+                if(item.isNewMessage()){
+                    if(item.getChatId().equals(chatRealm.getChatId())){
+                        Message messageToUpdate = new Message(RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(messages.last()));
+                        if (!messageToUpdate.getReadByUids().contains(thisUid)) {
+                            messageToUpdate.addReadByUid(thisUid);
+                            messageList.add(messageToUpdate);
+                        }else{
+                            updateGroupChat(new MessageRealm(messageToUpdate), chatRealm);
+                            fbManager.updateMainModels(messageToUpdate);
+                        }
+                    }
+                }
+            }
+        }
+
         if (messageList.size() > 0) {
             realmManager.insertOrUpdateMessages(messageList);
             fbManager.updateMessages(messageList);
         }
-
-        updateMainRelatedMainModel(messages.last(), groupChat);
     }
 
-    public void updateMessages(RealmResults<MessageRealm> messages, DirectChatRealm directChat) {
+    public void updateMessages(RealmResults<MessageRealm> messages, DirectChatRealm chatRealm) {
         List<Message> messageList = new ArrayList<>();
         for (MessageRealm realmMessage : messages) {
             Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
@@ -169,6 +186,18 @@ public class DataManager {
                 messageList.add(temp);
             }
         }
+
+        MainRecentModel recentModel = RealmUISingleton.getInstance().getRealmInstance().where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
+        if(recentModel != null){
+            for(RowItem item : recentModel.getRowItems()){
+                if(item.isNewMessage()){
+                    if(item.getChatId().equals(chatRealm.getChatId())){
+                        messageList.add(new Message(messages.last()));
+                    }
+                }
+            }
+        }
+
         if (messageList.size() > 0) {
             realmManager.insertOrUpdateMessages(messageList);
             fbManager.updateMessages(messageList);
@@ -214,20 +243,11 @@ public class DataManager {
         realmManager.updateOrInserNewMessageNotification(newMessageNotification);
     }
 
-    public void updateMainRelatedMainModel(MessageRealm message, GroupChatRealm groupChat) {
-//        RowItem recentRowItem = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(RealmUISingleton.getInstance().getRealmInstance().where(RowItem.class).equalTo("chatId", chatId).findFirst());
-//        recentRowItem.setMessageContent(message.getMessageContent());
-//        recentRowItem.setMessageOwnerName(message.getMessageOwnerName());
-//        recentRowItem.setMessageCreatedAtTime(message.getCreatedDate());
-//        recentRowItem.setNewMessage(false);
-//        realmManager.inserOrUpdateRowItem(recentRowItem);
-
-//        GroupChat chat = new GroupChat(groupChat);
-//        chat.setMostRecentMessage(new Message(message));
-//        chat.setMessageCreatedTime(message.getCreatedDate());
-//        realmManager.insertOrUpdateGroupChat(chat);
-//        fbManager.updateGroupChat(chat);
-
-        //update Main models here i think.
+    public void updateGroupChat(MessageRealm message, GroupChatRealm groupChat) {
+        GroupChat chat = new GroupChat(groupChat);
+        chat.setMostRecentMessage(new Message(message));
+        chat.setMessageCreatedTime(message.getCreatedDate());
+        realmManager.insertOrUpdateGroupChat(chat);
+        fbManager.updateGroupChat(chat);
     }
 }

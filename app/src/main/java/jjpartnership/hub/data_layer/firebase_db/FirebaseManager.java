@@ -994,4 +994,8 @@ public class FirebaseManager {
     public void updateGroupChat(GroupChat chat) {
         groupChatsReference.child(chat.getChatId()).setValue(chat);
     }
+
+    public void updateMainModels(Message messageToUpdate) {
+        syncManager.updateMainModels(messageToUpdate);
+    }
 }

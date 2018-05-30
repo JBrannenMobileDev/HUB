@@ -647,11 +647,20 @@ public class FirebaseSyncManager {
                             needsToBeUpdated = true;
                         }
 
+                        GroupChatRealm matchingChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
+                        GroupChatRealm chatCopy = null;
+                        if(matchingChat != null){
+                            chatCopy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(matchingChat);
+                            chatCopy.setMostRecentMessage(new MessageRealm(message));
+                            chatCopy.setMessageCreatedTime(message.getCreatedDate());
+                        }
+
                         if(localMessage != null && localMessage.isSavedToFirebase()) {
                             //Do nothing
                         }else{
                             message.setSavedToFirebase(true);
                             needsToBeUpdated = true;
+                            if(chatCopy != null) DataManager.getInstance().insertOrUpdateGroupChat(chatCopy);
                             updateMainModels(message);
                         }
 
@@ -667,6 +676,14 @@ public class FirebaseSyncManager {
                     if(message != null) {
                         message.setSavedToFirebase(true);
                         updateMainModels(message);
+                        GroupChatRealm matchingChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("chatId", message.getChatId()).findFirst();
+                        GroupChatRealm chatCopy = null;
+                        if(matchingChat != null){
+                            chatCopy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(matchingChat);
+                            chatCopy.setMostRecentMessage(new MessageRealm(message));
+                            chatCopy.setMessageCreatedTime(message.getCreatedDate());
+                        }
+                        if(chatCopy != null) DataManager.getInstance().insertOrUpdateGroupChat(chatCopy);
                         batchUtil.updateMessageRealm(message);
                     }
                 }
@@ -729,7 +746,7 @@ public class FirebaseSyncManager {
 
     }
 
-    private void updateMainModels(Message message) {
+    public void updateMainModels(Message message) {
         Calendar twoWeeksAgo = Calendar.getInstance();
         twoWeeksAgo.add(Calendar.DAY_OF_YEAR, -14);
 
@@ -820,15 +837,15 @@ public class FirebaseSyncManager {
         if(currentRecentModel != null) {
             for (GroupChatRealm groupChat : allRealmGroupChats) {
                 if (groupChat.getChatId().equals(message.getChatId())){
-                    RowItem newRecentItem = new RowItem();
-                    newRecentItem.setItemType(RowItem.TYPE_GROUP_CHAT);
-                    newRecentItem.setChatId(message.getChatId());
-                    newRecentItem.setMessageCreatedAtTime(message.getCreatedDate());
-                    newRecentItem.setMessageOwnerName(message.getMessageOwnerName());
-                    newRecentItem.setNewMessage(!message.getReadByUids().contains(UserPreferences.getInstance().getUid()));
-                    newRecentItem.setMessageContent(message.getMessageContent());
-                    newRecentItem.setAccountId(groupChat.getAccountId());
-                    recentRowItems.add(newRecentItem);
+                    RowItem recentItem = new RowItem();
+                    recentItem.setItemType(RowItem.TYPE_GROUP_CHAT);
+                    recentItem.setChatId(message.getChatId());
+                    recentItem.setMessageCreatedAtTime(message.getCreatedDate());
+                    recentItem.setMessageOwnerName(message.getMessageOwnerName());
+                    recentItem.setNewMessage(!message.getReadByUids().contains(UserPreferences.getInstance().getUid()));
+                    recentItem.setMessageContent(message.getMessageContent());
+                    recentItem.setAccountId(groupChat.getAccountId());
+                    recentRowItems.add(recentItem);
                 }else{
                     RowItem sameItem = new RowItem();
                     sameItem.setItemType(RowItem.TYPE_GROUP_CHAT);
@@ -854,10 +871,6 @@ public class FirebaseSyncManager {
             }
             recentRowItems.add(newRecentItem);
         }
-
-
-
-
 
         Collections.sort(recentRowItems, RowItem.createdAtComparator);
         Collections.reverse(recentRowItems);

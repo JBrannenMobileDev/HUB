@@ -497,12 +497,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
                     recentRecyclerView.setAdapter(recentRecyclerAdapter);
                 } else {
-                    if (recentModel.getRowItems().size() > 5) {
-                        for (int i = 0; i < recentModel.getRowItems().size(); i++) {
-                            if (recentModel.getRowItems().get(i).isNewMessage()) {
-                                newMessagesCount++;
-                            }
+                    for (int i = 0; i < recentModel.getRowItems().size(); i++) {
+                        if (recentModel.getRowItems().get(i).isNewMessage()) {
+                            newMessagesCount++;
                         }
+                    }
+                    if (recentModel.getRowItems().size() > 5) {
+                        showAllTv.setEnabled(true);
                         List<RowItem> newList = recentModel.getRowItems().subList(0, 5);
                         newRealmList = new RealmList<>();
                         for (RowItem item : newList) {

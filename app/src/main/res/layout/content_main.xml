@@ -43,8 +43,9 @@
                         android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_weight="1"
+                        android:enabled="false"
                         android:text="Show All"
-                        android:textColor="@color/white"
+                        android:textColor="@color/colorAccentVeryDark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
 
@@ -52,8 +53,8 @@
                         android:id="@+id/new_message_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
                         android:layout_marginEnd="75dp"
+                        android:layout_marginStart="115dp"
                         android:layout_marginTop="4dp"
                         android:visibility="visible">
 
@@ -62,7 +63,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="16dp"
                             android:layout_gravity="end"
-                            android:layout_marginTop="6dp"
+                            android:layout_marginTop="2dp"
                             app:srcCompat="@drawable/new_message_circle" />
 
                         <TextView
@@ -70,12 +71,13 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="fill_vertical|center_horizontal"
-                            android:layout_marginEnd="4dp"
-                            android:layout_marginStart="4dp"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="1dp"
                             android:text="0"
                             android:textAlignment="center"
-                            android:textColor="@color/white" />
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
 
                     </FrameLayout>
 
