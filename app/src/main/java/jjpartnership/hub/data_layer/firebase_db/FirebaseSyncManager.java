@@ -659,6 +659,7 @@ public class FirebaseSyncManager {
                             //Do nothing
                         }else{
                             message.setSavedToFirebase(true);
+                            chatMessagesReference.child(message.getChatId()).child("messages").child(message.getMessageId()).setValue(message);
                             needsToBeUpdated = true;
                             if(chatCopy != null) DataManager.getInstance().insertOrUpdateGroupChat(chatCopy);
                             updateMainModels(message);

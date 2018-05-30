@@ -30,6 +30,7 @@ public class MainPresenterImp implements MainPresenter {
     private MainDirectMessagesModel directModel;
     private RealmList<GroupChatRealm> groupChats;
     private NewMessageNotification newMessageNotification;
+    private RealmResults<GroupChatRealm> allGroupChats;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
@@ -43,6 +44,7 @@ public class MainPresenterImp implements MainPresenter {
             recentModel = realm.where(MainRecentModel.class).equalTo("permanentId", MainRecentModel.PERM_ID).findFirst();
             directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
             newMessageNotification = realm.where(NewMessageNotification.class).equalTo("newMessageId", NewMessageNotification.PERM_ID).findFirst();
+            allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
             UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
             if (user != null) {
                 CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
@@ -57,10 +59,10 @@ public class MainPresenterImp implements MainPresenter {
             if (directModel != null) {
                 activity.onDirectMessagesModelReceived(directModel);
             }
-
-            RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
-            groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
-            activity.onGroupMessagesReceived(groupChats);
+            if(allGroupChats != null){
+                groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
+                activity.onGroupMessagesReceived(groupChats);
+            }
             initDataListeners();
         }
     }
@@ -86,6 +88,7 @@ public class MainPresenterImp implements MainPresenter {
                 activity.onAccountModelReceived(accountModel);
             }
         }
+        
         if(recentModel != null){
             recentModel.addChangeListener(new RealmChangeListener<MainRecentModel>() {
                 @Override
@@ -106,6 +109,7 @@ public class MainPresenterImp implements MainPresenter {
                 activity.onRecentModelReceived(recentModel);
             }
         }
+
         if(directModel != null){
             directModel.addChangeListener(new RealmChangeListener<MainDirectMessagesModel>() {
                 @Override
@@ -127,9 +131,19 @@ public class MainPresenterImp implements MainPresenter {
             }
         }
 
-        RealmResults<GroupChatRealm> allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
-        groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(allGroupChats);
-        if(allGroupChats != null) {
+        if(groupChats != null){
+            if(allGroupChats != null) {
+                allGroupChats.addChangeListener(new RealmChangeListener<RealmResults<GroupChatRealm>>() {
+                    @Override
+                    public void onChange(RealmResults<GroupChatRealm> groupChatRealms) {
+                        groupChats = FilterUtil.filterOutCustomerRequestAndAllAgentGroups(groupChatRealms);
+                        activity.onGroupMessagesReceived(groupChats);
+                    }
+                });
+                activity.onGroupMessagesReceived(groupChats);
+            }
+        }else{
+            allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
             allGroupChats.addChangeListener(new RealmChangeListener<RealmResults<GroupChatRealm>>() {
                 @Override
                 public void onChange(RealmResults<GroupChatRealm> groupChatRealms) {
@@ -139,6 +153,7 @@ public class MainPresenterImp implements MainPresenter {
             });
             activity.onGroupMessagesReceived(groupChats);
         }
+
 
         if(newMessageNotification != null){
             newMessageNotification.addChangeListener(new RealmChangeListener<RealmModel>() {
@@ -165,6 +180,7 @@ public class MainPresenterImp implements MainPresenter {
         if(accountModel != null) accountModel.removeAllChangeListeners();
         if(recentModel != null) recentModel.removeAllChangeListeners();
         if(directModel != null) directModel.removeAllChangeListeners();
+        if(groupChats != null) groupChats.removeAllChangeListeners();
     }
 
     @Override

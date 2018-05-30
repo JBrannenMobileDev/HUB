@@ -121,7 +121,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-//                    updateMainAccountModel(message);
+                    syncManager.updateMainModels(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -131,7 +131,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-//                    updateMainAccountModel(message);
+                    syncManager.updateMainModels(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -179,7 +179,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-//                    updateMainAccountModel(message);
+                    syncManager.updateMainModels(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }
@@ -189,7 +189,7 @@ public class FirebaseManager {
                 Message message = dataSnapshot.getValue(Message.class);
                 if(message != null) {
                     message.setSavedToFirebase(true);
-//                    updateMainAccountModel(message);
+                    syncManager.updateMainModels(message);
                     DataManager.getInstance().updateRealmMessage(message);
                 }
             }

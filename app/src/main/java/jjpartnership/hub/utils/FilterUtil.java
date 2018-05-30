@@ -25,7 +25,7 @@ public class FilterUtil {
         RealmList<GroupChatRealm> filteredChats = new RealmList<>();
         for(GroupChatRealm chat : allGroups){
             if(chat.getCustomerRequestIds() == null || chat.getCustomerRequestIds().size() == 0) {
-                if(chat.getGroupName() != null && !chat.getGroupName().equals("All Sales Agents")) {
+                if(chat.getGroupName() != null) {
                     filteredChats.add(chat);
                 }
             }

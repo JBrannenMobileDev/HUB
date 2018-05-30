@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -75,6 +76,16 @@ public class DirectMessageRecyclerAdapter extends RecyclerView.Adapter<DirectMes
         if(user != null){
             holder.userName.setText(user.getFirstName() + " " + user.getLastName());
             holder.userIcon.setText(String.valueOf(user.getFirstName().charAt(0)));
+        }
+
+        if(directItem.isNewMessage()){
+            holder.userName.setTextColor(Color.BLACK);
+            holder.messageTime.setTextColor(Color.BLACK);
+            holder.messageContent.setTextColor(Color.BLACK);
+        }else{
+            holder.userName.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
+            holder.messageTime.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
+            holder.messageContent.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
         }
 
         if(directItem.getMessageCreatedAtTime() != 0) {

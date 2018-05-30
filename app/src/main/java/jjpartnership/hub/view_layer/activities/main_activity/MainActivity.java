@@ -504,6 +504,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     if (recentModel.getRowItems().size() > 5) {
                         showAllTv.setEnabled(true);
+                        showAllTv.setTextColor(Color.WHITE);
                         List<RowItem> newList = recentModel.getRowItems().subList(0, 5);
                         newRealmList = new RealmList<>();
                         for (RowItem item : newList) {
@@ -517,6 +518,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             showAllTv.setEnabled(true);
                         }
                     } else {
+                        showAllTv.setEnabled(false);
+                        showAllTv.setTextColor(getResources().getColor(R.color.colorAccentVeryDark));
                         recentRecyclerAdapter.onDataSetChanged(recentModel);
                     }
                     if (newMessagesCount > 0) {

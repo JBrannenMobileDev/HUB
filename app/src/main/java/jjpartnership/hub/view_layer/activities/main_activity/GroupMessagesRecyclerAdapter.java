@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -85,6 +86,16 @@ public class GroupMessagesRecyclerAdapter extends RecyclerView.Adapter<GroupMess
             holder.messageContent.setText(company.getName() + " - " + messageUser.getFirstName() + " " + messageUser.getLastName());
         }else{
             holder.messageContent.setText("Be the first to post a message.");
+        }
+
+        if(!chatToUse.getMostRecentMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
+            holder.groupName.setTextColor(Color.BLACK);
+            holder.messageDateTime.setTextColor(Color.BLACK);
+            holder.messageContent.setTextColor(Color.BLACK);
+        }else{
+            holder.groupName.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
+            holder.messageDateTime.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
+            holder.messageContent.setTextColor(context.getResources().getColor(R.color.colorPrimaryLight));
         }
     }
 
