@@ -192,34 +192,50 @@ public class FirebaseSyncManager {
     }
 
     private void getCompanies() {
-        for(Account account : userAccounts) {
-            String companyId;
-            if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
-                companyId = account.getCompanyCustomerId();
-            } else {
-                companyId = account.getCompanySalesId();
+        ValueEventListener currentUserCompanyListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Company company = dataSnapshot.getValue(Company.class);
+                if (company != null) {
+                    companies.add(company);
+                }
+                for(Account account : userAccounts) {
+                    String companyId;
+                    if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
+                        companyId = account.getCompanyCustomerId();
+                    } else {
+                        companyId = account.getCompanySalesId();
+                    }
+
+                    ValueEventListener companyListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Company company = dataSnapshot.getValue(Company.class);
+                            if (company != null) {
+                                companies.add(company);
+                            }
+                            if(companies.size() == userAccounts.size()){
+                                getAccountRequests();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w(TAG, "loadCompanies:onCancelled", databaseError.toException());
+                            syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                        }
+                    };
+                    companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
+                }
             }
 
-            ValueEventListener companyListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Company company = dataSnapshot.getValue(Company.class);
-                    if (company != null) {
-                        companies.add(company);
-                    }
-                    if(companies.size() == userAccounts.size()){
-                        getAccountRequests();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.w(TAG, "loadCompanies:onCancelled", databaseError.toException());
-                    syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
-                }
-            };
-            companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.w(TAG, "loadCompanies:onCancelled", databaseError.toException());
+                syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+            }
+        };
+        companiesReference.child(currentUser.getCompanyId()).addListenerForSingleValueEvent(currentUserCompanyListener);
     }
 
     private void getAccountRequests() {
@@ -636,6 +652,14 @@ public class FirebaseSyncManager {
                                 && (message.getReceivedByUids() == null || (message.getReceivedByUids() != null && !message.getReceivedByUids().contains(UserPreferences.getInstance().getUid())))){
                             NewMessageNotification newMessageNotification = new NewMessageNotification();
                             newMessageNotification.setNewMessage(message.getMessageId());
+                            if(message.getReceivedByUids() != null){
+                                message.getReceivedByUids().add(UserPreferences.getInstance().getUid());
+                            }else{
+                                List<String> receivedByIds = new ArrayList<>();
+                                receivedByIds.add(UserPreferences.getInstance().getUid());
+                                message.setReceivedByUids(receivedByIds);
+                            }
+                            chatMessagesReference.child(message.getChatId()).child("messages").child(message.getMessageId()).setValue(message);
                             DataManager.getInstance().updateOrInsertNewMessageNotification(newMessageNotification);
                         }
 

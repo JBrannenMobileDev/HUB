@@ -21,4 +21,5 @@ public interface MainView {
     void setToolbarElevation(float height);
     void VibratePhone();
     void onShowAll(MainRecentModel recentModel);
+    void setNavHeaderData(String userName, String email, String iconLetter, int color);
 }

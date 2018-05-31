@@ -16,6 +16,7 @@ import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.FilterUtil;
 import jjpartnership.hub.utils.NewMessageVibrateUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserColorUtil;
 import jjpartnership.hub.utils.UserPreferences;
 
 /**
@@ -31,10 +32,12 @@ public class MainPresenterImp implements MainPresenter {
     private RealmList<GroupChatRealm> groupChats;
     private NewMessageNotification newMessageNotification;
     private RealmResults<GroupChatRealm> allGroupChats;
+    private boolean firstResponseToNewMessageListener;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
         realm = RealmUISingleton.getInstance().getRealmInstance();
+        firstResponseToNewMessageListener = true;
         fetchInitData();
     }
 
@@ -47,6 +50,8 @@ public class MainPresenterImp implements MainPresenter {
             allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
             UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
             if (user != null) {
+                int iconColor = UserColorUtil.getUserColor(user.getUserColor());
+                activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor);
                 CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
                 if (company != null) activity.setPageTitle(company.getName());
             }
@@ -88,7 +93,7 @@ public class MainPresenterImp implements MainPresenter {
                 activity.onAccountModelReceived(accountModel);
             }
         }
-        
+
         if(recentModel != null){
             recentModel.addChangeListener(new RealmChangeListener<MainRecentModel>() {
                 @Override
@@ -159,11 +164,15 @@ public class MainPresenterImp implements MainPresenter {
             newMessageNotification.addChangeListener(new RealmChangeListener<RealmModel>() {
                 @Override
                 public void onChange(RealmModel realmModel) {
-                    if(!newMessageNotification.hasBeenViewed() && newMessageNotification.getNewMessage() != null){
-                        activity.VibratePhone();
-                        NewMessageNotification copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(newMessageNotification);
-                        copy.setHasBeenViewed(true);
-                        DataManager.getInstance().updateOrInsertNewMessageNotification(copy);
+                    if(!firstResponseToNewMessageListener) {
+                        if (!newMessageNotification.hasBeenViewed() && newMessageNotification.getNewMessage() != null) {
+                            activity.VibratePhone();
+                            NewMessageNotification copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(newMessageNotification);
+                            copy.setHasBeenViewed(true);
+                            DataManager.getInstance().updateOrInsertNewMessageNotification(copy);
+                        }
+                    }else{
+                        firstResponseToNewMessageListener = false;
                     }
                 }
             });

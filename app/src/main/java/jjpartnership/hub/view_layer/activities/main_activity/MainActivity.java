@@ -3,7 +3,9 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +56,7 @@ import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.NewMessageVibrateUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserColorUtil;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
@@ -99,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RealmList<RowItem> newRealmList;
     private boolean recentExpanded;
     private int[] hideBtLocation;
+    private TextView nav_user_name;
+    private TextView nav_user_email;
+    private TextView nav_user_icon;
 
 
 
@@ -139,7 +145,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initAnimations();
         initAdapters();
         initScrollViewListener();
+
+        View hView =  navigationView.getHeaderView(0);
+        navigationView.setItemIconTintList(null);
+
+        int[][] state = new int[][] {
+                new int[] {-android.R.attr.state_checked}, // checked
+                new int[] {-android.R.attr.state_checked}
+        };
+
+        int[] color = new int[] {
+                getResources().getColor(R.color.colorPrimaryLight),
+                getResources().getColor(R.color.colorPrimaryLight)
+        };
+        ColorStateList csl = new ColorStateList(state, color);
+        navigationView.setItemTextColor(csl);
+
+        setNavIconColors(navigationView);
+        nav_user_name = hView.findViewById(R.id.nav_user_name);
+        nav_user_email = hView.findViewById(R.id.nav_user_email);
+        nav_user_icon = hView.findViewById(R.id.nav_user_icon);
+
         presenter = new MainPresenterImp(this);
+    }
+
+    private void setNavIconColors(NavigationView navigationView) {
+        navigationView.getMenu()
+                .findItem(R.id.nav_share_lead)
+                .getIcon()
+                .setColorFilter(getResources().getColor(R.color.user_color_14), PorterDuff.Mode.SRC_IN);
+
+        navigationView.getMenu()
+                .findItem(R.id.nav_new_account)
+                .getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorAccentDark), PorterDuff.Mode.SRC_IN);
+
+        navigationView.getMenu()
+                .findItem(R.id.nav_new_direct_message)
+                .getIcon()
+                .setColorFilter(getResources().getColor(R.color.user_color_4), PorterDuff.Mode.SRC_IN);
+
+        navigationView.getMenu()
+                .findItem(R.id.nav_settings)
+                .getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryLight), PorterDuff.Mode.SRC_IN);
     }
 
     private void initScrollViewListener() {
@@ -387,9 +436,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-        }
         if(id == R.id.app_bar_search){
             overlayImage.setVisibility(View.VISIBLE);
             return true;
@@ -404,17 +450,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_share_lead) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_new_account) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_new_direct_message) {
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_sign_out) {
+        } else if (id == R.id.nav_settings) {
             FirebaseAuth.getInstance().signOut();
             DataManager.getInstance().clearRealmData();
             startActivity(new Intent(getApplicationContext(), BootActivity.class));
@@ -574,5 +616,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void setPageTitle(String title) {
         setTitle(title);
+    }
+
+    @Override
+    public void setNavHeaderData(String userName, String email, String iconLetter, int iconColor){
+        nav_user_name.setText(userName);
+        nav_user_email.setText(email);
+        nav_user_icon.setText(iconLetter);
+        nav_user_icon.setBackgroundTintList(getResources().getColorStateList(iconColor));
     }
 }
