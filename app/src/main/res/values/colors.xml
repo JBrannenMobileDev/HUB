@@ -28,7 +28,7 @@
     <color name="user_color_2">#34b728</color>
     <color name="user_color_2_dark">#34841e</color>
     <color name="user_color_3">#177e2d</color>
-    <color name="user_color_3_dark">#1e842a</color>
+    <color name="user_color_3_dark">#186922</color>
     <color name="user_color_4">#28b35d</color>
     <color name="user_color_4_dark">#1d8444</color>
     <color name="user_color_5">#29b486</color>
@@ -40,18 +40,18 @@
     <color name="user_color_8">#2964b6</color>
     <color name="user_color_8_dark">#1c447c</color>
     <color name="user_color_9">#2836b6</color>
-    <color name="user_color_9_dark">#394cff</color>
-    <color name="user_color_10">#4a3891</color>
-    <color name="user_color_10_dark">#6139ff</color>
-    <color name="user_color_11">#603caf</color>
-    <color name="user_color_11_dark">#9c3aff</color>
+    <color name="user_color_9_dark">#1e298b</color>
+    <color name="user_color_10">#412f86</color>
+    <color name="user_color_10_dark">#36276e</color>
+    <color name="user_color_11">#6a43bf</color>
+    <color name="user_color_11_dark">#4e308e</color>
     <color name="user_color_12">#e7db28</color>
-    <color name="user_color_12_dark">#751e8b</color>
+    <color name="user_color_12_dark">#89820b</color>
     <color name="user_color_13">#ff8426</color>
     <color name="user_color_13_dark">#b16711</color>
     <color name="user_color_14">#fd3232</color>
-    <color name="user_color_14_dark">#cc1923</color>
+    <color name="user_color_14_dark">#ba1720</color>
     <color name="user_color_15">#101d8b</color>
-    <color name="user_color_15_dark">#8b1f3d</color>
+    <color name="user_color_15_dark">#0a135b</color>
     <color name="white_overlay">#a4ffffff</color>
 </resources>

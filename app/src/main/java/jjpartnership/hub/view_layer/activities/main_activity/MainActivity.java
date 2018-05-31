@@ -62,6 +62,7 @@ import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActiv
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActivity;
+import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
@@ -165,8 +166,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_user_name = hView.findViewById(R.id.nav_user_name);
         nav_user_email = hView.findViewById(R.id.nav_user_email);
         nav_user_icon = hView.findViewById(R.id.nav_user_icon);
+        initDrawerHeaderClickListeners();
 
         presenter = new MainPresenterImp(this);
+    }
+
+    private void initDrawerHeaderClickListeners() {
+        nav_user_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), UserProfileActivity.class).putExtra("userId", UserPreferences.getInstance().getUid()));
+            }
+        });
+        nav_user_email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), UserProfileActivity.class).putExtra("userId", UserPreferences.getInstance().getUid()));
+            }
+        });
+        nav_user_name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), UserProfileActivity.class).putExtra("userId", UserPreferences.getInstance().getUid()));
+            }
+        });
     }
 
     private void setNavIconColors(NavigationView navigationView) {
