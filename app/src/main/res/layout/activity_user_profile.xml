@@ -7,6 +7,47 @@
     android:background="@color/colorPrimaryVeryLight"
     tools:context="jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity">
 
+    <LinearLayout
+        android:id="@+id/color_setting_layout"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="220dp"
+        android:background="@drawable/rounded_rectangle_white_tile_bg"
+        android:elevation="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp">
+
+        <FrameLayout
+            android:id="@+id/user_color_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18dp">
+
+            <ImageView
+                android:id="@+id/user_profile_current_color_iv"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/rounded_rectangle_non_user" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="8dp"
+            android:text="Change Color"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/user_profile_header_frame_layout"
         android:layout_width="match_parent"
@@ -22,7 +63,7 @@
         android:layout_marginLeft="32dp"
         android:layout_marginTop="12dp"
         android:background="@drawable/rounded_rectangle_user_color"
-        android:elevation="3dp"
+        android:elevation="6dp"
         android:gravity="center_vertical"
         android:textAlignment="center"
         android:textColor="@color/white"
@@ -52,52 +93,108 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/user_phone_tv"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:text="Phone:"
-            android:textColor="@color/colorPrimary"
-            android:textSize="14sp" />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/user_email_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:maxLines="1"
-            android:text="Email:"
-            android:textColor="@color/colorPrimary"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:text="Phone:"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/info1_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:maxLines="1"
-            android:text="Business Unit:"
-            android:textColor="@color/colorPrimary"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/user_phone_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="32dp"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/info2_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
-            android:maxLines="1"
-            android:text="Role:"
-            android:textColor="@color/colorPrimary"
-            android:textSize="14sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:text="Email:"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/user_email_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
+                android:maxLines="1"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:text="Business Unit:"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/info1_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
+                android:maxLines="1"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:text="Role:"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/info2_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="32dp"
+                android:maxLines="1"
+                android:textColor="@color/colorPrimary"
+                android:textSize="14sp" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -210,7 +307,18 @@
         android:orientation="vertical"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="8dp">
+        android:paddingTop="8dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="4dp"
+            android:text="Select A Color"
+            android:textColor="@color/colorPrimaryLight"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -246,6 +354,22 @@
                     android:layout_margin="4dp"
                     android:layout_weight="1"
                     android:tint="@color/user_color_14"
+                    app:srcCompat="@drawable/rounded_rectangle_non_user" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/user_color_16"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/imageView28"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:tint="@color/user_color_16"
                     app:srcCompat="@drawable/rounded_rectangle_non_user" />
             </FrameLayout>
 
@@ -298,6 +422,22 @@
             </FrameLayout>
 
             <FrameLayout
+                android:id="@+id/user_color_3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <ImageView
+                    android:id="@+id/imageView17"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="4dp"
+                    android:layout_weight="1"
+                    android:tint="@color/user_color_3"
+                    app:srcCompat="@drawable/rounded_rectangle_non_user" />
+            </FrameLayout>
+
+            <FrameLayout
                 android:id="@+id/user_color_4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -312,6 +452,12 @@
                     android:tint="@color/user_color_4"
                     app:srcCompat="@drawable/rounded_rectangle_non_user" />
             </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <FrameLayout
                 android:id="@+id/user_color_5"
@@ -328,29 +474,6 @@
                     android:tint="@color/user_color_5"
                     app:srcCompat="@drawable/rounded_rectangle_non_user" />
             </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/user_color_3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/imageView17"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:tint="@color/user_color_3"
-                    app:srcCompat="@drawable/rounded_rectangle_non_user" />
-            </FrameLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
             <FrameLayout
                 android:id="@+id/user_color_6"
@@ -464,21 +587,6 @@
                     app:srcCompat="@drawable/rounded_rectangle_non_user" />
             </FrameLayout>
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/imageView28"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:tint="@android:color/white"
-                    app:srcCompat="@drawable/rounded_rectangle_non_user" />
-            </FrameLayout>
-
         </LinearLayout>
 
         <FrameLayout
@@ -506,7 +614,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_marginTop="8dp"
                 android:text="Save"
-                android:textColor="@color/colorAccentDark"
+                android:textColor="@color/colorPrimaryLight"
                 android:textStyle="bold" />
         </FrameLayout>
 

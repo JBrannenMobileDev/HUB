@@ -432,8 +432,15 @@ public class FirebaseManager {
         industriesReference.push().setValue(industry);
     }
 
-    public void updateOrCreateUserColor(int colorId, String uid){
+    public void updateOrCreateUserColor(int colorId, String uid, UserRealm realmUser){
         userColorsReference.child(uid).setValue(colorId);
+        usersReference.child(uid).setValue(new User(realmUser));
+    }
+
+    public void updateOrCreateUserColor(int colorId, String uid){
+        UserRealm realmUser = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).equalTo("uid", uid).findFirst();
+        userColorsReference.child(uid).setValue(colorId);
+        if(realmUser != null) usersReference.child(uid).setValue(new User(realmUser));
     }
 
     public void updateUserInfo(String firstName, String lastName, String phoneNumber, String businessUnit, String role) {

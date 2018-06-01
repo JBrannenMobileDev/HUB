@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.direct_message_activity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -33,6 +34,7 @@ import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.view_layer.activities.account_activity.ChatRecyclerAdapter;
+import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 import jjpartnership.hub.view_layer.custom_views.AdjustableScrollSpeedLayoutManager;
 import jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText;
 import jjpartnership.hub.view_layer.custom_views.HideShowScrollListener;
@@ -309,6 +311,11 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
     @Override
     public void onSendEmailIntent(String email) {
         CommunicationsUtil.launchEmailIntent(email, getApplicationContext());
+    }
+
+    @Override
+    public void launchUserProfile(String toUid) {
+        startActivity(new Intent(getApplicationContext(), UserProfileActivity.class).putExtra("userId", toUid));
     }
 
     @Override

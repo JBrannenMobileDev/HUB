@@ -15,4 +15,5 @@ public interface DirectMessageView {
     void onReceiveMessages(RealmResults<MessageRealm> messagesRealm, HashMap<String, Long> usersColors, boolean equals);
     void onSendCallIntent(String phoneNumber);
     void onSendEmailIntent(String email);
+    void launchUserProfile(String toUid);
 }

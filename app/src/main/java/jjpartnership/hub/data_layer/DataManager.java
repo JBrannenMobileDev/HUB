@@ -25,6 +25,7 @@ import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
 import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.User;
 import jjpartnership.hub.data_layer.data_models.UserColor;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.data_layer.firebase_db.FirebaseManager;
 import jjpartnership.hub.data_layer.realm_db.RealmManager;
 import jjpartnership.hub.utils.BaseCallback;
@@ -129,8 +130,10 @@ public class DataManager {
         realmManager.nukeDb();
     }
 
-    public void updateRealmUserColor(long color, String uid) {
+    public void updateUserColor(long color, int colorId, String uid, UserRealm user) {
         realmManager.insertOrUpdateUserColor(color, uid);
+        realmManager.updateUserColor(colorId, uid);
+        fbManager.updateOrCreateUserColor(colorId, uid, user);
     }
 
     public void insertOrUpdateMessageThread(MessageThread thread) {

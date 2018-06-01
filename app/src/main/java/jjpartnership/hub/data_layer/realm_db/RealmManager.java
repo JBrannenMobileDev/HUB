@@ -428,4 +428,19 @@ public class RealmManager {
         });
         realm.close();
     }
+
+    public void updateUserColor(final int colorId, final String uid) {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransactionAsync(new Realm.Transaction() {
+            @Override
+            public void execute(Realm bgRealm) {
+                UserRealm user = bgRealm.where(UserRealm.class).equalTo("uid", uid).findFirst();
+                if(user != null){
+                    user.setUserColor(colorId);
+                    bgRealm.copyToRealmOrUpdate(user);
+                }
+            }
+        });
+        realm.close();
+    }
 }

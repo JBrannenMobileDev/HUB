@@ -53,5 +53,7 @@
     <color name="user_color_14_dark">#ba1720</color>
     <color name="user_color_15">#101d8b</color>
     <color name="user_color_15_dark">#0a135b</color>
+    <color name="user_color_16">#f139d5</color>
+    <color name="user_color_16_dark">#b92aa3</color>
     <color name="white_overlay">#a4ffffff</color>
 </resources>

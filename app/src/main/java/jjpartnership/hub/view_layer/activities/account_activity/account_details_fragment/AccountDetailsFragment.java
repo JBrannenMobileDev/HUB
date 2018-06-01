@@ -70,9 +70,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         currentUserProfileSelectedCallback = new BaseCallback<String>() {
             @Override
             public void onResponse(String currentUserUid) {
-                Intent userProfileIntent = new Intent(getActivity().getApplicationContext(), UserProfileActivity.class);
-                userProfileIntent.putExtra("uid", currentUserUid);
-                startActivity(userProfileIntent);
+
             }
 
             @Override
@@ -84,7 +82,9 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         agentSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
             public void onResponse(UserRealm user) {
-
+                Intent userProfileIntent = new Intent(getActivity().getApplicationContext(), UserProfileActivity.class);
+                userProfileIntent.putExtra("userId", user.getUid());
+                startActivity(userProfileIntent);
             }
 
             @Override

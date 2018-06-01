@@ -33,6 +33,7 @@ public class MainPresenterImp implements MainPresenter {
     private NewMessageNotification newMessageNotification;
     private RealmResults<GroupChatRealm> allGroupChats;
     private boolean firstResponseToNewMessageListener;
+    private UserRealm user;
 
     public MainPresenterImp(MainView activity){
         this.activity = activity;
@@ -48,10 +49,11 @@ public class MainPresenterImp implements MainPresenter {
             directModel = realm.where(MainDirectMessagesModel.class).equalTo("permanentId", MainDirectMessagesModel.PERM_ID).findFirst();
             newMessageNotification = realm.where(NewMessageNotification.class).equalTo("newMessageId", NewMessageNotification.PERM_ID).findFirst();
             allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
-            UserRealm user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
+            user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
             if (user != null) {
                 int iconColor = UserColorUtil.getUserColor(user.getUserColor());
-                activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor);
+                int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
+                activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor, iconColorDark);
                 CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
                 if (company != null) activity.setPageTitle(company.getName());
             }
@@ -73,6 +75,30 @@ public class MainPresenterImp implements MainPresenter {
     }
 
     private void initDataListeners() {
+        if(user != null){
+            user.addChangeListener(new RealmChangeListener<UserRealm>() {
+                @Override
+                public void onChange(UserRealm user) {
+                    if(user != null){
+                        int iconColor = UserColorUtil.getUserColor(user.getUserColor());
+                        int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
+                        activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor, iconColorDark);
+                        CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
+                        if (company != null) activity.setPageTitle(company.getName());
+                    }
+                }
+            });
+        }else{
+            user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
+            if (user != null) {
+                int iconColor = UserColorUtil.getUserColor(user.getUserColor());
+                int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
+                activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor, iconColorDark);
+                CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
+                if (company != null) activity.setPageTitle(company.getName());
+            }
+        }
+
         if(accountModel != null) {
             accountModel.addChangeListener(new RealmChangeListener<MainAccountsModel>() {
                 @Override

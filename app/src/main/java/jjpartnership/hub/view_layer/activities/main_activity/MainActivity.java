@@ -68,8 +68,6 @@ import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
     @BindView(R.id.search_selected_overlay)ImageView overlayImage;
     @BindView(R.id.search_results_layout)LinearLayout searchResultsLayout;
-    @BindView(R.id.search_results_pager)ViewPager searchResultsPager;
-    @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
     @BindView(R.id.recent_list_view)RecyclerView recentRecyclerView;
     @BindView(R.id.recent_title_tv)TextView recentTitle;
     @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
@@ -106,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView nav_user_name;
     private TextView nav_user_email;
     private TextView nav_user_icon;
+    private LinearLayout nav_main_header_layout;
 
 
 
@@ -166,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_user_name = hView.findViewById(R.id.nav_user_name);
         nav_user_email = hView.findViewById(R.id.nav_user_email);
         nav_user_icon = hView.findViewById(R.id.nav_user_icon);
+        nav_main_header_layout = hView.findViewById(R.id.main_header_linear_layout);
         initDrawerHeaderClickListeners();
 
         presenter = new MainPresenterImp(this);
@@ -194,14 +194,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setNavIconColors(NavigationView navigationView) {
         navigationView.getMenu()
+                .findItem(R.id.nav_search)
+                .getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorPrimaryLight), PorterDuff.Mode.SRC_IN);
+
+        navigationView.getMenu()
                 .findItem(R.id.nav_share_lead)
                 .getIcon()
                 .setColorFilter(getResources().getColor(R.color.user_color_14), PorterDuff.Mode.SRC_IN);
-
-        navigationView.getMenu()
-                .findItem(R.id.nav_new_account)
-                .getIcon()
-                .setColorFilter(getResources().getColor(R.color.colorAccentDark), PorterDuff.Mode.SRC_IN);
 
         navigationView.getMenu()
                 .findItem(R.id.nav_new_direct_message)
@@ -373,14 +373,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void initializeViewPager() {
-//        if(null != tabLayout)
-//            tabLayout.setupWithViewPager(mPager, true);
-//
-//        SplashScreenAdapter pagerAdapter = new SplashScreenAdapter(getSupportFragmentManager());
-//        mPager.setAdapter(pagerAdapter);
-    }
-
     private void initAnimations() {
         slideUpAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up_animation);
         slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down_animation);
@@ -394,8 +386,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onImeBack(BackAwareSearchView searchView) {
                 searchView.clearFocus();
                 if(searchView.getQuery().length() == 0){
-                    searchResultsVisible = false;
-                    overlayImage.setVisibility(View.GONE);
+                    hideOverlayImage();
                     searchResultsLayout.startAnimation(slideDownAnimation);
                     searchResultsLayout.setVisibility(View.GONE);
                     if (!searchView.isIconified()) {
@@ -409,8 +400,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchView.setOnCloseListener(new android.support.v7.widget.SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                searchResultsVisible = false;
-                overlayImage.setVisibility(View.GONE);
+                hideOverlayImage();
                 searchResultsLayout.startAnimation(slideDownAnimation);
                 searchResultsLayout.setVisibility(View.GONE);
                 return false;
@@ -421,6 +411,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View view) {
                 overlayImage.setVisibility(View.VISIBLE);
+                searchResultsLayout.setVisibility(View.VISIBLE);
+                searchResultsLayout.startAnimation(slideUpAnimation);
             }
         });
 
@@ -433,23 +425,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                toggleSearchResultsAnimation(newText);
                 presenter.onSearchQuery(newText);
                 return false;
             }
         });
     }
 
-    private void toggleSearchResultsAnimation(String query){
-        if(query.length() > 0 && !searchResultsVisible){
-            searchResultsLayout.setVisibility(View.VISIBLE);
-            searchResultsLayout.startAnimation(slideUpAnimation);
-            searchResultsVisible = true;
-        }else if(query.length() == 0 && searchResultsVisible){
-            searchResultsLayout.startAnimation(slideDownAnimation);
-            searchResultsLayout.setVisibility(View.GONE);
-            searchResultsVisible = false;
-        }
+    private void hideOverlayImage(){
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                overlayImage.setVisibility(View.GONE);
+            }
+        }, 200);
     }
 
     @Override
@@ -461,6 +450,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(id == R.id.app_bar_search){
             overlayImage.setVisibility(View.VISIBLE);
+            searchResultsLayout.setVisibility(View.VISIBLE);
+            searchResultsLayout.startAnimation(slideUpAnimation);
             return true;
         }
 
@@ -473,9 +464,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_share_lead) {
-            // Handle the camera action
-        } else if (id == R.id.nav_new_account) {
+        if (id == R.id.nav_share_lead){
+
+        } else if (id == R.id.nav_search) {
 
         } else if (id == R.id.nav_new_direct_message) {
 
@@ -642,10 +633,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void setNavHeaderData(String userName, String email, String iconLetter, int iconColor){
+    public void setNavHeaderData(String userName, String email, String iconLetter, int iconColor, int userColorDark){
         nav_user_name.setText(userName);
         nav_user_email.setText(email);
         nav_user_icon.setText(iconLetter);
         nav_user_icon.setBackgroundTintList(getResources().getColorStateList(iconColor));
+        nav_main_header_layout.setBackgroundTintList(getResources().getColorStateList(userColorDark));
     }
 }

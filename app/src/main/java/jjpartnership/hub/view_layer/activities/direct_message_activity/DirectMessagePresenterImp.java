@@ -168,6 +168,6 @@ public class DirectMessagePresenterImp implements DirectMessagePresenter{
 
     @Override
     public void onProfileClicked() {
-
+        activity.launchUserProfile(toUid);
     }
 }
