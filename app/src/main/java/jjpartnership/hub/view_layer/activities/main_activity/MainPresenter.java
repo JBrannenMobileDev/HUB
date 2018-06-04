@@ -10,4 +10,5 @@ public interface MainPresenter {
     void fetchData();
     void onShowAllClicked();
     void onRestoreRecentModel();
+    void onSearch(String query);
 }

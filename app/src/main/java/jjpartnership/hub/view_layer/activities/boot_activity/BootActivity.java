@@ -387,6 +387,7 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
                 bootLoadingLayout.setVisibility(View.VISIBLE);
                 currentUser = mAuth.getCurrentUser();
                 startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                finish();
             }
 
             @Override

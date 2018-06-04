@@ -21,7 +21,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="64dp"
         android:layout_marginRight="16dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/account_name_tv"
@@ -31,6 +31,15 @@
             android:text="Loma Linda University"
             android:textColor="@color/colorPrimaryLight"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/account_adress_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="4454 E Lama Street Loma Linda CA"
+            android:textColor="@color/colorPrimaryLight"
+            android:visibility="gone" />
 
     </LinearLayout>
 

@@ -35,6 +35,7 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
     @BindView(R.id.account_details_industries_tv)TextView industriesTv;
     @BindView(R.id.assigned_agents_recycler_view)RecyclerView agentsRecycler;
     @BindView(R.id.select_all_checkbox)CheckBox selectAllCheckBox;
+    @BindView(R.id.select_all_tv)TextView selectAllTv;
     @BindView(R.id.agents_group_chat_tv)TextView sendGroupChat;
 
     private AssignedAgentsRecyclerAdapter agentsAdapter;
@@ -183,6 +184,10 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         sendGroupChat.setTextColor(getActivity().getResources().getColor(R.color.colorAccent));
     }
 
+    @Override
+    public void showRestrictedAccesToast() {
+        Toast.makeText(getActivity(), "You must be assigned to this account to share a lead.", Toast.LENGTH_LONG).show();
+    }
 
     @Override
     public void onReceiveCompanyData(String address, String industries) {

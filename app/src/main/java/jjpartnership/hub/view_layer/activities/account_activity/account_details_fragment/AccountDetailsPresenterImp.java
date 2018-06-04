@@ -27,6 +27,7 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
     private List<UserRealm> checkedUsers;
     private String accountName;
     private String accountId;
+    private boolean isCurrentUserAssigned;
 
     public AccountDetailsPresenterImp(AccountDetailsView fragment, String account_name, String account_id) {
         this.fragment = fragment;
@@ -51,6 +52,8 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
                     if(!uid.equals(UserPreferences.getInstance().getUid())) {
                         UserRealm salesAgent = realm.where(UserRealm.class).equalTo("uid", uid).findFirst();
                         if (salesAgent != null) salesAgents.add(salesAgent);
+                    }else{
+                        isCurrentUserAssigned = true;
                     }
                 }
             }
@@ -60,7 +63,6 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
                 fragment.onReceiveSalesAgentData(salesAgents);
             }
         }
-
 //        createNewRequest();
     }
 
@@ -104,10 +106,14 @@ public class AccountDetailsPresenterImp implements AccountDetailsPresenter {
 
     @Override
     public void onNewGroupChatClicked() {
-        if(checkedUsers.size() > 0){
-            fragment.showNewGroupDialog(accountId, getAgentIds(salesAgents), getAgentIds(checkedUsers));
+        if(isCurrentUserAssigned) {
+            if (checkedUsers.size() > 0) {
+                fragment.showNewGroupDialog(accountId, getAgentIds(salesAgents), getAgentIds(checkedUsers));
+            } else {
+                fragment.showNoAgentsSelectedToast();
+            }
         }else{
-            fragment.showNoAgentsSelectedToast();
+            fragment.showRestrictedAccesToast();
         }
     }
 

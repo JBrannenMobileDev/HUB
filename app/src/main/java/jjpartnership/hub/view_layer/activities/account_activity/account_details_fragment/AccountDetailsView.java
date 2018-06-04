@@ -18,6 +18,7 @@ public interface AccountDetailsView {
     void showNoAgentsSelectedToast();
     void setNewGroupTextDissabled();
     void setNewGroupTextEnabled();
+    void showRestrictedAccesToast();
 }
 
 

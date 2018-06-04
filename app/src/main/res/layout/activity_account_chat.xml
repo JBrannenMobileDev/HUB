@@ -8,6 +8,20 @@
     android:orientation="vertical"
     tools:context="jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity">
 
+    <TextView
+        android:id="@+id/request_account_access_tv"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorAccentDark"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:text="Request Account Access"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
@@ -24,6 +38,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="56dp"
         android:layout_marginTop="48dp"
         android:orientation="vertical">
 
@@ -33,42 +48,6 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <FrameLayout
-            android:id="@+id/user_input_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="@color/white"
-            android:elevation="4dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/send_image_view"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_gravity="bottom|right"
-                android:padding="15dp"
-                android:src="@drawable/ic_menu_send"
-                android:tint="@color/colorPrimaryVeryLight" />
-
-            <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
-                android:id="@+id/user_message_sales_team_et"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginRight="45dp"
-                android:backgroundTint="@android:color/transparent"
-                android:enabled="true"
-                android:focusable="true"
-                android:hint="Group Message (sales team)"
-                android:inputType="textCapSentences|textMultiLine"
-                android:isScrollContainer="true"
-                android:maxLines="4"
-                android:minLines="1"
-                android:paddingLeft="16dp"
-                android:textColorHint="@color/colorPrimaryLight" />
-
-        </FrameLayout>
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

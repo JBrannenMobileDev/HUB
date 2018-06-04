@@ -5,6 +5,6 @@
         android:id="@+id/app_bar_search"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="Search"
-        app:showAsAction="always"
-        app:actionViewClass="jjpartnership.hub.view_layer.custom_views.BackAwareSearchView" />
+        app:actionViewClass="jjpartnership.hub.view_layer.custom_views.BackAwareSearchView"
+        app:showAsAction="always" />
 </menu>

@@ -148,7 +148,7 @@ public class DataManager {
         List<Message> messageList = new ArrayList<>();
         String thisUid = UserPreferences.getInstance().getUid();
         for (MessageRealm realmMessage : messages) {
-            Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
+            Message temp = new Message(RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(realmMessage));
             if (!temp.getReadByUids().contains(thisUid)) {
                 temp.addReadByUid(thisUid);
                 messageList.add(temp);
@@ -182,7 +182,7 @@ public class DataManager {
     public void updateMessages(RealmResults<MessageRealm> messages, DirectChatRealm chatRealm) {
         List<Message> messageList = new ArrayList<>();
         for (MessageRealm realmMessage : messages) {
-            Message temp = new Message(Realm.getDefaultInstance().copyFromRealm(realmMessage));
+            Message temp = new Message(RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(realmMessage));
             String thisUid = UserPreferences.getInstance().getUid();
             if (!temp.getReadByUids().contains(thisUid)) {
                 temp.addReadByUid(thisUid);

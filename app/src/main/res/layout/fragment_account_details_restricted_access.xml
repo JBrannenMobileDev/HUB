@@ -1,0 +1,27 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="jjpartnership.hub.view_layer.activities.account_activity.account_details_restricted_access_fragment.AccountDetailsRestrictedAccessFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:id="@+id/imageView27"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_marginBottom="50dp"
+        android:src="@drawable/ic_info_outline_black_24dp"
+        android:tint="@color/colorOrange" />
+
+    <TextView
+        android:id="@+id/restricted_access_message_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="60dp"
+        android:gravity="center_vertical|center_horizontal" />
+
+</FrameLayout>

@@ -11,6 +11,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -52,6 +55,7 @@ import jjpartnership.hub.data_layer.data_models.RowItem;
 import jjpartnership.hub.data_layer.data_models.MainAccountsModel;
 import jjpartnership.hub.data_layer.data_models.MainDirectMessagesModel;
 import jjpartnership.hub.data_layer.data_models.MainRecentModel;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.NewMessageVibrateUtil;
@@ -65,26 +69,28 @@ import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActi
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView {
-    @BindView(R.id.search_selected_overlay)ImageView overlayImage;
-    @BindView(R.id.search_results_layout)LinearLayout searchResultsLayout;
-    @BindView(R.id.recent_list_view)RecyclerView recentRecyclerView;
-    @BindView(R.id.recent_title_tv)TextView recentTitle;
-    @BindView(R.id.accounts_list_view)RecyclerView accountsRecyclerView;
-    @BindView(R.id.direct_messages_list_view)RecyclerView directMessagesRecyclerView;
-    @BindView(R.id.group_messages_recycler_view)RecyclerView groupMessagesRecyclerView;
-    @BindView(R.id.recent_empty_state_layout)LinearLayout recent_empty_layout;
-    @BindView(R.id.accounts_empty_state_layout)LinearLayout accounts_empty_layout;
-    @BindView(R.id.direc_messages_empty_state_layout)LinearLayout direct_messages_empty_state;
-    @BindView(R.id.group_messages_empty_state_layout)LinearLayout group_messages_empty_state;
-    @BindView(R.id.main_scrollview)NestedScrollView scrollView;
-    @BindView(R.id.show_all_recent_tv)TextView showAllTv;
-    @BindView(R.id.new_message_icon)FrameLayout newMessagesIcon;
-    @BindView(R.id.new_message_count_tv)TextView newMessageCountTv;
-    @BindView(R.id.hide_recent_tv)TextView hideTv;
-    @BindView(R.id.recent_frame_layout)FrameLayout recentFrameLayout;
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView,
+        AccountSearchResultsFragment.OnFragmentInteractionListener, UsersSearchResultFragment.OnFragmentInteractionListener{
+    @BindView(R.id.search_selected_overlay) ImageView overlayImage;
+    @BindView(R.id.search_results_layout) FrameLayout searchResultsLayout;
+    @BindView(R.id.recent_list_view) RecyclerView recentRecyclerView;
+    @BindView(R.id.recent_title_tv) TextView recentTitle;
+    @BindView(R.id.accounts_list_view) RecyclerView accountsRecyclerView;
+    @BindView(R.id.direct_messages_list_view) RecyclerView directMessagesRecyclerView;
+    @BindView(R.id.group_messages_recycler_view) RecyclerView groupMessagesRecyclerView;
+    @BindView(R.id.recent_empty_state_layout) LinearLayout recent_empty_layout;
+    @BindView(R.id.accounts_empty_state_layout) LinearLayout accounts_empty_layout;
+    @BindView(R.id.direc_messages_empty_state_layout) LinearLayout direct_messages_empty_state;
+    @BindView(R.id.group_messages_empty_state_layout) LinearLayout group_messages_empty_state;
+    @BindView(R.id.main_scrollview) NestedScrollView scrollView;
+    @BindView(R.id.show_all_recent_tv) TextView showAllTv;
+    @BindView(R.id.new_message_icon) FrameLayout newMessagesIcon;
+    @BindView(R.id.new_message_count_tv) TextView newMessageCountTv;
+    @BindView(R.id.hide_recent_tv) TextView hideTv;
+    @BindView(R.id.recent_frame_layout) FrameLayout recentFrameLayout;
+    @BindView(R.id.search_results_pager)ViewPager searchResultPager;
+    @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
 
-    private boolean searchResultsVisible;
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
     private AccountRecyclerAdapter accountsAdapter;
@@ -105,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView nav_user_email;
     private TextView nav_user_icon;
     private LinearLayout nav_main_header_layout;
-
+    private BackAwareSearchView searchViewBackAware;
+    private BackAwareSearchView.BackPressedListener backPressedListenerPhone;
+    private SearchResultsPagerAdapter pagerAdapter;
 
 
     @Override
@@ -118,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
-        mAppBarLayout=findViewById(R.id.mAppBarLayout);
+        mAppBarLayout = findViewById(R.id.mAppBarLayout);
         mAppBarLayout.setElevation(0);
         isVisible = true;
         hideBtLocation = new int[2];
@@ -146,15 +154,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initAdapters();
         initScrollViewListener();
 
-        View hView =  navigationView.getHeaderView(0);
+        View hView = navigationView.getHeaderView(0);
         navigationView.setItemIconTintList(null);
 
-        int[][] state = new int[][] {
-                new int[] {-android.R.attr.state_checked}, // checked
-                new int[] {-android.R.attr.state_checked}
+        int[][] state = new int[][]{
+                new int[]{-android.R.attr.state_checked}, // checked
+                new int[]{-android.R.attr.state_checked}
         };
 
-        int[] color = new int[] {
+        int[] color = new int[]{
                 getResources().getColor(R.color.colorPrimaryLight),
                 getResources().getColor(R.color.colorPrimaryLight)
         };
@@ -167,6 +175,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_user_icon = hView.findViewById(R.id.nav_user_icon);
         nav_main_header_layout = hView.findViewById(R.id.main_header_linear_layout);
         initDrawerHeaderClickListeners();
+        pagerAdapter = new SearchResultsPagerAdapter(getSupportFragmentManager());
+        searchResultPager.setAdapter(pagerAdapter);
+        searchResultPager.setOffscreenPageLimit(2);
+        searchResultsTabs.setupWithViewPager(searchResultPager);
+        searchResultsTabs.setTabMode(TabLayout.MODE_FIXED);
 
         presenter = new MainPresenterImp(this);
     }
@@ -218,10 +231,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         scrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if(scrollView.canScrollVertically(-1)){
+                if (scrollView.canScrollVertically(-1)) {
                     hideTv.setElevation(4);
                     setToolbarElevation(4);
-                    if(recentExpanded) {
+                    if (recentExpanded) {
                         recentFrameLayout.getLocationOnScreen(hideBtLocation);
                         if (hideBtLocation[1] + recentFrameLayout.getHeight() - 54 <= 0) {
                             animateHideBottonHide();
@@ -229,8 +242,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             animateHideButtonShow();
                         }
                     }
-                }else{
-                    if(recentExpanded) hideTv.setElevation(0);
+                } else {
+                    if (recentExpanded) hideTv.setElevation(0);
                     setToolbarElevation(0);
                 }
             }
@@ -238,29 +251,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void setToolbarElevation(float height){
+    public void setToolbarElevation(float height) {
         mAppBarLayout.setElevation(DpUtil.pxFromDp(this, height));
     }
 
     @Override
     public void VibratePhone() {
-        if(isVisible) NewMessageVibrateUtil.vibratePhone(this);
+        if (isVisible) NewMessageVibrateUtil.vibratePhone(this);
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         isVisible = true;
     }
 
     @Override
-    public void onStop(){
+    public void onStop() {
         super.onStop();
         isVisible = false;
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         presenter.onDestroy();
         isVisible = false;
         super.onDestroy();
@@ -270,10 +283,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         accountSelectedCallback = new BaseCallback<AccountRowItem>() {
             @Override
             public void onResponse(AccountRowItem rowItem) {
-                Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
-                accountChatIntent.putExtra("account_id", rowItem.getAccountIdFire());
-                accountChatIntent.putExtra("account_name", rowItem.getAccountName());
-                startActivity(accountChatIntent);
+                launchAccountDetailsIntent(rowItem);
             }
 
             @Override
@@ -285,14 +295,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recentSelectedCallback = new BaseCallback<RowItem>() {
             @Override
             public void onResponse(RowItem rowItem) {
-                if(rowItem.getItemType().equals(RowItem.TYPE_GROUP_CHAT)) {
+                if (rowItem.getItemType().equals(RowItem.TYPE_GROUP_CHAT)) {
                     Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
                     groupChatIntent.putExtra("chatId", rowItem.getChatId());
                     startActivity(groupChatIntent);
-                }else{
+                } else {
                     Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
                     DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", rowItem.getAccountId()).findFirst();
-                    if(dChat != null) directMessageIntent.putExtra("toUid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid()));
+                    if (dChat != null)
+                        directMessageIntent.putExtra("toUid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid()));
                     directMessageIntent.putExtra("uid", UserPreferences.getInstance().getUid());
                     startActivity(directMessageIntent);
                 }
@@ -309,7 +320,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(DirectItem directItem) {
                 Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
                 DirectChatRealm dChat = RealmUISingleton.getInstance().getRealmInstance().where(DirectChatRealm.class).equalTo("chatId", directItem.getDirectChatId()).findFirst();
-                if(dChat != null) directMessageIntent.putExtra("toUid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid()));
+                if (dChat != null)
+                    directMessageIntent.putExtra("toUid", dChat.getDirectChatUid(UserPreferences.getInstance().getUid()));
                 directMessageIntent.putExtra("uid", UserPreferences.getInstance().getUid());
                 startActivity(directMessageIntent);
             }
@@ -347,17 +359,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if(searchResultsLayout.getVisibility() == View.VISIBLE){
+                hideOverlayImage();
+                searchResultsLayout.startAnimation(slideDownAnimation);
+                searchResultsLayout.setVisibility(View.GONE);
+                if (!searchViewBackAware.isIconified()) {
+                    searchViewBackAware.setIconified(true);
+                }
+                searchViewBackAware.clearFocus();
+                backPressedListenerPhone.onImeBack(searchViewBackAware);
+            }else {
+                super.onBackPressed();
+            }
         }
     }
 
     @OnClick(R.id.add_account_iv)
-    public void onAddAccountClicked(){
+    public void onAddAccountClicked() {
 
     }
 
     @OnClick(R.id.add_direct_message_iv)
-    public void onNewDirectMessageClicked(){
+    public void onNewDirectMessageClicked() {
 
     }
 
@@ -381,11 +404,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void initSearchView(BackAwareSearchView searchView) {
-        BackAwareSearchView.BackPressedListener backPressedListenerPhone = new BackAwareSearchView.BackPressedListener() {
+        backPressedListenerPhone = new BackAwareSearchView.BackPressedListener() {
             @Override
             public void onImeBack(BackAwareSearchView searchView) {
+                searchViewBackAware = searchView;
                 searchView.clearFocus();
-                if(searchView.getQuery().length() == 0){
+                if (searchView.getQuery().length() == 0) {
                     hideOverlayImage();
                     searchResultsLayout.startAnimation(slideDownAnimation);
                     searchResultsLayout.setVisibility(View.GONE);
@@ -419,19 +443,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // this is when user is done typing and clicks search
+
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                presenter.onSearchQuery(newText);
+                if(newText.length() > 0) {
+                    presenter.onSearchQuery(newText);
+                }else{
+                    pagerAdapter.onQueryResultsAccount(new ArrayList<AccountRowItem>(), "");
+                    setAccountsTabTitle("Accounts(0)");
+                    setUsersTabTitle("Users(0)");
+                }
                 return false;
             }
         });
     }
 
-    private void hideOverlayImage(){
+    private void hideOverlayImage() {
+        Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_out);
+        animation.setDuration(200);
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -448,8 +480,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == R.id.app_bar_search){
+        if (id == R.id.app_bar_search) {
             overlayImage.setVisibility(View.VISIBLE);
+            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
+            animation.setDuration(200);
+            overlayImage.startAnimation(animation);
             searchResultsLayout.setVisibility(View.VISIBLE);
             searchResultsLayout.startAnimation(slideUpAnimation);
             return true;
@@ -464,7 +499,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_share_lead){
+        if (id == R.id.nav_share_lead) {
 
         } else if (id == R.id.nav_search) {
 
@@ -482,9 +517,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @OnClick(R.id.show_all_recent_tv)
-    public void onShowAllClicked(){
+    public void onShowAllClicked() {
         recentExpanded = true;
-        if(scrollView.getScrollY() == 0){
+        if (scrollView.getScrollY() == 0) {
             hideTv.setElevation(0);
         }
         presenter.onShowAllClicked();
@@ -493,34 +528,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @OnClick(R.id.hide_recent_tv)
-    public void onHideClicked(){
+    public void onHideClicked() {
         recentExpanded = false;
         presenter.onRestoreRecentModel();
         animateHideBottonHide();
         showAllTv.setVisibility(View.VISIBLE);
-        scrollView.scrollTo(0,0);
+        scrollView.scrollTo(0, 0);
         hideTv.setElevation(0);
     }
 
     @Override
-    public void onShowAll(MainRecentModel recentModel){
-        if(recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0){
+    public void onShowAll(MainRecentModel recentModel) {
+        if (recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0) {
             recent_empty_layout.setVisibility(View.GONE);
-            if(recentRecyclerAdapter == null){
+            if (recentRecyclerAdapter == null) {
                 recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
                 recentRecyclerView.setAdapter(recentRecyclerAdapter);
-            }else{
+            } else {
                 recentRecyclerAdapter.onDataSetChanged(recentModel);
             }
-            if(newRealmList.size() > recentModel.getRowItems().size()){
+            if (newRealmList.size() > recentModel.getRowItems().size()) {
                 recentRecyclerAdapter.notifyItemRangeInserted(newRealmList.size(), recentModel.getRowItems().size() - newRealmList.size());
-            }else {
+            } else {
                 recentRecyclerAdapter.notifyDataSetChanged();
             }
         }
     }
 
-    private void animateHideButtonShow(){
+    private void animateHideButtonShow() {
         hideTv.animate().scaleX(0).setDuration(0);
         hideTv.animate().scaleY(0).setDuration(0);
         hideTv.setVisibility(View.VISIBLE);
@@ -528,7 +563,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         hideTv.animate().scaleX(1).setDuration(100);
     }
 
-    private void animateHideBottonHide(){
+    private void animateHideBottonHide() {
         hideTv.animate().scaleX(0).setDuration(100);
         hideTv.animate().scaleY(0).setDuration(100);
         final Handler handler = new Handler();
@@ -543,9 +578,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onRecentModelReceived(MainRecentModel recentModel) {
-        if(recentExpanded){
+        if (recentExpanded) {
             onShowAll(recentModel);
-        }else {
+        } else {
             int newMessagesCount = 0;
             if (recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0) {
                 recent_empty_layout.setVisibility(View.GONE);
@@ -592,7 +627,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onAccountModelReceived(MainAccountsModel dataModel) {
-        if(dataModel != null && dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
+        if (dataModel != null && dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
             accounts_empty_layout.setVisibility(View.GONE);
             if (accountsAdapter == null) {
                 accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
@@ -604,7 +639,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onDirectMessagesModelReceived(MainDirectMessagesModel dataModel) {
-        if(dataModel != null && dataModel.getDirectItems() != null && dataModel.getDirectItems().size() > 0) {
+        if (dataModel != null && dataModel.getDirectItems() != null && dataModel.getDirectItems().size() > 0) {
             direct_messages_empty_state.setVisibility(View.GONE);
             directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), dataModel, directMessageSelectedCallback);
             directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
@@ -613,8 +648,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onGroupMessagesReceived(List<GroupChatRealm> groupChats){
-        if(groupChats != null && groupChats.size() > 0){
+    public void onGroupMessagesReceived(List<GroupChatRealm> groupChats) {
+        if (groupChats != null && groupChats.size() > 0) {
             group_messages_empty_state.setVisibility(View.GONE);
             groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), groupChats, groupMessageSelectedCallback);
             groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
@@ -633,11 +668,92 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void setNavHeaderData(String userName, String email, String iconLetter, int iconColor, int userColorDark){
+    public void setNavHeaderData(String userName, String email, String iconLetter, int iconColor, int userColorDark) {
         nav_user_name.setText(userName);
         nav_user_email.setText(email);
         nav_user_icon.setText(iconLetter);
         nav_user_icon.setBackgroundTintList(getResources().getColorStateList(iconColor));
         nav_main_header_layout.setBackgroundTintList(getResources().getColorStateList(userColorDark));
+    }
+
+    @Override
+    public void onQueryResults(List<AccountRowItem> searchResults, String query) {
+        pagerAdapter.onQueryResultsAccount(searchResults, query);
+        setAccountsTabTitle("Accounts(" + searchResults.size() + ")");
+    }
+
+    private void setAccountsTabTitle(String title){
+        searchResultsTabs.getTabAt(0).setText(title);
+    }
+
+    private void setUsersTabTitle(String title){
+        searchResultsTabs.getTabAt(1).setText(title);
+    }
+
+    @Override
+    public void onUserSelected(UserRealm user) {
+
+    }
+
+    @Override
+    public void onAccountSelected(AccountRowItem rowItem) {
+        launchAccountDetailsIntent(rowItem);
+    }
+
+    private void launchAccountDetailsIntent(AccountRowItem rowItem){
+        Intent accountChatIntent = new Intent(getApplicationContext(), AccountChatActivity.class);
+        accountChatIntent.putExtra("account_id", rowItem.getAccountIdFire());
+        accountChatIntent.putExtra("account_name", rowItem.getAccountName());
+        startActivity(accountChatIntent);
+    }
+
+    private class SearchResultsPagerAdapter extends FragmentPagerAdapter {
+        private AccountSearchResultsFragment accountSearchResultsFragment;
+        private UsersSearchResultFragment usersSearchResultFragment;
+        private String accountsTitle;
+        private String usersTitle;
+
+        public SearchResultsPagerAdapter(FragmentManager fm) {
+            super(fm);
+            accountSearchResultsFragment = new AccountSearchResultsFragment();
+            usersSearchResultFragment = new UsersSearchResultFragment();
+            accountsTitle = "Accounts(0)";
+            usersTitle = "Users(0)";
+        }
+
+        public void onQueryResultsAccount(List<AccountRowItem> items, String query){
+            if(accountSearchResultsFragment != null){
+                accountSearchResultsFragment.onResultsReceived(items, query);
+            }
+        }
+
+        @Override
+        public Fragment getItem(int pos) {
+            switch (pos) {
+                case 0:
+                    return accountSearchResultsFragment;
+                case 1:
+                    return usersSearchResultFragment;
+                default:
+                    return usersSearchResultFragment;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if(position == 0){
+                return "Accounts(0)";
+            }
+
+            if(position == 1){
+                return "Users(0)";
+            }
+            return "";
+        }
     }
 }

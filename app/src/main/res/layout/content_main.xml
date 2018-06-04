@@ -137,7 +137,7 @@
                             android:layout_gravity="center_vertical"
                             android:layout_marginLeft="16dp"
                             android:layout_marginRight="16dp"
-                            android:text="Your recently active Accounts and Direct Messages will show up here."
+                            android:text="Your recently active accounts and direct messages will show up here."
                             android:textColor="@color/colorPrimaryLight"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -217,7 +217,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
-                        android:text="Your assigned Accounts will show up here."
+                        android:text="Your assigned accounts will show up here."
                         android:textColor="@color/colorPrimaryLight"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -296,7 +296,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="16dp"
                         android:layout_marginRight="16dp"
-                        android:text="You have no Direct Messages. Search for another user to start a Direct Message."
+                        android:text="You have no direct messages. Search for a user to start a Direct Message."
                         android:textColor="@color/colorPrimaryLight"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -391,7 +391,7 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/search_results_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -400,13 +400,29 @@
         android:orientation="vertical"
         android:visibility="gone">
 
-    </LinearLayout>
+        <android.support.design.widget.TabLayout
+            android:id="@+id/search_results_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@color/colorAccentDark"
+            android:elevation="4dp"
+            android:minHeight="?attr/actionBarSize"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/colorAccentVeryDark" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/search_results_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp" />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/search_selected_overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
         android:src="@android:drawable/screen_background_dark_transparent"
         android:visibility="gone" />
 

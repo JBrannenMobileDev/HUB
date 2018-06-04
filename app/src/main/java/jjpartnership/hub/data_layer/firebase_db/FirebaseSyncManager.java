@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import io.realm.RealmList;
-import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.RealmMessageBatchUtil;
 import jjpartnership.hub.data_layer.data_models.Account;
@@ -65,6 +64,7 @@ public class FirebaseSyncManager {
     private DatabaseReference userColorsReference;
     private DatabaseReference chatMessagesReference;
     private DatabaseReference customerRequestsReference;
+    private DatabaseReference userCompanyAccountsReference;
     private FirebaseDatabase database;
     private RealmMessageBatchUtil batchUtil;
 
@@ -72,7 +72,7 @@ public class FirebaseSyncManager {
     private User currentUser;
     private List<User> users;
     private List<String> accountIds;
-    private List<Account> userAccounts;
+    private List<Account> userCompanyAccounts;
     private List<CustomerRequest> customerRequests;
     private List<Company> companies;
     private List<GroupChat> allGroupChats;
@@ -94,7 +94,7 @@ public class FirebaseSyncManager {
     private void initData(){
         users = new ArrayList<>();
         accountIds = new ArrayList<>();
-        userAccounts = new ArrayList<>();
+        userCompanyAccounts = new ArrayList<>();
         customerRequests = new ArrayList<>();
         companies = new ArrayList<>();
         allGroupChats = new ArrayList<>();
@@ -148,6 +148,7 @@ public class FirebaseSyncManager {
     }
 
     private void getAccountIds(){
+        userCompanyAccountsReference = database.getReference().child("companies").child(currentUser.getCompanyId()).child("accountList");
         final ValueEventListener userAccountsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -164,7 +165,7 @@ public class FirebaseSyncManager {
                 syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
             }
         };
-        thisUserAccountsReference.addListenerForSingleValueEvent(userAccountsListener);
+        userCompanyAccountsReference.addListenerForSingleValueEvent(userAccountsListener);
     }
 
     private void getAccounts() {
@@ -174,9 +175,9 @@ public class FirebaseSyncManager {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Account account = dataSnapshot.getValue(Account.class);
                     if(account != null){
-                        userAccounts.add(account);
+                        userCompanyAccounts.add(account);
                     }
-                    if(userAccounts.size() == accountIds.size()){
+                    if(userCompanyAccounts.size() == accountIds.size()){
                         getCompanies();
                     }
                 }
@@ -199,7 +200,7 @@ public class FirebaseSyncManager {
                 if (company != null) {
                     companies.add(company);
                 }
-                for(Account account : userAccounts) {
+                for(Account account : userCompanyAccounts) {
                     String companyId;
                     if (UserPreferences.getInstance().getUserType().equalsIgnoreCase(UserRealm.TYPE_SALES)) {
                         companyId = account.getCompanyCustomerId();
@@ -214,7 +215,7 @@ public class FirebaseSyncManager {
                             if (company != null) {
                                 companies.add(company);
                             }
-                            if(companies.size() == userAccounts.size()){
+                            if(companies.size() == userCompanyAccounts.size()){
                                 getAccountRequests();
                             }
                         }
@@ -240,15 +241,15 @@ public class FirebaseSyncManager {
 
     private void getAccountRequests() {
         int requestCount = 0;
-        for(Account accountTemp : userAccounts){
+        for(Account accountTemp : userCompanyAccounts){
             if(accountTemp.getCustomerRequestIds() != null){
                 requestCount = requestCount + accountTemp.getCustomerRequestIds().size();
             }
         }
         final int finalCount = requestCount;
 
-        if(userAccounts != null && userAccounts.size() > 0) {
-            for (final Account localAccount : userAccounts) {
+        if(userCompanyAccounts != null && userCompanyAccounts.size() > 0) {
+            for (final Account localAccount : userCompanyAccounts) {
                 if(localAccount.getCustomerRequestIds() != null) {
                     for (String requestId : localAccount.getCustomerRequestIds().values()) {
                         ValueEventListener chatListener = new ValueEventListener() {
@@ -475,7 +476,7 @@ public class FirebaseSyncManager {
                 syncCompleteCallback.onFailure(e);
             }
         };
-        DataManager.getInstance().syncBootDataToLocal(users, userAccounts, customerRequests, companies,
+        DataManager.getInstance().syncBootDataToLocal(users, userCompanyAccounts, customerRequests, companies,
                 allGroupChats, directChats, userColors, allMessages, syncCompleteListener);
     }
 
@@ -543,13 +544,15 @@ public class FirebaseSyncManager {
         }
 
         RealmList<AccountRowItem> accountRowItems = new RealmList<>();
-        for(int i = 0; i < userAccounts.size(); i++) {
-            Company company = getAccountCompany(userAccounts.get(i));
+        for(int i = 0; i < userCompanyAccounts.size(); i++) {
+            Company company = getAccountCompany(userCompanyAccounts.get(i));
             if (company != null) {
-                AccountRowItem temp = new AccountRowItem();
-                temp.setAccountName(company.getName());
-                temp.setAccountIdFire(userAccounts.get(i).getAccountIdFire());
-                accountRowItems.add(temp);
+                if(userCompanyAccounts.get(i).getAccountUsers().keySet().contains(UserPreferences.getInstance().getUid())) {
+                    AccountRowItem temp = new AccountRowItem();
+                    temp.setAccountName(company.getName());
+                    temp.setAccountIdFire(userCompanyAccounts.get(i).getAccountIdFire());
+                    accountRowItems.add(temp);
+                }
             }
         }
         Collections.sort(accountRowItems);
