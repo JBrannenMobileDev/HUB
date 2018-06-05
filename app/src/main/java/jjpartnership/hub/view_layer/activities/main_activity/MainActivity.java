@@ -60,7 +60,6 @@ import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.NewMessageVibrateUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
-import jjpartnership.hub.utils.UserColorUtil;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity;
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
@@ -90,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.recent_frame_layout) FrameLayout recentFrameLayout;
     @BindView(R.id.search_results_pager)ViewPager searchResultPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
+    @BindView(R.id.add_account_iv)ImageView addAccountButton;
+    @BindView(R.id.add_direct_message_iv)ImageView addDirectMessageIv;
+    @BindView(R.id.add_group_message_iv)ImageView shareLeadIv;
 
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
@@ -363,11 +365,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 hideOverlayImage();
                 searchResultsLayout.startAnimation(slideDownAnimation);
                 searchResultsLayout.setVisibility(View.GONE);
-                if (!searchViewBackAware.isIconified()) {
-                    searchViewBackAware.setIconified(true);
+                if (scrollView.canScrollVertically(-1)) {
+                    setToolbarElevation(4);
+                }else{
+                    setToolbarElevation(0);
                 }
-                searchViewBackAware.clearFocus();
-                backPressedListenerPhone.onImeBack(searchViewBackAware);
+                if(searchViewBackAware != null) {
+                    if (!searchViewBackAware.isIconified()) {
+                        searchViewBackAware.setIconified(true);
+                    }
+                    searchViewBackAware.clearFocus();
+                    backPressedListenerPhone.onImeBack(searchViewBackAware);
+                }
             }else {
                 super.onBackPressed();
             }
@@ -390,9 +399,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.main, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchItem = menu.findItem(R.id.app_bar_search);
-        BackAwareSearchView searchView = (BackAwareSearchView) searchItem.getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        initSearchView(searchView);
+        searchViewBackAware = (BackAwareSearchView) searchItem.getActionView();
+        searchViewBackAware.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        initSearchView();
         return true;
     }
 
@@ -403,11 +412,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         exitToRightAnimation = AnimationUtils.loadAnimation(this, R.anim.exit_to_right);
     }
 
-    private void initSearchView(BackAwareSearchView searchView) {
+    private void initSearchView() {
         backPressedListenerPhone = new BackAwareSearchView.BackPressedListener() {
             @Override
             public void onImeBack(BackAwareSearchView searchView) {
-                searchViewBackAware = searchView;
                 searchView.clearFocus();
                 if (searchView.getQuery().length() == 0) {
                     hideOverlayImage();
@@ -419,28 +427,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         };
-        searchView.setBackPressedListener(backPressedListenerPhone);
+        searchViewBackAware.setBackPressedListener(backPressedListenerPhone);
 
-        searchView.setOnCloseListener(new android.support.v7.widget.SearchView.OnCloseListener() {
+        searchViewBackAware.setOnCloseListener(new android.support.v7.widget.SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
                 hideOverlayImage();
                 searchResultsLayout.startAnimation(slideDownAnimation);
                 searchResultsLayout.setVisibility(View.GONE);
+                if (scrollView.canScrollVertically(-1)) {
+                    setToolbarElevation(4);
+                }else{
+                    setToolbarElevation(0);
+                }
                 return false;
             }
         });
 
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
+        searchViewBackAware.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 overlayImage.setVisibility(View.VISIBLE);
                 searchResultsLayout.setVisibility(View.VISIBLE);
                 searchResultsLayout.startAnimation(slideUpAnimation);
+                setToolbarElevation(0);
             }
         });
 
-        searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+        searchViewBackAware.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
 
@@ -449,10 +463,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(newText.length() > 0) {
+                if(newText.length() > 1) {
                     presenter.onSearchQuery(newText);
                 }else{
                     pagerAdapter.onQueryResultsAccount(new ArrayList<AccountRowItem>(), "");
+                    pagerAdapter.onQueryResultsUser(new ArrayList<UserRealm>(), "");
                     setAccountsTabTitle("Accounts(0)");
                     setUsersTabTitle("Users(0)");
                 }
@@ -471,26 +486,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 overlayImage.setVisibility(View.GONE);
             }
         }, 200);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.app_bar_search) {
-            overlayImage.setVisibility(View.VISIBLE);
-            Animation animation = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-            animation.setDuration(200);
-            overlayImage.startAnimation(animation);
-            searchResultsLayout.setVisibility(View.VISIBLE);
-            searchResultsLayout.startAnimation(slideUpAnimation);
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -677,9 +672,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onQueryResults(List<AccountRowItem> searchResults, String query) {
+    public void onQueryResults(List<AccountRowItem> searchResults, List<UserRealm> userSearchResults, String query) {
         pagerAdapter.onQueryResultsAccount(searchResults, query);
+        pagerAdapter.onQueryResultsUser(userSearchResults, query);
         setAccountsTabTitle("Accounts(" + searchResults.size() + ")");
+        setUsersTabTitle("Users(" + userSearchResults.size() + ")");
+        if(searchResults.size() == 0 && userSearchResults.size() > 0){
+            searchResultPager.setCurrentItem(1);
+        }else if(searchResults.size() > 0 && userSearchResults.size() == 0){
+            searchResultPager.setCurrentItem(0);
+        }
     }
 
     private void setAccountsTabTitle(String title){
@@ -692,7 +694,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onUserSelected(UserRealm user) {
+        startActivity(new Intent(getApplicationContext(), UserProfileActivity.class).putExtra("userId", user.getUid()));
+    }
 
+    @Override
+    public void onDirectMessageSelected(UserRealm user) {
+        launchDirectMessageIntent(UserPreferences.getInstance().getUid(), user.getUid());
+    }
+
+    private void launchDirectMessageIntent(String uid, String toUid){
+        Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
+        directMessageIntent.putExtra("uid", uid);
+        directMessageIntent.putExtra("toUid", toUid);
+        startActivity(directMessageIntent);
     }
 
     @Override
@@ -724,6 +738,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public void onQueryResultsAccount(List<AccountRowItem> items, String query){
             if(accountSearchResultsFragment != null){
                 accountSearchResultsFragment.onResultsReceived(items, query);
+            }
+        }
+
+        public void onQueryResultsUser(List<UserRealm> items, String query){
+            if(usersSearchResultFragment != null){
+                usersSearchResultFragment.onResultsReceived(items, query);
             }
         }
 

@@ -19,7 +19,6 @@ import jjpartnership.hub.data_layer.data_models.MainRecentModel;
 import jjpartnership.hub.data_layer.data_models.NewMessageNotification;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.FilterUtil;
-import jjpartnership.hub.utils.NewMessageVibrateUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserColorUtil;
 import jjpartnership.hub.utils.UserPreferences;
@@ -38,6 +37,7 @@ public class MainPresenterImp implements MainPresenter {
     private NewMessageNotification newMessageNotification;
     private RealmResults<GroupChatRealm> allGroupChats;
     private RealmResults<AccountRealm> allUserCompanyAccounts;
+    private RealmResults<UserRealm> allUsers;
     private boolean firstResponseToNewMessageListener;
     private UserRealm user;
 
@@ -56,6 +56,7 @@ public class MainPresenterImp implements MainPresenter {
             newMessageNotification = realm.where(NewMessageNotification.class).equalTo("newMessageId", NewMessageNotification.PERM_ID).findFirst();
             allGroupChats = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).findAll();
             allUserCompanyAccounts = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).findAll();
+            allUsers = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).findAll();
             user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
             if (user != null) {
                 int iconColor = UserColorUtil.getUserColor(user.getUserColor());
@@ -217,7 +218,10 @@ public class MainPresenterImp implements MainPresenter {
         if(allUserCompanyAccounts == null){
             allUserCompanyAccounts = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).findAll();
         }
-        List<AccountRowItem> searchResults = new ArrayList<>();
+        if(allUsers == null){
+            allUsers = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).findAll();
+        }
+        List<AccountRowItem> accountSearchResults = new ArrayList<>();
         for(AccountRealm item : allUserCompanyAccounts){
             CompanyRealm company = RealmUISingleton.getInstance().getRealmInstance().where(CompanyRealm.class).equalTo("companyId", item.getCompanyCustomerId()).findFirst();
             if(company != null) {
@@ -225,11 +229,18 @@ public class MainPresenterImp implements MainPresenter {
                     AccountRowItem newItem = new AccountRowItem();
                     newItem.setAccountIdFire(item.getAccountIdFire());
                     newItem.setAccountName(company.getName());
-                    searchResults.add(newItem);
+                    accountSearchResults.add(newItem);
                 }
             }
         }
-        activity.onQueryResults(searchResults, query);
+
+        List<UserRealm> userSearchResults = new ArrayList<>();
+        for(UserRealm user : allUsers){
+            if((user.getFirstName() + " " + user.getLastName()).toLowerCase().contains(query.toLowerCase())){
+                userSearchResults.add(user);
+            }
+        }
+        activity.onQueryResults(accountSearchResults, userSearchResults, query);
     }
 
     @Override
@@ -242,11 +253,6 @@ public class MainPresenterImp implements MainPresenter {
     }
 
     @Override
-    public void fetchData() {
-        initDataListeners();
-    }
-
-    @Override
     public void onShowAllClicked() {
         activity.onShowAll(recentModel);
     }
@@ -254,16 +260,5 @@ public class MainPresenterImp implements MainPresenter {
     @Override
     public void onRestoreRecentModel() {
         activity.onRecentModelReceived(recentModel);
-    }
-
-    @Override
-    public void onSearch(String query) {
-        List<AccountRowItem> searchResults = new ArrayList<>();
-        for(AccountRowItem item : accountModel.getRowItems()){
-            if(item.getAccountName().toLowerCase().contains(query.toLowerCase())){
-                searchResults.add(item);
-            }
-        }
-        activity.onQueryResults(searchResults, query);
     }
 }

@@ -10,26 +10,52 @@
         android:id="@+id/search_results_empty_frame_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
-            android:id="@+id/no_results_user_input_tv"
+            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:layout_marginTop="25dp"
-            android:text='"Shawna Brannen"'
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="75dp"
+            android:text="No users found for"
             android:textColor="@color/colorPrimaryLight"
             android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/textView18"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:text="No user results found for"
-            android:textColor="@color/colorPrimaryLight"
-            android:textSize="18sp" />
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="100dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/no_results_user_input_tv3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text='"'
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/no_results_user_input_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/no_results_user_input_tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text='"'
+                android:textColor="@color/colorPrimaryLight"
+                android:textSize="18sp" />
+
+        </LinearLayout>
     </FrameLayout>
 
     <android.support.v7.widget.RecyclerView

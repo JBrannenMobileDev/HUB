@@ -1,15 +1,24 @@
 package jjpartnership.hub.view_layer.activities.main_activity;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.activities.account_activity.account_details_fragment.AssignedAgentsRecyclerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,17 +35,83 @@ public class UsersSearchResultFragment extends Fragment {
     }
 
 
+    @BindView(R.id.users_results_recycler_view)RecyclerView resultsRecycler;
+    @BindView(R.id.search_results_empty_frame_layout)FrameLayout noResultsLayout;
+    @BindView(R.id.no_results_user_input_tv)TextView noResultsUserInputText;
+
+    private BaseCallback<UserRealm> userSelectedCallback;
+    private BaseCallback<UserRealm> directMessageSelectedCallback;
+    private UserSearchResultsRecyclerAdapter usersAdapter;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_users_search_result, container, false);
+        View v = inflater.inflate(R.layout.fragment_users_search_result, container, false);
+        ButterKnife.bind(this, v);
+        resultsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
+        initCallbacks();
+        return v;
     }
+
+    private void initCallbacks() {
+        userSelectedCallback = new BaseCallback<UserRealm>() {
+            @Override
+            public void onResponse(UserRealm user) {
+                mListener.onUserSelected(user);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+        directMessageSelectedCallback = new BaseCallback<UserRealm>() {
+            @Override
+            public void onResponse(UserRealm user) {
+                mListener.onDirectMessageSelected(user);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
+    }
+
+    public void onResultsReceived(List<UserRealm> items, String userInput){
+        if(items != null) {
+            noResultsLayout.setVisibility(View.GONE);
+            if (usersAdapter == null) {
+                usersAdapter = new UserSearchResultsRecyclerAdapter(getActivity().getApplicationContext(), items, userSelectedCallback, directMessageSelectedCallback, null, null);
+                resultsRecycler.setAdapter(usersAdapter);
+            } else {
+                usersAdapter.OnDataSetChanged(items);
+            }
+            usersAdapter.notifyDataSetChanged();
+            if(items.size() == 0 && userInput != null && !userInput.isEmpty()){
+                noResultsLayout.setVisibility(View.VISIBLE);
+                noResultsUserInputText.setText(userInput);
+            }else{
+                resultsRecycler.setVisibility(View.VISIBLE);
+            }
+        }else{
+            resultsRecycler.setVisibility(View.GONE);
+            if(userInput != null && !userInput.isEmpty()) {
+                noResultsLayout.setVisibility(View.VISIBLE);
+                noResultsUserInputText.setText(userInput);
+            }else{
+                noResultsLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
+        if (context instanceof AccountSearchResultsFragment.OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -50,18 +125,8 @@ public class UsersSearchResultFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onUserSelected(UserRealm user);
+        void onDirectMessageSelected(UserRealm user);
     }
 }

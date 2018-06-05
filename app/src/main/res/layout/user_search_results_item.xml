@@ -19,18 +19,10 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="center_vertical|end"
-        android:layout_marginRight="56dp"
+        android:layout_marginRight="16dp"
         android:padding="8dp"
         android:src="@drawable/ic_chat_black_24dp"
         android:tint="@color/colorAccentDark" />
-
-    <CheckBox
-        android:id="@+id/group_message_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right|center_vertical"
-        android:layout_marginRight="16dp"
-        android:checked="false" />
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="75dp"
-            android:text="No account results found for"
+            android:text="No accounts found for"
             android:textColor="@color/colorPrimaryLight"
             android:textSize="18sp" />
     </FrameLayout>

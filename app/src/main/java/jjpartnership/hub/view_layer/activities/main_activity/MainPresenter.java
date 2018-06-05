@@ -7,8 +7,6 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 public interface MainPresenter {
     void onSearchQuery(String newText);
     void onDestroy();
-    void fetchData();
     void onShowAllClicked();
     void onRestoreRecentModel();
-    void onSearch(String query);
 }
