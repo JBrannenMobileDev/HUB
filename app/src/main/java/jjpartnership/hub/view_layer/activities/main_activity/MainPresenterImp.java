@@ -240,7 +240,14 @@ public class MainPresenterImp implements MainPresenter {
                 userSearchResults.add(user);
             }
         }
-        activity.onQueryResults(accountSearchResults, userSearchResults, query);
+
+        List<GroupChatRealm> sharedLeadsResults = new ArrayList<>();
+        for(GroupChatRealm chat : groupChats){
+            if(chat.getGroupName().toLowerCase().contains(query.toLowerCase())){
+                sharedLeadsResults.add(chat);
+            }
+        }
+        activity.onQueryResults(accountSearchResults, userSearchResults, sharedLeadsResults, query);
     }
 
     @Override

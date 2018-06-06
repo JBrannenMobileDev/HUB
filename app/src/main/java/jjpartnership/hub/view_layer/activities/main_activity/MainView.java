@@ -24,5 +24,5 @@ public interface MainView {
     void VibratePhone();
     void onShowAll(MainRecentModel recentModel);
     void setNavHeaderData(String userName, String email, String iconLetter, int color, int userColorDark);
-    void onQueryResults(List<AccountRowItem> searchResults, List<UserRealm> userSearchResults, String query);
+    void onQueryResults(List<AccountRowItem> searchResults, List<UserRealm> userSearchResults, List<GroupChatRealm> sharedLeads, String query);
 }

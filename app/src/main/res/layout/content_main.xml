@@ -410,7 +410,7 @@
             app:tabGravity="fill"
             app:tabMode="fixed"
             app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/colorAccentVeryDark" />
+            app:tabTextColor="@color/search_tab_unselected_color" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/search_results_pager"

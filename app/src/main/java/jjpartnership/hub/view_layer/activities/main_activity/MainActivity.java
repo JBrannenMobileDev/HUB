@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -69,7 +70,8 @@ import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfile
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, MainView,
-        AccountSearchResultsFragment.OnFragmentInteractionListener, UsersSearchResultFragment.OnFragmentInteractionListener{
+        AccountSearchResultsFragment.OnFragmentInteractionListener, UsersSearchResultFragment.OnFragmentInteractionListener,
+        SharedLeadsSearchResultFragment.OnFragmentInteractionListener{
     @BindView(R.id.search_selected_overlay) ImageView overlayImage;
     @BindView(R.id.search_results_layout) FrameLayout searchResultsLayout;
     @BindView(R.id.recent_list_view) RecyclerView recentRecyclerView;
@@ -116,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private BackAwareSearchView searchViewBackAware;
     private BackAwareSearchView.BackPressedListener backPressedListenerPhone;
     private SearchResultsPagerAdapter pagerAdapter;
+    private MenuItem searchItem;
 
 
     @Override
@@ -177,9 +180,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_user_icon = hView.findViewById(R.id.nav_user_icon);
         nav_main_header_layout = hView.findViewById(R.id.main_header_linear_layout);
         initDrawerHeaderClickListeners();
+
         pagerAdapter = new SearchResultsPagerAdapter(getSupportFragmentManager());
+        pagerAdapter.addFragment(new AccountSearchResultsFragment(), "Accounts(0)");
+        pagerAdapter.addFragment(new UsersSearchResultFragment(), "Users(0)");
+        pagerAdapter.addFragment(new SharedLeadsSearchResultFragment(), "Shared Leads(0)");
         searchResultPager.setAdapter(pagerAdapter);
-        searchResultPager.setOffscreenPageLimit(2);
+        searchResultPager.setOffscreenPageLimit(3);
         searchResultsTabs.setupWithViewPager(searchResultPager);
         searchResultsTabs.setTabMode(TabLayout.MODE_FIXED);
 
@@ -337,9 +344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         groupMessageSelectedCallback = new BaseCallback<GroupChatRealm>() {
             @Override
             public void onResponse(GroupChatRealm chat) {
-                Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
-                groupChatIntent.putExtra("chatId", chat.getChatId());
-                startActivity(groupChatIntent);
+                launchGroupMessageIntent(chat);
             }
 
             @Override
@@ -353,6 +358,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recentRecyclerView.setAdapter(recentRecyclerAdapter);
         directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
         groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
+    }
+
+    private void launchGroupMessageIntent(GroupChatRealm chat){
+        Intent groupChatIntent = new Intent(getApplicationContext(), GroupChatActivity.class);
+        groupChatIntent.putExtra("chatId", chat.getChatId());
+        startActivity(groupChatIntent);
     }
 
     @Override
@@ -398,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        MenuItem searchItem = menu.findItem(R.id.app_bar_search);
+        searchItem = menu.findItem(R.id.app_bar_search);
         searchViewBackAware = (BackAwareSearchView) searchItem.getActionView();
         searchViewBackAware.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         initSearchView();
@@ -432,14 +443,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchViewBackAware.setOnCloseListener(new android.support.v7.widget.SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                hideOverlayImage();
-                searchResultsLayout.startAnimation(slideDownAnimation);
-                searchResultsLayout.setVisibility(View.GONE);
-                if (scrollView.canScrollVertically(-1)) {
-                    setToolbarElevation(4);
-                }else{
-                    setToolbarElevation(0);
-                }
+                onHideSearchView();
                 return false;
             }
         });
@@ -468,12 +472,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     pagerAdapter.onQueryResultsAccount(new ArrayList<AccountRowItem>(), "");
                     pagerAdapter.onQueryResultsUser(new ArrayList<UserRealm>(), "");
+                    pagerAdapter.onQueryResultsSharedLeads(new ArrayList<GroupChatRealm>(), "");
                     setAccountsTabTitle("Accounts(0)");
                     setUsersTabTitle("Users(0)");
+                    setSharedLeadTitle("Shared Leads(0)");
                 }
                 return false;
             }
         });
+    }
+
+    private void onHideSearchView(){
+        hideOverlayImage();
+        searchResultsLayout.startAnimation(slideDownAnimation);
+        searchResultsLayout.setVisibility(View.GONE);
+        if (scrollView.canScrollVertically(-1)) {
+            setToolbarElevation(4);
+        }else{
+            setToolbarElevation(0);
+        }
     }
 
     private void hideOverlayImage() {
@@ -497,7 +514,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_share_lead) {
 
         } else if (id == R.id.nav_search) {
-
+            overlayImage.setVisibility(View.VISIBLE);
+            searchResultsLayout.setVisibility(View.VISIBLE);
+            searchResultsLayout.startAnimation(slideUpAnimation);
+            setToolbarElevation(0);
+            searchViewBackAware.setIconified(false);
         } else if (id == R.id.nav_new_direct_message) {
 
         } else if (id == R.id.nav_settings) {
@@ -672,15 +693,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onQueryResults(List<AccountRowItem> searchResults, List<UserRealm> userSearchResults, String query) {
+    public void onQueryResults(List<AccountRowItem> searchResults, List<UserRealm> userSearchResults, List<GroupChatRealm> sharedLeads, String query) {
         pagerAdapter.onQueryResultsAccount(searchResults, query);
         pagerAdapter.onQueryResultsUser(userSearchResults, query);
+        pagerAdapter.onQueryResultsSharedLeads(sharedLeads, query);
         setAccountsTabTitle("Accounts(" + searchResults.size() + ")");
         setUsersTabTitle("Users(" + userSearchResults.size() + ")");
-        if(searchResults.size() == 0 && userSearchResults.size() > 0){
+        setSharedLeadTitle("Shared Leads(" + sharedLeads.size() + ")");
+        if(searchResults.size() == 0 && userSearchResults.size() > 0 && sharedLeads.size() == 0){
             searchResultPager.setCurrentItem(1);
-        }else if(searchResults.size() > 0 && userSearchResults.size() == 0){
+        }else if(searchResults.size() > 0 && userSearchResults.size() == 0 && sharedLeads.size() == 0){
             searchResultPager.setCurrentItem(0);
+        }else if(searchResults.size() == 0 && userSearchResults.size() == 0 && sharedLeads.size() > 0){
+            searchResultPager.setCurrentItem(2);
         }
     }
 
@@ -690,6 +715,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void setUsersTabTitle(String title){
         searchResultsTabs.getTabAt(1).setText(title);
+    }
+
+    private void setSharedLeadTitle(String title){
+        searchResultsTabs.getTabAt(2).setText(title);
     }
 
     @Override
@@ -702,16 +731,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         launchDirectMessageIntent(UserPreferences.getInstance().getUid(), user.getUid());
     }
 
+    @Override
+    public void onAccountSelected(AccountRowItem rowItem) {
+        launchAccountDetailsIntent(rowItem);
+    }
+
+    @Override
+    public void onChatSelected(GroupChatRealm chat) {
+        launchGroupMessageIntent(chat);
+    }
+
     private void launchDirectMessageIntent(String uid, String toUid){
         Intent directMessageIntent = new Intent(getApplicationContext(), DirectMessageActivity.class);
         directMessageIntent.putExtra("uid", uid);
         directMessageIntent.putExtra("toUid", toUid);
         startActivity(directMessageIntent);
-    }
-
-    @Override
-    public void onAccountSelected(AccountRowItem rowItem) {
-        launchAccountDetailsIntent(rowItem);
     }
 
     private void launchAccountDetailsIntent(AccountRowItem rowItem){
@@ -722,58 +756,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private class SearchResultsPagerAdapter extends FragmentPagerAdapter {
-        private AccountSearchResultsFragment accountSearchResultsFragment;
-        private UsersSearchResultFragment usersSearchResultFragment;
-        private String accountsTitle;
-        private String usersTitle;
+        private List<Fragment> fragments;
+        private List<String> pageTitles;
+
+        private void addFragment(Fragment fragment, String pageTitle){
+            fragments.add(fragment);
+            pageTitles.add(pageTitle);
+        }
 
         public SearchResultsPagerAdapter(FragmentManager fm) {
             super(fm);
-            accountSearchResultsFragment = new AccountSearchResultsFragment();
-            usersSearchResultFragment = new UsersSearchResultFragment();
-            accountsTitle = "Accounts(0)";
-            usersTitle = "Users(0)";
+            fragments = new ArrayList<>();
+            pageTitles = new ArrayList<>();
         }
 
         public void onQueryResultsAccount(List<AccountRowItem> items, String query){
-            if(accountSearchResultsFragment != null){
-                accountSearchResultsFragment.onResultsReceived(items, query);
+            if(fragments.get(0) != null){
+                ((AccountSearchResultsFragment) fragments.get(0)).onResultsReceived(items, query);
             }
         }
 
         public void onQueryResultsUser(List<UserRealm> items, String query){
-            if(usersSearchResultFragment != null){
-                usersSearchResultFragment.onResultsReceived(items, query);
+            if(fragments.get(1) != null){
+                ((UsersSearchResultFragment) fragments.get(1)).onResultsReceived(items, query);
+            }
+        }
+
+        public void onQueryResultsSharedLeads(List<GroupChatRealm> items, String query){
+            if(fragments.get(2) != null){
+                ((SharedLeadsSearchResultFragment) fragments.get(2)).onResultsReceived(items, query);
             }
         }
 
         @Override
         public Fragment getItem(int pos) {
-            switch (pos) {
-                case 0:
-                    return accountSearchResultsFragment;
-                case 1:
-                    return usersSearchResultFragment;
-                default:
-                    return usersSearchResultFragment;
-            }
+            return fragments.get(pos);
         }
 
         @Override
         public int getCount() {
-            return 2;
+            return fragments.size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if(position == 0){
-                return "Accounts(0)";
-            }
-
-            if(position == 1){
-                return "Users(0)";
-            }
-            return "";
+            return pageTitles.get(position);
         }
     }
 }
