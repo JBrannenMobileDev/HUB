@@ -34,6 +34,7 @@ import jjpartnership.hub.data_layer.data_models.UserColor;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserPreferences;
 
 /**
  * Created by jbrannen on 2/24/18.
@@ -171,6 +172,7 @@ public class RealmManager {
                     bgRealm.copyToRealmOrUpdate(new MainDirectMessagesModel());
                     bgRealm.copyToRealmOrUpdate(new MainRecentModel());
                     bgRealm.copyToRealmOrUpdate(new NewMessageNotification());
+                    bgRealm.copyToRealmOrUpdate(new UserRealm(UserPreferences.getInstance().getUid()));
                 }
             });
         }

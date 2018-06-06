@@ -140,8 +140,8 @@ public class FirebaseSyncManager {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.w(TAG, "loadUser:onCancelled", databaseError.toException());
-                syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+
+                if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
             }
         };
         thisUserReference.addListenerForSingleValueEvent(userListener);
@@ -162,7 +162,7 @@ public class FirebaseSyncManager {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, "loadAccountIds:onCancelled", databaseError.toException());
-                syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
             }
         };
         userCompanyAccountsReference.addListenerForSingleValueEvent(userAccountsListener);
@@ -185,7 +185,7 @@ public class FirebaseSyncManager {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     Log.w(TAG, "loadAccounts:onCancelled", databaseError.toException());
-                    syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                    if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
                 }
             };
             accountsReference.child(accountId).addListenerForSingleValueEvent(accountListener);
@@ -223,7 +223,7 @@ public class FirebaseSyncManager {
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                             Log.w(TAG, "loadCompanies:onCancelled", databaseError.toException());
-                            syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                            if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
                         }
                     };
                     companiesReference.child(companyId).addListenerForSingleValueEvent(companyListener);
@@ -233,7 +233,7 @@ public class FirebaseSyncManager {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.w(TAG, "loadCompanies:onCancelled", databaseError.toException());
-                syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
             }
         };
         companiesReference.child(currentUser.getCompanyId()).addListenerForSingleValueEvent(currentUserCompanyListener);
@@ -267,7 +267,7 @@ public class FirebaseSyncManager {
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                                 Log.w(TAG, "loadAccountRequests:onCancelled", databaseError.toException());
-                                syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                                if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
                             }
                         };
                         if (requestId != null && !requestId.isEmpty()) {
@@ -303,7 +303,7 @@ public class FirebaseSyncManager {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.w(TAG, "loadDirectChats:onCancelled", databaseError.toException());
-                        syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                        if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
                     }
                 };
                 directChatsReference.child(chatId).addListenerForSingleValueEvent(chatListener);
@@ -340,7 +340,7 @@ public class FirebaseSyncManager {
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         Log.w(TAG, "loadGroupChats:onCancelled", databaseError.toException());
-                        syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
+                        if(syncCompleteCallback != null) syncCompleteCallback.onFailure(new Exception(databaseError.getMessage()));
                     }
                 };
                 groupChatsReference.child(chatId).addListenerForSingleValueEvent(groupChatListener);
@@ -473,7 +473,7 @@ public class FirebaseSyncManager {
 
             @Override
             public void onFailure(Exception e) {
-                syncCompleteCallback.onFailure(e);
+                if(syncCompleteCallback != null) syncCompleteCallback.onFailure(e);
             }
         };
         DataManager.getInstance().syncBootDataToLocal(users, userCompanyAccounts, customerRequests, companies,
@@ -605,13 +605,13 @@ public class FirebaseSyncManager {
         BaseCallback<Boolean> mainModelsSaveCompleteListener = new BaseCallback<Boolean>() {
             @Override
             public void onResponse(Boolean success) {
-                syncCompleteCallback.onResponse(success);
+                if(syncCompleteCallback != null) syncCompleteCallback.onResponse(success);
                 initDataListeners();
             }
 
             @Override
             public void onFailure(Exception e) {
-                syncCompleteCallback.onFailure(e);
+                if(syncCompleteCallback != null) syncCompleteCallback.onFailure(e);
             }
         };
 

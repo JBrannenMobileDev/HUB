@@ -397,7 +397,11 @@ public class BootActivity extends AppCompatActivity implements BackAwareEditText
         };
 
         if(user.isEmailVerified()) {
-            DataManager.getInstance().syncFirebaseToRealmDb(syncCompleteListener);
+            DataManager.getInstance().syncFirebaseToRealmDb(null);
+            bootLoadingLayout.setVisibility(View.VISIBLE);
+            currentUser = mAuth.getCurrentUser();
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
         }else{
             if(!accountJustCreated) {
                 Toast.makeText(this, "Cannot login until email is verified.", Toast.LENGTH_LONG).show();

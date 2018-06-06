@@ -218,17 +218,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.getMenu()
                 .findItem(R.id.nav_search)
                 .getIcon()
-                .setColorFilter(getResources().getColor(R.color.colorPrimaryLight), PorterDuff.Mode.SRC_IN);
+                .setColorFilter(getResources().getColor(R.color.colorOrange), PorterDuff.Mode.SRC_IN);
 
         navigationView.getMenu()
                 .findItem(R.id.nav_share_lead)
                 .getIcon()
-                .setColorFilter(getResources().getColor(R.color.user_color_14), PorterDuff.Mode.SRC_IN);
+                .setColorFilter(getResources().getColor(R.color.colorAccentVeryDark), PorterDuff.Mode.SRC_IN);
 
         navigationView.getMenu()
                 .findItem(R.id.nav_new_direct_message)
                 .getIcon()
-                .setColorFilter(getResources().getColor(R.color.user_color_4), PorterDuff.Mode.SRC_IN);
+                .setColorFilter(getResources().getColor(R.color.colorAccentVeryDark), PorterDuff.Mode.SRC_IN);
+
+        navigationView.getMenu()
+                .findItem(R.id.nav_add_account)
+                .getIcon()
+                .setColorFilter(getResources().getColor(R.color.colorAccentVeryDark), PorterDuff.Mode.SRC_IN);
 
         navigationView.getMenu()
                 .findItem(R.id.nav_settings)
@@ -396,11 +401,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @OnClick(R.id.add_account_iv)
     public void onAddAccountClicked() {
-
+        showSearchSelectedView();
+        searchResultPager.setCurrentItem(0);
     }
 
     @OnClick(R.id.add_direct_message_iv)
     public void onNewDirectMessageClicked() {
+        showSearchSelectedView();
+        searchResultPager.setCurrentItem(1);
+    }
+
+    @OnClick(R.id.add_group_message_iv)
+    public void onAddShareLeadClicked(){
 
     }
 
@@ -505,6 +517,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }, 200);
     }
 
+    private void showSearchSelectedView(){
+        overlayImage.setVisibility(View.VISIBLE);
+        searchResultsLayout.setVisibility(View.VISIBLE);
+        searchResultsLayout.startAnimation(slideUpAnimation);
+        setToolbarElevation(0);
+        searchViewBackAware.setIconified(false);
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -514,17 +534,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_share_lead) {
 
         } else if (id == R.id.nav_search) {
-            overlayImage.setVisibility(View.VISIBLE);
-            searchResultsLayout.setVisibility(View.VISIBLE);
-            searchResultsLayout.startAnimation(slideUpAnimation);
-            setToolbarElevation(0);
-            searchViewBackAware.setIconified(false);
+            showSearchSelectedView();
         } else if (id == R.id.nav_new_direct_message) {
-
+            showSearchSelectedView();
+            searchResultPager.setCurrentItem(1);
         } else if (id == R.id.nav_settings) {
             FirebaseAuth.getInstance().signOut();
             DataManager.getInstance().clearRealmData();
             startActivity(new Intent(getApplicationContext(), BootActivity.class));
+        } else if(id == R.id.nav_share_lead){
+            showSearchSelectedView();
+            searchResultPager.setCurrentItem(2);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

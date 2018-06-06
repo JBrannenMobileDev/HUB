@@ -58,7 +58,7 @@ public class MainPresenterImp implements MainPresenter {
             allUserCompanyAccounts = RealmUISingleton.getInstance().getRealmInstance().where(AccountRealm.class).findAll();
             allUsers = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).findAll();
             user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
-            if (user != null) {
+            if (user != null && user.getLastName() != null && user.getFirstName() != null && user.getEmail() != null && user.getUserColor() != 0) {
                 int iconColor = UserColorUtil.getUserColor(user.getUserColor());
                 int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
                 activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor, iconColorDark);
@@ -87,7 +87,7 @@ public class MainPresenterImp implements MainPresenter {
             user.addChangeListener(new RealmChangeListener<UserRealm>() {
                 @Override
                 public void onChange(UserRealm user) {
-                    if(user != null){
+                    if(user != null && user.getLastName() != null && user.getFirstName() != null && user.getEmail() != null && user.getUserColor() != 0){
                         int iconColor = UserColorUtil.getUserColor(user.getUserColor());
                         int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
                         activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor, iconColorDark);
@@ -98,12 +98,19 @@ public class MainPresenterImp implements MainPresenter {
             });
         }else{
             user = realm.where(UserRealm.class).equalTo("uid", UserPreferences.getInstance().getUid()).findFirst();
-            if (user != null) {
-                int iconColor = UserColorUtil.getUserColor(user.getUserColor());
-                int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
-                activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0,1), iconColor, iconColorDark);
-                CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
-                if (company != null) activity.setPageTitle(company.getName());
+            if(user != null) {
+                user.addChangeListener(new RealmChangeListener<UserRealm>() {
+                    @Override
+                    public void onChange(UserRealm user) {
+                        if (user != null && user.getLastName() != null && user.getFirstName() != null && user.getEmail() != null && user.getUserColor() != 0) {
+                            int iconColor = UserColorUtil.getUserColor(user.getUserColor());
+                            int iconColorDark = UserColorUtil.getUserColorDark(user.getUserColor());
+                            activity.setNavHeaderData(user.getFirstName() + " " + user.getLastName(), user.getEmail(), user.getFirstName().substring(0, 1), iconColor, iconColorDark);
+                            CompanyRealm company = realm.where(CompanyRealm.class).equalTo("companyId", user.getCompanyId()).findFirst();
+                            if (company != null) activity.setPageTitle(company.getName());
+                        }
+                    }
+                });
             }
         }
 

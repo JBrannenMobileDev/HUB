@@ -69,6 +69,10 @@ public class UserRealm extends RealmObject implements Comparable<UserRealm>{
         if(user.getGroupChats() != null) this.groupChatIds = createGroupChats(user.getGroupChats().values());
     }
 
+    public UserRealm(String uid) {
+        this.uid = uid;
+    }
+
     private RealmList<String> createGroupChats(Collection<String> groupChatIds) {
         if(groupChatIds != null) {
             RealmList<String> groupChatIdsRealm = new RealmList<>();

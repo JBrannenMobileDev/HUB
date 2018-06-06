@@ -56,5 +56,5 @@
     <color name="user_color_16">#f139d5</color>
     <color name="user_color_16_dark">#b92aa3</color>
     <color name="white_overlay">#a4ffffff</color>
-    <color name="search_tab_unselected_color">#184745</color>
+    <color name="search_tab_unselected_color">#1c524f</color>
 </resources>
