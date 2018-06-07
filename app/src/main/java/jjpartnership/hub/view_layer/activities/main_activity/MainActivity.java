@@ -66,6 +66,7 @@ import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActiv
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActivity;
+import jjpartnership.hub.view_layer.activities.share_lead_activity.ShareLeadActivity;
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
 
@@ -164,12 +165,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         int[][] state = new int[][]{
                 new int[]{-android.R.attr.state_checked}, // checked
-                new int[]{-android.R.attr.state_checked}
+                new int[]{android.R.attr.state_checked}
         };
 
         int[] color = new int[]{
                 getResources().getColor(R.color.colorPrimaryLight),
-                getResources().getColor(R.color.colorPrimaryLight)
+                getResources().getColor(R.color.colorAccentVeryDark)
         };
         ColorStateList csl = new ColorStateList(state, color);
         navigationView.setItemTextColor(csl);
@@ -402,18 +403,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @OnClick(R.id.add_account_iv)
     public void onAddAccountClicked() {
         showSearchSelectedView();
-        searchResultPager.setCurrentItem(0);
+        pagerAdapter.clearData();
+        pagerAdapter.addReplacmentFragment(new AccountSearchResultsFragment(), "Accounts(0)");
+        pagerAdapter.notifyDataSetChanged();
     }
 
     @OnClick(R.id.add_direct_message_iv)
     public void onNewDirectMessageClicked() {
         showSearchSelectedView();
-        searchResultPager.setCurrentItem(1);
+        pagerAdapter.clearData();
+        pagerAdapter.addReplacmentFragment(new UsersSearchResultFragment(), "Users(0)");
+        pagerAdapter.notifyDataSetChanged();
     }
 
     @OnClick(R.id.add_group_message_iv)
     public void onAddShareLeadClicked(){
+        launchShareLeadIntent();
+    }
 
+    private void launchShareLeadIntent() {
+        startActivity(new Intent(this, ShareLeadActivity.class));
     }
 
     @Override
@@ -463,6 +472,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchViewBackAware.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pagerAdapter.clearData();
+                pagerAdapter.addReplacmentFragment(new AccountSearchResultsFragment(), "Accounts(0)");
+                pagerAdapter.addReplacmentFragment(new UsersSearchResultFragment(), "Users(0)");
+                pagerAdapter.addReplacmentFragment(new SharedLeadsSearchResultFragment(), "Shared Leads(0)");
+                pagerAdapter.notifyDataSetChanged();
                 overlayImage.setVisibility(View.VISIBLE);
                 searchResultsLayout.setVisibility(View.VISIBLE);
                 searchResultsLayout.startAnimation(slideUpAnimation);
@@ -531,20 +545,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_share_lead) {
-
+        if (id == R.id.nav_add_account) {
+            showSearchSelectedView();
+            pagerAdapter.clearData();
+            pagerAdapter.addReplacmentFragment(new AccountSearchResultsFragment(), "Accounts(0)");
+            pagerAdapter.notifyDataSetChanged();
         } else if (id == R.id.nav_search) {
             showSearchSelectedView();
         } else if (id == R.id.nav_new_direct_message) {
             showSearchSelectedView();
-            searchResultPager.setCurrentItem(1);
+            pagerAdapter.clearData();
+            pagerAdapter.addReplacmentFragment(new UsersSearchResultFragment(), "Users(0)");
+            pagerAdapter.notifyDataSetChanged();
         } else if (id == R.id.nav_settings) {
             FirebaseAuth.getInstance().signOut();
             DataManager.getInstance().clearRealmData();
             startActivity(new Intent(getApplicationContext(), BootActivity.class));
         } else if(id == R.id.nav_share_lead){
-            showSearchSelectedView();
-            searchResultPager.setCurrentItem(2);
+            launchShareLeadIntent();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -782,6 +800,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         private void addFragment(Fragment fragment, String pageTitle){
             fragments.add(fragment);
             pageTitles.add(pageTitle);
+        }
+
+        private void addReplacmentFragment(Fragment fragment, String pageTitle){
+            fragments.add(fragment);
+            pageTitles.add(pageTitle);
+        }
+
+        private void clearData(){
+            fragments.clear();
+            pageTitles.clear();
         }
 
         public SearchResultsPagerAdapter(FragmentManager fm) {

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="jjpartnership.hub">
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -43,18 +43,22 @@
         <activity
             android:name=".view_layer.activities.direct_message_activity.DirectMessageActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".view_layer.activities.group_chat_activity.GroupChatActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".view_layer.activities.customer_request_chat_activity.CustomerRequestChatActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".view_layer.activities.user_profile_activity.UserProfileActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view_layer.activities.share_lead_activity.ShareLeadActivity"
+            android:screenOrientation="portrait"
+            ></activity>
     </application>
 
 </manifest>
