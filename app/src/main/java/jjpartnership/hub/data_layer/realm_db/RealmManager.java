@@ -257,7 +257,7 @@ public class RealmManager {
 
     public void insertOrUpdateDirectChat(final DirectChat newDirectChat) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(new DirectChatRealm(newDirectChat));
@@ -268,7 +268,7 @@ public class RealmManager {
 
     public void insertOrUpdateDirectChatRealm(final DirectChatRealm directChat) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(directChat);
@@ -279,7 +279,7 @@ public class RealmManager {
 
     public void insertOrUpdateGroupChatRealm(final GroupChatRealm groupChatRealm) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(groupChatRealm);
@@ -294,7 +294,7 @@ public class RealmManager {
             realmRequests.add(new CustomerRequestRealm(request));
         }
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmRequests);
@@ -305,7 +305,7 @@ public class RealmManager {
 
     public void insertOrUpdateCustomerRequest(final CustomerRequestRealm request) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransaction(new Realm.Transaction() {
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(request);

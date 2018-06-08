@@ -20,6 +20,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
+import jjpartnership.hub.utils.ActionBarUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_activity.account_details_fragment.AccountDetailsFragment;
@@ -48,8 +49,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_chat);
         ButterKnife.bind(this);
-        getSupportActionBar().setElevation(0);
-        setTitle(getIntent().getStringExtra("account_name"));
         accountId = getIntent().getStringExtra("account_id");
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         Bundle bundle = new Bundle();
@@ -70,6 +69,8 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
             }
         });
+        ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
+                R.color.colorAccentDark, true, getIntent().getStringExtra("account_name"));
     }
 
     public void initPager(){

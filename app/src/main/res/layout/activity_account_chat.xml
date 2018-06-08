@@ -8,23 +8,30 @@
     android:orientation="vertical"
     tools:context="jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity">
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:minHeight="?attr/actionBarSize"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        app:tabSelectedTextColor="@color/white"
-        app:tabTextColor="@color/colorPrimaryLight" />
+        android:background="@drawable/rounded_rectangle_expanded_title"
+        android:elevation="4dp">
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"
+            android:minHeight="?attr/actionBarSize"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/white"
+            app:tabTextColor="@color/colorAccentVeryDark" />
+    </FrameLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="40dp"
         android:orientation="vertical">
 
         <android.support.v4.view.ViewPager

@@ -29,6 +29,7 @@ import butterknife.OnClick;
 import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
+import jjpartnership.hub.utils.ActionBarUtil;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.view_layer.activities.account_activity.ChatRecyclerAdapter;
@@ -63,6 +64,8 @@ public class GroupChatActivity extends AppCompatActivity implements GroupChatVie
         chatRecycler.setLayoutManager(layoutManager);
         initListeners();
         userInput.setBackPressedListener(this);
+        ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
+                R.color.colorAccentDark, true, "");
         presenter = new GroupChatPresenterImp(this, getIntent().getStringExtra("chatId"));
     }
 

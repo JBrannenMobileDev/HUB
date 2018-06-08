@@ -2,6 +2,7 @@ package jjpartnership.hub.view_layer.activities.share_lead_activity;
 
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -31,14 +32,14 @@ import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.ActionBarUtil;
-import jjpartnership.hub.utils.UserColorUtil;
-import jjpartnership.hub.view_layer.activities.main_activity.AccountSearchResultsFragment;
-import jjpartnership.hub.view_layer.activities.main_activity.SharedLeadsSearchResultFragment;
-import jjpartnership.hub.view_layer.activities.main_activity.UsersSearchResultFragment;
 import mabbas007.tagsedittext.TagsEditText;
 
 public class ShareLeadActivity extends AppCompatActivity implements SelectAccountFragment.OnFragmentInteractionListener,
         SelectUsersFragment.OnFragmentInteractionListener, TagsEditText.TagsEditListener{
+
+    private static final String SELECT_USER = "Select Users";
+    private static final String SELECT_ACCOUNT = "Select Account";
+
     @BindView(R.id.back_to_select_account_bt)ImageView backBt;
     @BindView(R.id.forward_to_select_account_bt)ImageView forwardBt;
     @BindView(R.id.title_tv)TextView title;
@@ -48,20 +49,17 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
 
     private ShareLeadAdapter pagerAdapter;
     private ArrayList<String> agentNames;
-    private ArrayList<String> selectedAgentNames;
-    private Map<String, UserRealm> agents;
-    private List<String> selectedAgentIds;
+    private Map<String, String> selectedAgentIds;
     private String selectedAccountId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_share_lead);
         ButterKnife.bind(this);
         agentNames = new ArrayList<>();
-        agents = new HashMap<>();
-        selectedAgentIds = new ArrayList<>();
-        selectedAgentNames = new ArrayList<>();
+        selectedAgentIds = new HashMap<>();
         initActionBar();
         initpager();
         initTagsView();
@@ -72,11 +70,40 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         pagerAdapter.addFragment(new SelectAccountFragment());
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(3);
+        animateTitleTextChange(SELECT_ACCOUNT);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch(position){
+                    case 0:
+                        animateTitleTextChange(SELECT_ACCOUNT);
+                        forwardBt.setVisibility(View.VISIBLE);
+                        backBt.setVisibility(View.GONE);
+                        break;
+                    case 1:
+                        animateTitleTextChange(SELECT_USER);
+                        backBt.setVisibility(View.VISIBLE);
+                        if(pagerAdapter.getCount() < 3) forwardBt.setVisibility(View.GONE);
+                        break;
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void initActionBar() {
-        ActionBarUtil.initActionBar(this, R.color.colorAccentVeryDark, 8,
-                R.color.colorAccentVeryDark, true, "Share Lead");
+        ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
+                R.color.colorAccentDark, true, "Share Lead");
     }
 
     private void initTagsView() {
@@ -85,10 +112,6 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         tags.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, agentNames));
         tags.setThreshold(1);
-        String[] selectedAgentsArray = new String[selectedAgentNames.size()];
-        selectedAgentsArray = selectedAgentNames.toArray(selectedAgentsArray);
-        tags.setTags(selectedAgentsArray);
-
     }
 
     @Override
@@ -109,12 +132,22 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         backBt.setVisibility(View.VISIBLE);
         forwardBt.setVisibility(View.GONE);
         selectedAccountName.setText(account.getAccountName());
-        title.setText("-Select Users-");
+    }
+
+    private void animateTitleTextChange(final String text){
+        title.animate().scaleX(.0f).setDuration(150);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                title.animate().scaleX(1f).setDuration(150);
+                title.setText(text);
+            }
+        }, 150);
     }
 
     @OnClick(R.id.back_to_select_account_bt)
     public void onBackToAccountClicked(){
-        title.setText("-Select Account-");
         forwardBt.setVisibility(View.VISIBLE);
         backBt.setVisibility(View.GONE);
         viewPager.setCurrentItem(0);
@@ -125,12 +158,6 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         viewPager.setCurrentItem(1);
         backBt.setVisibility(View.VISIBLE);
         if(pagerAdapter.getCount() < 3) forwardBt.setVisibility(View.GONE);
-        title.setText("-Select Users-");
-    }
-
-    @Override
-    public void onUserSelected(List<UserRealm> users) {
-
     }
 
     @Override
@@ -143,6 +170,21 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
 
     }
 
+    @Override
+    public void onUserChecboxClicked(UserRealm user, boolean checked) {
+        if(checked) {
+            selectedAgentIds.put(user.getUid(), user.getUid());
+            tags.setTag(Integer.valueOf(user.getPhoneNumber()), user.getFirstName() + " " + user.getLastName());
+        }else{
+            selectedAgentIds.remove(user.getUid());
+        }
+    }
+
+    @Override
+    public void finish(){
+        super.finish();
+        overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
+    }
 
     private class ShareLeadAdapter extends FragmentPagerAdapter {
         private List<Fragment> fragments;

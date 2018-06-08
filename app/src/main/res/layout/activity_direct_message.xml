@@ -20,12 +20,14 @@
             android:id="@+id/new_message_switch"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@color/white"
-            android:elevation="1dp"
+            android:background="@drawable/rounded_rectangle_expanded_title"
+            android:checked="true"
+            android:elevation="4dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="Notify new messages for this chat"
-            android:textColor="@color/grey_text" />
+            android:textColor="@color/white"
+            android:trackTint="@color/colorMainBg" />
 
         <TextView
             android:id="@+id/chat_empty_state"

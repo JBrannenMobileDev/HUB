@@ -30,6 +30,7 @@ import butterknife.OnClick;
 import io.realm.RealmResults;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.MessageRealm;
+import jjpartnership.hub.utils.ActionBarUtil;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.CommunicationsUtil;
 import jjpartnership.hub.utils.DpUtil;
@@ -66,6 +67,8 @@ public class DirectMessageActivity extends AppCompatActivity implements DirectMe
         chatRecycler.setLayoutManager(layoutManager);
         initListeners();
         userInput.setBackPressedListener(this);
+        ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
+                R.color.colorAccentDark, true, "");
         presenter = new DirectMessagePresenterImp(this, getIntent().getStringExtra("uid"),
                 getIntent().getStringExtra("toUid"));
     }
