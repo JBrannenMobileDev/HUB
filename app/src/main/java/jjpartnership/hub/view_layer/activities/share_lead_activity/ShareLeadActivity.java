@@ -126,8 +126,16 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
     @Override
     public void onAccountSelected(AccountRowItem account) {
         selectedAccountId = account.getAccountIdFire();
-        pagerAdapter.addFragment(new SelectUsersFragment());
-        pagerAdapter.notifyDataSetChanged();
+        if(pagerAdapter.getCount() == 1) {
+            Bundle bundle = new Bundle();
+            bundle.putString("accountId", selectedAccountId);
+            Fragment frag = new SelectUsersFragment();
+            frag.setArguments(bundle);
+            pagerAdapter.addFragment(frag);
+            pagerAdapter.notifyDataSetChanged();
+        }else{
+            pagerAdapter.updateAccountIdForUserFragment(account.getAccountIdFire());
+        }
         viewPager.setCurrentItem(1);
         backBt.setVisibility(View.VISIBLE);
         forwardBt.setVisibility(View.GONE);
@@ -193,7 +201,6 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
             fragments.add(fragment);
         }
 
-
         public ShareLeadAdapter(FragmentManager fm) {
             super(fm);
             fragments = new ArrayList<>();
@@ -207,6 +214,10 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         @Override
         public int getCount() {
             return fragments.size();
+        }
+
+        public void updateAccountIdForUserFragment(String accountIdFire) {
+            ((SelectUsersFragment)fragments.get(1)).updateAccountId(accountIdFire);
         }
     }
 }

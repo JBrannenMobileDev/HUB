@@ -60,7 +60,7 @@ public class ShareLeadAccountRecyclerAdapter extends RecyclerView.Adapter<ShareL
                 public void onClick(View view) {
                     selectedPosition = getLayoutPosition();
                     notifyDataSetChanged();
-                    root.setBackgroundColor(context.getResources().getColor(R.color.colorMainBg));
+                    root.setBackgroundColor(context.getResources().getColor(R.color.colorAccentDarkTransparent));
                     rowSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
                 }
             });

@@ -1,11 +1,10 @@
-package jjpartnership.hub.view_layer.activities.main_activity;
+package jjpartnership.hub.view_layer.activities.search_activities;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,7 +32,6 @@ public class UserSearchResultsRecyclerAdapter extends RecyclerView.Adapter<UserS
 
     public UserSearchResultsRecyclerAdapter(Context context, List<UserRealm> dataModel, BaseCallback<UserRealm> rowSelectedCallback,
                                             BaseCallback<UserRealm> directMessageSelectedCallback,
-                                            BaseCallback<String> currentUserProfileSelectedCallback,
                                             TwoResponseCallback<UserRealm, Boolean> checkboxSelectedCallback) {
         this.dataModel = dataModel;
         this.rowSelectedCallback = rowSelectedCallback;
@@ -64,13 +62,7 @@ public class UserSearchResultsRecyclerAdapter extends RecyclerView.Adapter<UserS
             root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(currentUserId.equals(dataModel.get(getLayoutPosition()).getUid())){
-                        if(rowSelectedCallback != null) {
-                            rowSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
-                        }
-                    }else {
-                        rowSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
-                    }
+                    rowSelectedCallback.onResponse(dataModel.get(getLayoutPosition()));
                 }
             });
 

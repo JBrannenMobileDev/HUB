@@ -11,14 +11,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.KeyEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -66,6 +62,12 @@ import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActiv
 import jjpartnership.hub.view_layer.activities.boot_activity.BootActivity;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
 import jjpartnership.hub.view_layer.activities.group_chat_activity.GroupChatActivity;
+import jjpartnership.hub.view_layer.activities.search_activities.AccountSearchResultsFragment;
+import jjpartnership.hub.view_layer.activities.search_activities.AddAccountActivity;
+import jjpartnership.hub.view_layer.activities.search_activities.NewDirectMessageActivity;
+import jjpartnership.hub.view_layer.activities.search_activities.SearchAllManager;
+import jjpartnership.hub.view_layer.activities.search_activities.SharedLeadsSearchResultFragment;
+import jjpartnership.hub.view_layer.activities.search_activities.UsersSearchResultFragment;
 import jjpartnership.hub.view_layer.activities.share_lead_activity.ShareLeadActivity;
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
@@ -92,9 +94,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.recent_frame_layout) FrameLayout recentFrameLayout;
     @BindView(R.id.search_results_pager)ViewPager searchResultPager;
     @BindView(R.id.search_results_tabs)TabLayout searchResultsTabs;
-    @BindView(R.id.add_account_iv)ImageView addAccountButton;
-    @BindView(R.id.add_direct_message_iv)ImageView addDirectMessageIv;
-    @BindView(R.id.add_group_message_iv)ImageView shareLeadIv;
 
     private Animation slideUpAnimation, slideDownAnimation, enterFromRightAnimation, exitToRightAnimation;
     private MainPresenter presenter;
@@ -118,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private LinearLayout nav_main_header_layout;
     private BackAwareSearchView searchViewBackAware;
     private BackAwareSearchView.BackPressedListener backPressedListenerPhone;
-    private SearchResultsPagerAdapter pagerAdapter;
+    private SearchAllManager searchManager;
     private MenuItem searchItem;
 
 
@@ -182,14 +181,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         nav_main_header_layout = hView.findViewById(R.id.main_header_linear_layout);
         initDrawerHeaderClickListeners();
 
-        pagerAdapter = new SearchResultsPagerAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(new AccountSearchResultsFragment(), "Accounts(0)");
-        pagerAdapter.addFragment(new UsersSearchResultFragment(), "Users(0)");
-        pagerAdapter.addFragment(new SharedLeadsSearchResultFragment(), "Shared Leads(0)");
-        searchResultPager.setAdapter(pagerAdapter);
-        searchResultPager.setOffscreenPageLimit(3);
-        searchResultsTabs.setupWithViewPager(searchResultPager);
-        searchResultsTabs.setTabMode(TabLayout.MODE_FIXED);
+        searchManager = new SearchAllManager(getSupportFragmentManager(), searchResultPager, searchResultsTabs);
+
+
 
         presenter = new MainPresenterImp(this);
     }
@@ -400,27 +394,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @OnClick(R.id.add_account_iv)
-    public void onAddAccountClicked() {
-        showSearchSelectedView();
-        pagerAdapter.clearData();
-        pagerAdapter.addReplacmentFragment(new AccountSearchResultsFragment(), "Accounts(0)");
-        pagerAdapter.notifyDataSetChanged();
-    }
-
-    @OnClick(R.id.add_direct_message_iv)
-    public void onNewDirectMessageClicked() {
-        showSearchSelectedView();
-        pagerAdapter.clearData();
-        pagerAdapter.addReplacmentFragment(new UsersSearchResultFragment(), "Users(0)");
-        pagerAdapter.notifyDataSetChanged();
-    }
-
-    @OnClick(R.id.add_group_message_iv)
-    public void onAddShareLeadClicked(){
-        launchShareLeadIntent();
-    }
-
     private void launchShareLeadIntent() {
         startActivity(new Intent(this, ShareLeadActivity.class));
     }
@@ -472,11 +445,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchViewBackAware.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pagerAdapter.clearData();
-                pagerAdapter.addReplacmentFragment(new AccountSearchResultsFragment(), "Accounts(0)");
-                pagerAdapter.addReplacmentFragment(new UsersSearchResultFragment(), "Users(0)");
-                pagerAdapter.addReplacmentFragment(new SharedLeadsSearchResultFragment(), "Shared Leads(0)");
-                pagerAdapter.notifyDataSetChanged();
+                searchManager.initAllMode();
                 overlayImage.setVisibility(View.VISIBLE);
                 searchResultsLayout.setVisibility(View.VISIBLE);
                 searchResultsLayout.startAnimation(slideUpAnimation);
@@ -496,12 +465,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(newText.length() > 1) {
                     presenter.onSearchQuery(newText);
                 }else{
-                    pagerAdapter.onQueryResultsAccount(new ArrayList<AccountRowItem>(), "");
-                    pagerAdapter.onQueryResultsUser(new ArrayList<UserRealm>(), "");
-                    pagerAdapter.onQueryResultsSharedLeads(new ArrayList<GroupChatRealm>(), "");
-                    setAccountsTabTitle("Accounts(0)");
-                    setUsersTabTitle("Users(0)");
-                    setSharedLeadTitle("Shared Leads(0)");
+                    searchManager.onQueryResults(new ArrayList<AccountRowItem>(), new ArrayList<UserRealm>(),
+                            new ArrayList<GroupChatRealm>(), "");
                 }
                 return false;
             }
@@ -546,17 +511,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_add_account) {
-            showSearchSelectedView();
-            pagerAdapter.clearData();
-            pagerAdapter.addReplacmentFragment(new AccountSearchResultsFragment(), "Accounts(0)");
-            pagerAdapter.notifyDataSetChanged();
+            launchAddAccountIntent();
         } else if (id == R.id.nav_search) {
             showSearchSelectedView();
         } else if (id == R.id.nav_new_direct_message) {
-            showSearchSelectedView();
-            pagerAdapter.clearData();
-            pagerAdapter.addReplacmentFragment(new UsersSearchResultFragment(), "Users(0)");
-            pagerAdapter.notifyDataSetChanged();
+            startActivity(new Intent(getApplicationContext(), NewDirectMessageActivity.class));
         } else if (id == R.id.nav_settings) {
             FirebaseAuth.getInstance().signOut();
             DataManager.getInstance().clearRealmData();
@@ -568,6 +527,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void launchAddAccountIntent() {
+        startActivity(new Intent(getApplicationContext(), AddAccountActivity.class));
     }
 
     @OnClick(R.id.show_all_recent_tv)
@@ -732,31 +695,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onQueryResults(List<AccountRowItem> searchResults, List<UserRealm> userSearchResults, List<GroupChatRealm> sharedLeads, String query) {
-        pagerAdapter.onQueryResultsAccount(searchResults, query);
-        pagerAdapter.onQueryResultsUser(userSearchResults, query);
-        pagerAdapter.onQueryResultsSharedLeads(sharedLeads, query);
-        setAccountsTabTitle("Accounts(" + searchResults.size() + ")");
-        setUsersTabTitle("Users(" + userSearchResults.size() + ")");
-        setSharedLeadTitle("Shared Leads(" + sharedLeads.size() + ")");
-        if(searchResults.size() == 0 && userSearchResults.size() > 0 && sharedLeads.size() == 0){
-            searchResultPager.setCurrentItem(1);
-        }else if(searchResults.size() > 0 && userSearchResults.size() == 0 && sharedLeads.size() == 0){
-            searchResultPager.setCurrentItem(0);
-        }else if(searchResults.size() == 0 && userSearchResults.size() == 0 && sharedLeads.size() > 0){
-            searchResultPager.setCurrentItem(2);
-        }
-    }
-
-    private void setAccountsTabTitle(String title){
-        searchResultsTabs.getTabAt(0).setText(title);
-    }
-
-    private void setUsersTabTitle(String title){
-        searchResultsTabs.getTabAt(1).setText(title);
-    }
-
-    private void setSharedLeadTitle(String title){
-        searchResultsTabs.getTabAt(2).setText(title);
+        searchManager.onQueryResults(searchResults, userSearchResults, sharedLeads, query);
     }
 
     @Override
@@ -791,64 +730,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         accountChatIntent.putExtra("account_id", rowItem.getAccountIdFire());
         accountChatIntent.putExtra("account_name", rowItem.getAccountName());
         startActivity(accountChatIntent);
-    }
-
-    private class SearchResultsPagerAdapter extends FragmentPagerAdapter {
-        private List<Fragment> fragments;
-        private List<String> pageTitles;
-
-        private void addFragment(Fragment fragment, String pageTitle){
-            fragments.add(fragment);
-            pageTitles.add(pageTitle);
-        }
-
-        private void addReplacmentFragment(Fragment fragment, String pageTitle){
-            fragments.add(fragment);
-            pageTitles.add(pageTitle);
-        }
-
-        private void clearData(){
-            fragments.clear();
-            pageTitles.clear();
-        }
-
-        public SearchResultsPagerAdapter(FragmentManager fm) {
-            super(fm);
-            fragments = new ArrayList<>();
-            pageTitles = new ArrayList<>();
-        }
-
-        public void onQueryResultsAccount(List<AccountRowItem> items, String query){
-            if(fragments.get(0) != null){
-                ((AccountSearchResultsFragment) fragments.get(0)).onResultsReceived(items, query);
-            }
-        }
-
-        public void onQueryResultsUser(List<UserRealm> items, String query){
-            if(fragments.get(1) != null){
-                ((UsersSearchResultFragment) fragments.get(1)).onResultsReceived(items, query);
-            }
-        }
-
-        public void onQueryResultsSharedLeads(List<GroupChatRealm> items, String query){
-            if(fragments.get(2) != null){
-                ((SharedLeadsSearchResultFragment) fragments.get(2)).onResultsReceived(items, query);
-            }
-        }
-
-        @Override
-        public Fragment getItem(int pos) {
-            return fragments.get(pos);
-        }
-
-        @Override
-        public int getCount() {
-            return fragments.size();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return pageTitles.get(position);
-        }
     }
 }

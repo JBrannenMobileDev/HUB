@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="jjpartnership.hub.view_layer.activities.main_activity.UsersSearchResultFragment">
+    tools:context="jjpartnership.hub.view_layer.activities.search_activities.UsersSearchResultFragment">
 
     <FrameLayout
         android:id="@+id/search_results_empty_frame_layout"

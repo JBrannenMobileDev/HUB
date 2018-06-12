@@ -148,6 +148,7 @@
                         android:nestedScrollingEnabled="false" />
 
                 </FrameLayout>
+
             </LinearLayout>
 
             <FrameLayout
@@ -167,16 +168,6 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/add_account_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="1"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/colorPrimaryLight"
-                    app:srcCompat="@drawable/ic_add_black_24dp" />
             </FrameLayout>
 
             <FrameLayout
@@ -247,16 +238,6 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/add_direct_message_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="1"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/colorPrimaryLight"
-                    app:srcCompat="@drawable/ic_add_black_24dp" />
             </FrameLayout>
 
             <FrameLayout
@@ -327,16 +308,6 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/add_group_message_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="1"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:tint="@color/colorPrimaryLight"
-                    app:srcCompat="@drawable/ic_add_black_24dp" />
             </FrameLayout>
 
             <FrameLayout

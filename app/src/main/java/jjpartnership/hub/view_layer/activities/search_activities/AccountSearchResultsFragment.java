@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.main_activity;
+package jjpartnership.hub.view_layer.activities.search_activities;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,47 +16,43 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
-import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.utils.BaseCallback;
+import jjpartnership.hub.view_layer.activities.main_activity.AccountRecyclerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SharedLeadsSearchResultFragment.OnFragmentInteractionListener} interface
+ * {@link AccountSearchResultsFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class SharedLeadsSearchResultFragment extends Fragment {
+public class AccountSearchResultsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public SharedLeadsSearchResultFragment() {
+    public AccountSearchResultsFragment() {
         // Required empty public constructor
     }
 
-    @BindView(R.id.users_results_recycler_view)RecyclerView resultsRecycler;
+    @BindView(R.id.account_results_recycler_view)RecyclerView resultsRecycler;
     @BindView(R.id.search_results_empty_frame_layout)FrameLayout noResultsLayout;
+    @BindView(R.id.request_new_account_tv)TextView requestNewAccountButton;
     @BindView(R.id.no_results_user_input_tv)TextView noResultsUserInputText;
 
-    private BaseCallback<GroupChatRealm> chatSelectedCallback;
-    private GroupMessagesRecyclerAdapter groupChatAdapter;
+    private BaseCallback<AccountRowItem> accountSelectedCallback;
+    private AccountRecyclerAdapter accountsAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_shared_leads_search_result, container, false);
+        View v = inflater.inflate(R.layout.fragment_account_search_results, container, false);
         ButterKnife.bind(this, v);
         resultsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        initCallbacks();
-        return v;
-    }
-
-    private void initCallbacks() {
-        chatSelectedCallback = new BaseCallback<GroupChatRealm>() {
+        accountSelectedCallback = new BaseCallback<AccountRowItem>() {
             @Override
-            public void onResponse(GroupChatRealm chat) {
-                mListener.onChatSelected(chat);
+            public void onResponse(AccountRowItem object) {
+                mListener.onAccountSelected(object);
             }
 
             @Override
@@ -64,18 +60,19 @@ public class SharedLeadsSearchResultFragment extends Fragment {
 
             }
         };
+        return v;
     }
 
-    public void onResultsReceived(List<GroupChatRealm> items, String userInput){
+    public void onResultsReceived(List<AccountRowItem> items, String userInput){
         if(items != null) {
             noResultsLayout.setVisibility(View.GONE);
-            if (groupChatAdapter == null) {
-                groupChatAdapter = new GroupMessagesRecyclerAdapter(getActivity().getApplicationContext(), items, chatSelectedCallback);
-                resultsRecycler.setAdapter(groupChatAdapter);
+            if (accountsAdapter == null) {
+                accountsAdapter = new AccountRecyclerAdapter(getActivity().getApplicationContext(), items, accountSelectedCallback);
+                resultsRecycler.setAdapter(accountsAdapter);
             } else {
-                groupChatAdapter.OnDataSetChanged(items);
+                accountsAdapter.OnDataSetChanged(items);
             }
-            groupChatAdapter.notifyDataSetChanged();
+            accountsAdapter.notifyDataSetChanged();
             if(items.size() == 0 && userInput != null && !userInput.isEmpty()){
                 noResultsLayout.setVisibility(View.VISIBLE);
                 noResultsUserInputText.setText(userInput);
@@ -98,7 +95,7 @@ public class SharedLeadsSearchResultFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof AccountSearchResultsFragment.OnFragmentInteractionListener) {
+        if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -112,7 +109,9 @@ public class SharedLeadsSearchResultFragment extends Fragment {
         mListener = null;
     }
 
+
     public interface OnFragmentInteractionListener {
-        void onChatSelected(GroupChatRealm chat);
+        // TODO: Update argument type and name
+        void onAccountSelected(AccountRowItem rowItem);
     }
 }

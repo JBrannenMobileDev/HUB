@@ -8,6 +8,7 @@
     <color name="colorAccenttest">#3eb395</color>
     <color name="colorAccent">#43b3ab</color>
     <color name="colorAccentDark">#32837d</color>
+    <color name="colorAccentDarkTransparent">#1a32837d</color>
     <color name="colorAccentVeryDark">#286c69</color>
     <color name="colorAccentVeryVeryDark">#0b1e1d</color>
     <color name="colorOrange">#fc9c01</color>

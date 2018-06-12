@@ -1,4 +1,4 @@
-package jjpartnership.hub.view_layer.activities.main_activity;
+package jjpartnership.hub.view_layer.activities.search_activities;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -16,38 +16,36 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.UserRealm;
+import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.utils.BaseCallback;
-import jjpartnership.hub.view_layer.activities.account_activity.account_details_fragment.AssignedAgentsRecyclerAdapter;
+import jjpartnership.hub.view_layer.activities.main_activity.GroupMessagesRecyclerAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link UsersSearchResultFragment.OnFragmentInteractionListener} interface
+ * {@link SharedLeadsSearchResultFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class UsersSearchResultFragment extends Fragment {
+public class SharedLeadsSearchResultFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public UsersSearchResultFragment() {
+    public SharedLeadsSearchResultFragment() {
         // Required empty public constructor
     }
-
 
     @BindView(R.id.users_results_recycler_view)RecyclerView resultsRecycler;
     @BindView(R.id.search_results_empty_frame_layout)FrameLayout noResultsLayout;
     @BindView(R.id.no_results_user_input_tv)TextView noResultsUserInputText;
 
-    private BaseCallback<UserRealm> userSelectedCallback;
-    private BaseCallback<UserRealm> directMessageSelectedCallback;
-    private UserSearchResultsRecyclerAdapter usersAdapter;
+    private BaseCallback<GroupChatRealm> chatSelectedCallback;
+    private GroupMessagesRecyclerAdapter groupChatAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_users_search_result, container, false);
+        View v = inflater.inflate(R.layout.fragment_shared_leads_search_result, container, false);
         ButterKnife.bind(this, v);
         resultsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         initCallbacks();
@@ -55,21 +53,10 @@ public class UsersSearchResultFragment extends Fragment {
     }
 
     private void initCallbacks() {
-        userSelectedCallback = new BaseCallback<UserRealm>() {
+        chatSelectedCallback = new BaseCallback<GroupChatRealm>() {
             @Override
-            public void onResponse(UserRealm user) {
-                mListener.onUserSelected(user);
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        };
-        directMessageSelectedCallback = new BaseCallback<UserRealm>() {
-            @Override
-            public void onResponse(UserRealm user) {
-                mListener.onDirectMessageSelected(user);
+            public void onResponse(GroupChatRealm chat) {
+                mListener.onChatSelected(chat);
             }
 
             @Override
@@ -79,16 +66,16 @@ public class UsersSearchResultFragment extends Fragment {
         };
     }
 
-    public void onResultsReceived(List<UserRealm> items, String userInput){
+    public void onResultsReceived(List<GroupChatRealm> items, String userInput){
         if(items != null) {
             noResultsLayout.setVisibility(View.GONE);
-            if (usersAdapter == null) {
-                usersAdapter = new UserSearchResultsRecyclerAdapter(getActivity().getApplicationContext(), items, userSelectedCallback, directMessageSelectedCallback, null, null);
-                resultsRecycler.setAdapter(usersAdapter);
+            if (groupChatAdapter == null) {
+                groupChatAdapter = new GroupMessagesRecyclerAdapter(getActivity().getApplicationContext(), items, chatSelectedCallback);
+                resultsRecycler.setAdapter(groupChatAdapter);
             } else {
-                usersAdapter.OnDataSetChanged(items);
+                groupChatAdapter.OnDataSetChanged(items);
             }
-            usersAdapter.notifyDataSetChanged();
+            groupChatAdapter.notifyDataSetChanged();
             if(items.size() == 0 && userInput != null && !userInput.isEmpty()){
                 noResultsLayout.setVisibility(View.VISIBLE);
                 noResultsUserInputText.setText(userInput);
@@ -126,7 +113,6 @@ public class UsersSearchResultFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        void onUserSelected(UserRealm user);
-        void onDirectMessageSelected(UserRealm user);
+        void onChatSelected(GroupChatRealm chat);
     }
 }

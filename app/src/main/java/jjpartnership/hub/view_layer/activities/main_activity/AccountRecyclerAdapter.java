@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
     private Context context;
     private List<AccountRowItem> dataModel;
     private BaseCallback<AccountRowItem> rowSelectedCallback;
+    private int lastPosition = -1;
 
     public AccountRecyclerAdapter(@NonNull Context context, MainAccountsModel dataModel, BaseCallback<AccountRowItem> rowSelectedCallback) {
         this.context = context;
@@ -95,8 +98,23 @@ public class AccountRecyclerAdapter extends RecyclerView.Adapter<AccountRecycler
 
         if(!account.getAccountSalesAgentUids().contains(UserPreferences.getInstance().getUid())){
             holder.icon.setImageTintList(context.getResources().getColorStateList(R.color.colorPrimaryLight));
+        }else{
+            holder.icon.setImageTintList(context.getResources().getColorStateList(R.color.colorAccentVeryDark));
+        }
+
+        setAnimation(holder.itemView, position);
+    }
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
+            animation.setDuration(600);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
         }
     }
+
 
     @Override
     public int getItemCount() {

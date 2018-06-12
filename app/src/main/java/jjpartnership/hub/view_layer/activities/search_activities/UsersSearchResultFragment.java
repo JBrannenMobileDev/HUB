@@ -1,9 +1,7 @@
-package jjpartnership.hub.view_layer.activities.main_activity;
+package jjpartnership.hub.view_layer.activities.search_activities;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,42 +16,48 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import jjpartnership.hub.R;
-import jjpartnership.hub.data_layer.data_models.AccountRowItem;
+import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.BaseCallback;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link AccountSearchResultsFragment.OnFragmentInteractionListener} interface
+ * {@link UsersSearchResultFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  */
-public class AccountSearchResultsFragment extends Fragment {
+public class UsersSearchResultFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public AccountSearchResultsFragment() {
+    public UsersSearchResultFragment() {
         // Required empty public constructor
     }
 
-    @BindView(R.id.account_results_recycler_view)RecyclerView resultsRecycler;
+
+    @BindView(R.id.users_results_recycler_view)RecyclerView resultsRecycler;
     @BindView(R.id.search_results_empty_frame_layout)FrameLayout noResultsLayout;
-    @BindView(R.id.request_new_account_tv)TextView requestNewAccountButton;
     @BindView(R.id.no_results_user_input_tv)TextView noResultsUserInputText;
 
-    private BaseCallback<AccountRowItem> accountSelectedCallback;
-    private AccountRecyclerAdapter accountsAdapter;
+    private BaseCallback<UserRealm> userSelectedCallback;
+    private BaseCallback<UserRealm> directMessageSelectedCallback;
+    private UserSearchResultsRecyclerAdapter usersAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_account_search_results, container, false);
+        View v = inflater.inflate(R.layout.fragment_users_search_result, container, false);
         ButterKnife.bind(this, v);
         resultsRecycler.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
-        accountSelectedCallback = new BaseCallback<AccountRowItem>() {
+        initCallbacks();
+        return v;
+    }
+
+    private void initCallbacks() {
+        userSelectedCallback = new BaseCallback<UserRealm>() {
             @Override
-            public void onResponse(AccountRowItem object) {
-                mListener.onAccountSelected(object);
+            public void onResponse(UserRealm user) {
+                mListener.onUserSelected(user);
             }
 
             @Override
@@ -61,19 +65,29 @@ public class AccountSearchResultsFragment extends Fragment {
 
             }
         };
-        return v;
+        directMessageSelectedCallback = new BaseCallback<UserRealm>() {
+            @Override
+            public void onResponse(UserRealm user) {
+                mListener.onDirectMessageSelected(user);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        };
     }
 
-    public void onResultsReceived(List<AccountRowItem> items, String userInput){
+    public void onResultsReceived(List<UserRealm> items, String userInput){
         if(items != null) {
             noResultsLayout.setVisibility(View.GONE);
-            if (accountsAdapter == null) {
-                accountsAdapter = new AccountRecyclerAdapter(getActivity().getApplicationContext(), items, accountSelectedCallback);
-                resultsRecycler.setAdapter(accountsAdapter);
+            if (usersAdapter == null) {
+                usersAdapter = new UserSearchResultsRecyclerAdapter(getActivity().getApplicationContext(), items, userSelectedCallback, directMessageSelectedCallback,null);
+                resultsRecycler.setAdapter(usersAdapter);
             } else {
-                accountsAdapter.OnDataSetChanged(items);
+                usersAdapter.OnDataSetChanged(items);
             }
-            accountsAdapter.notifyDataSetChanged();
+            usersAdapter.notifyDataSetChanged();
             if(items.size() == 0 && userInput != null && !userInput.isEmpty()){
                 noResultsLayout.setVisibility(View.VISIBLE);
                 noResultsUserInputText.setText(userInput);
@@ -96,7 +110,7 @@ public class AccountSearchResultsFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
+        if (context instanceof AccountSearchResultsFragment.OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
@@ -110,9 +124,8 @@ public class AccountSearchResultsFragment extends Fragment {
         mListener = null;
     }
 
-
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onAccountSelected(AccountRowItem rowItem);
+        void onUserSelected(UserRealm user);
+        void onDirectMessageSelected(UserRealm user);
     }
 }

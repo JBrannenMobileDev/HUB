@@ -57,8 +57,15 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view_layer.activities.share_lead_activity.ShareLeadActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view_layer.activities.search_activities.AddAccountActivity"
             android:screenOrientation="portrait"
-            ></activity>
+            android:parentActivityName=".view_layer.activities.main_activity.MainActivity"/>
+        <activity
+            android:name=".view_layer.activities.search_activities.NewDirectMessageActivity"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".view_layer.activities.main_activity.MainActivity"/>
     </application>
 
 </manifest>

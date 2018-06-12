@@ -55,7 +55,7 @@ public class SelectUsersFragment extends Fragment {
         ButterKnife.bind(this, v);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
         initCallbacks();
-        fetchData();
+        fetchData(getArguments().getString("accountId"));
         return v;
     }
 
@@ -84,7 +84,7 @@ public class SelectUsersFragment extends Fragment {
         userCheckedCallback = new TwoResponseCallback<UserRealm, Boolean>() {
             @Override
             public void onResponse(UserRealm user, Boolean checked) {
-                mListener.onUserChecboxClicked(user, checked);
+//                mListener.onUserChecboxClicked(user, checked);
             }
 
             @Override
@@ -94,12 +94,14 @@ public class SelectUsersFragment extends Fragment {
         };
     }
 
-    private void fetchData() {
+    private void fetchData(String accountId) {
         RealmResults<UserRealm> userList = RealmUISingleton.getInstance().getRealmInstance().where(UserRealm.class).sort("firstName").findAll();
         List<UserRealm> filteredList = new ArrayList<>();
         for(UserRealm user : userList){
             if(!user.getUid().equals(UserPreferences.getInstance().getUid())){
-                filteredList.add(user);
+                if(user.getAccountIds().contains(accountId)) {
+                    filteredList.add(user);
+                }
             }
         }
         if(filteredList != null) initRecycler(filteredList);
@@ -125,6 +127,10 @@ public class SelectUsersFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    public void updateAccountId(String accountIdFire) {
+        fetchData(accountIdFire);
     }
 
     /**
