@@ -7,6 +7,12 @@ package jjpartnership.hub.view_layer.activities.main_activity;
 public interface MainPresenter {
     void onSearchQuery(String newText);
     void onDestroy();
-    void onShowAllClicked();
+    void onShowAllRecentClicked();
+    void onShowAllAccountsClicked();
+    void onShowAllDirectMessagesClicked();
+    void onShowAllSharedLeadsClicked();
     void onRestoreRecentModel();
+    void onRestoreSharedLeads();
+    void onRestoreAccounts();
+    void onRestoreDirectMessages();
 }

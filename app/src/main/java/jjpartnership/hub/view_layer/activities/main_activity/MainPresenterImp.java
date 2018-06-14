@@ -267,12 +267,42 @@ public class MainPresenterImp implements MainPresenter {
     }
 
     @Override
-    public void onShowAllClicked() {
-        activity.onShowAll(recentModel);
+    public void onShowAllRecentClicked() {
+        activity.onShowAllRecent(recentModel);
+    }
+
+    @Override
+    public void onShowAllAccountsClicked() {
+        activity.onShowAllAccounts(accountModel);
+    }
+
+    @Override
+    public void onShowAllDirectMessagesClicked() {
+        activity.onShowAllDirectMessages(directModel);
+    }
+
+    @Override
+    public void onShowAllSharedLeadsClicked() {
+        activity.onShowAllSharedLeads(groupChats);
     }
 
     @Override
     public void onRestoreRecentModel() {
         activity.onRecentModelReceived(recentModel);
+    }
+
+    @Override
+    public void onRestoreSharedLeads() {
+        activity.onGroupMessagesReceived(groupChats);
+    }
+
+    @Override
+    public void onRestoreAccounts() {
+        activity.onAccountModelReceived(accountModel);
+    }
+
+    @Override
+    public void onRestoreDirectMessages() {
+        activity.onDirectMessagesModelReceived(directModel);
     }
 }

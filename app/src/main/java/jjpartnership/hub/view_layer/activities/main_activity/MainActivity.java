@@ -87,7 +87,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.direc_messages_empty_state_layout) LinearLayout direct_messages_empty_state;
     @BindView(R.id.group_messages_empty_state_layout) LinearLayout group_messages_empty_state;
     @BindView(R.id.main_scrollview) NestedScrollView scrollView;
-    @BindView(R.id.show_all_recent_tv) TextView showAllTv;
+    @BindView(R.id.show_all_recent_tv) TextView showAllRecentTv;
+    @BindView(R.id.show_all_accounts_tv)TextView showAllAccountsTv;
+    @BindView(R.id.show_all_direct_messages_tv)TextView showAllDirectMessageTv;
+    @BindView(R.id.show_all_shared_leads_tv)TextView showAllSharedLeadsTv;
     @BindView(R.id.new_message_icon) FrameLayout newMessagesIcon;
     @BindView(R.id.new_message_count_tv) TextView newMessageCountTv;
     @BindView(R.id.hide_recent_tv) TextView hideTv;
@@ -108,8 +111,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Toolbar toolbar;
     private AppBarLayout mAppBarLayout;
     private boolean isVisible;
-    private RealmList<RowItem> newRealmList;
+    private RealmList<RowItem> newRecentRealmList;
+    private RealmList<AccountRowItem> newAccountRealmList;
+    private RealmList<DirectItem> newDirectRealmList;
+    private RealmList<GroupChatRealm> newGroupChatRealmList;
     private boolean recentExpanded;
+    private boolean accountsExpanded;
+    private boolean directMessagesExpanded;
+    private boolean sharedLeadsExpanded;
     private int[] hideBtLocation;
     private TextView nav_user_name;
     private TextView nav_user_email;
@@ -534,14 +543,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @OnClick(R.id.show_all_recent_tv)
-    public void onShowAllClicked() {
+    public void onShowAllRecentClicked() {
         recentExpanded = true;
         if (scrollView.getScrollY() == 0) {
             hideTv.setElevation(0);
         }
-        presenter.onShowAllClicked();
+        presenter.onShowAllRecentClicked();
         animateHideButtonShow();
-        showAllTv.setVisibility(View.GONE);
+        showAllRecentTv.setVisibility(View.GONE);
+    }
+
+    @OnClick(R.id.show_all_accounts_tv)
+    public void onShowAllAccountsClicked() {
+        if(!accountsExpanded){
+            showAllAccountsTv.setText("Hide");
+            accountsExpanded = true;
+            presenter.onShowAllAccountsClicked();
+        }else{
+            accountsExpanded = false;
+            presenter.onRestoreAccounts();
+        }
+    }
+
+    @OnClick(R.id.show_all_direct_messages_tv)
+    public void onShowAllDirectMessagesClicked() {
+        if(!directMessagesExpanded){
+            showAllDirectMessageTv.setText("Hide");
+            directMessagesExpanded = true;
+            presenter.onShowAllDirectMessagesClicked();
+        }else{
+            directMessagesExpanded = false;
+            presenter.onRestoreDirectMessages();
+        }
+    }
+
+    @OnClick(R.id.show_all_shared_leads_tv)
+    public void onShowAllSharedLeadsClicked() {
+        if(!sharedLeadsExpanded){
+            showAllSharedLeadsTv.setText("Hide");
+            sharedLeadsExpanded = true;
+            presenter.onShowAllSharedLeadsClicked();
+        }else{
+            sharedLeadsExpanded = false;
+            presenter.onRestoreSharedLeads();
+        }
     }
 
     @OnClick(R.id.hide_recent_tv)
@@ -549,13 +594,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         recentExpanded = false;
         presenter.onRestoreRecentModel();
         animateHideBottonHide();
-        showAllTv.setVisibility(View.VISIBLE);
+        showAllRecentTv.setVisibility(View.VISIBLE);
         scrollView.scrollTo(0, 0);
         hideTv.setElevation(0);
     }
 
     @Override
-    public void onShowAll(MainRecentModel recentModel) {
+    public void onShowAllRecent(MainRecentModel recentModel) {
         if (recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0) {
             recent_empty_layout.setVisibility(View.GONE);
             if (recentRecyclerAdapter == null) {
@@ -564,10 +609,64 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 recentRecyclerAdapter.onDataSetChanged(recentModel);
             }
-            if (newRealmList.size() > recentModel.getRowItems().size()) {
-                recentRecyclerAdapter.notifyItemRangeInserted(newRealmList.size(), recentModel.getRowItems().size() - newRealmList.size());
+            if (newRecentRealmList.size() > recentModel.getRowItems().size()) {
+                recentRecyclerAdapter.notifyItemRangeInserted(newRecentRealmList.size(), recentModel.getRowItems().size() - newRecentRealmList.size());
             } else {
                 recentRecyclerAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public void onShowAllAccounts(MainAccountsModel accountsModel) {
+        if (accountsModel.getRowItems() != null && accountsModel.getRowItems().size() > 0) {
+            accounts_empty_layout.setVisibility(View.GONE);
+            if (accountsAdapter == null) {
+                accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<AccountRowItem>()), accountSelectedCallback);
+                accountsRecyclerView.setAdapter(accountsAdapter);
+            } else {
+                accountsAdapter.OnDataSetChanged(accountsModel);
+            }
+            if (newAccountRealmList.size() > accountsModel.getRowItems().size()) {
+                accountsAdapter.notifyItemRangeInserted(newAccountRealmList.size(), accountsModel.getRowItems().size() - newAccountRealmList.size());
+            } else {
+                accountsAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public void onShowAllDirectMessages(MainDirectMessagesModel directModel) {
+        if (directModel.getDirectItems() != null && directModel.getDirectItems().size() > 0) {
+            direct_messages_empty_state.setVisibility(View.GONE);
+            if (directRecyclerAdapter == null) {
+                directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
+                directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
+            } else {
+                directRecyclerAdapter.OnDataSetChanged(directModel);
+            }
+            if (newDirectRealmList.size() > directModel.getDirectItems().size()) {
+                directRecyclerAdapter.notifyItemRangeInserted(newDirectRealmList.size(), directModel.getDirectItems().size() - newDirectRealmList.size());
+            } else {
+                directRecyclerAdapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    public void onShowAllSharedLeads(List<GroupChatRealm> groupChats) {
+        if (groupChats != null && groupChats.size() > 0) {
+            group_messages_empty_state.setVisibility(View.GONE);
+            if (groupRecyclerAdapter == null) {
+                groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), groupChats, groupMessageSelectedCallback);
+                groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
+            } else {
+                groupRecyclerAdapter.OnDataSetChanged(groupChats);
+            }
+            if (newGroupChatRealmList.size() > groupChats.size()) {
+                groupRecyclerAdapter.notifyItemRangeInserted(newGroupChatRealmList.size(), groupChats.size() - newGroupChatRealmList.size());
+            } else {
+                groupRecyclerAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -595,8 +694,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onRecentModelReceived(MainRecentModel recentModel) {
+        showAllRecentTv.setText("(" + recentModel.getRowItems().size() + ") Show All");
         if (recentExpanded) {
-            onShowAll(recentModel);
+            onShowAllRecent(recentModel);
         } else {
             int newMessagesCount = 0;
             if (recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0) {
@@ -611,23 +711,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                     if (recentModel.getRowItems().size() > 5) {
-                        showAllTv.setEnabled(true);
-                        showAllTv.setTextColor(Color.WHITE);
+                        showAllRecentTv.setEnabled(true);
+                        showAllRecentTv.setTextColor(Color.WHITE);
                         List<RowItem> newList = recentModel.getRowItems().subList(0, 5);
-                        newRealmList = new RealmList<>();
+                        newRecentRealmList = new RealmList<>();
                         for (RowItem item : newList) {
-                            newRealmList.add(item);
+                            newRecentRealmList.add(item);
                         }
                         MainRecentModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(recentModel);
-                        copy.setRowItems(newRealmList);
+                        copy.setRowItems(newRecentRealmList);
                         recentRecyclerAdapter.onDataSetChanged(copy);
                         if (newMessagesCount > 0) {
-                            showAllTv.setTextColor(Color.WHITE);
-                            showAllTv.setEnabled(true);
+                            showAllRecentTv.setTextColor(Color.WHITE);
+                            showAllRecentTv.setEnabled(true);
                         }
                     } else {
-                        showAllTv.setEnabled(false);
-                        showAllTv.setTextColor(getResources().getColor(R.color.colorAccentVeryDark));
+                        showAllRecentTv.setEnabled(false);
+                        showAllRecentTv.setTextColor(getResources().getColor(R.color.colorAccentVeryDark));
                         recentRecyclerAdapter.onDataSetChanged(recentModel);
                     }
                     if (newMessagesCount > 0) {
@@ -644,33 +744,102 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onAccountModelReceived(MainAccountsModel dataModel) {
-        if (dataModel != null && dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
-            accounts_empty_layout.setVisibility(View.GONE);
-            if (accountsAdapter == null) {
-                accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
-                accountsRecyclerView.setAdapter(accountsAdapter);
+        showAllAccountsTv.setText("(" + dataModel.getRowItems().size() + ") Show All");
+        if (accountsExpanded) {
+            onShowAllAccounts(dataModel);
+        } else {
+            if (dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
+                accounts_empty_layout.setVisibility(View.GONE);
+                if (accountsAdapter == null) {
+                    accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<AccountRowItem>()), accountSelectedCallback);
+                    accountsRecyclerView.setAdapter(accountsAdapter);
+                } else {
+                    if (dataModel.getRowItems().size() > 5) {
+                        showAllAccountsTv.setEnabled(true);
+                        showAllAccountsTv.setTextColor(getResources().getColor(R.color.colorAccentDark));
+                        List<AccountRowItem> newList = dataModel.getRowItems().subList(0, 5);
+                        newAccountRealmList = new RealmList<>();
+                        for (AccountRowItem item : newList) {
+                            newAccountRealmList.add(item);
+                        }
+                        MainAccountsModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(dataModel);
+                        copy.setRowItems(newAccountRealmList);
+                        accountsAdapter.OnDataSetChanged(copy);
+                    } else {
+                        showAllAccountsTv.setEnabled(false);
+                        showAllAccountsTv.setTextColor(getResources().getColor(R.color.colorPrimaryLight));
+                        accountsAdapter.OnDataSetChanged(dataModel);
+                    }
+                }
+                accountsAdapter.notifyDataSetChanged();
             }
-            accountsAdapter.notifyDataSetChanged();
         }
     }
 
     @Override
     public void onDirectMessagesModelReceived(MainDirectMessagesModel dataModel) {
-        if (dataModel != null && dataModel.getDirectItems() != null && dataModel.getDirectItems().size() > 0) {
-            direct_messages_empty_state.setVisibility(View.GONE);
-            directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), dataModel, directMessageSelectedCallback);
-            directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
-            directRecyclerAdapter.notifyDataSetChanged();
+        showAllDirectMessageTv.setText("(" + dataModel.getDirectItems().size() + ") Show All");
+        if (directMessagesExpanded) {
+            onShowAllDirectMessages(dataModel);
+        } else {
+            if (dataModel.getDirectItems() != null && dataModel.getDirectItems().size() > 0) {
+                direct_messages_empty_state.setVisibility(View.GONE);
+                if (directRecyclerAdapter == null) {
+                    directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
+                    directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
+                } else {
+                    if (dataModel.getDirectItems().size() > 5) {
+                        showAllDirectMessageTv.setEnabled(true);
+                        showAllDirectMessageTv.setTextColor(getResources().getColor(R.color.colorAccentDark));
+                        List<DirectItem> newList = dataModel.getDirectItems().subList(0, 5);
+                        newDirectRealmList = new RealmList<>();
+                        for (DirectItem item : newList) {
+                            newDirectRealmList.add(item);
+                        }
+                        MainDirectMessagesModel copy = RealmUISingleton.getInstance().getRealmInstance().copyFromRealm(dataModel);
+                        copy.setDirectItems(newDirectRealmList);
+                        directRecyclerAdapter.OnDataSetChanged(copy);
+                    } else {
+                        showAllDirectMessageTv.setEnabled(false);
+                        showAllDirectMessageTv.setTextColor(getResources().getColor(R.color.colorPrimaryLight));
+                        directRecyclerAdapter.OnDataSetChanged(dataModel);
+                    }
+                }
+                directRecyclerAdapter.notifyDataSetChanged();
+            }
         }
     }
 
     @Override
-    public void onGroupMessagesReceived(List<GroupChatRealm> groupChats) {
-        if (groupChats != null && groupChats.size() > 0) {
-            group_messages_empty_state.setVisibility(View.GONE);
-            groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), groupChats, groupMessageSelectedCallback);
-            groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
-            groupRecyclerAdapter.notifyDataSetChanged();
+    public void onGroupMessagesReceived(List<GroupChatRealm> dataModel) {
+        showAllSharedLeadsTv.setText("(" + dataModel.size() + ") Show All");
+        if (sharedLeadsExpanded) {
+            onShowAllSharedLeads(dataModel);
+        } else {
+            if (dataModel != null && dataModel.size() > 0) {
+                group_messages_empty_state.setVisibility(View.GONE);
+                if (groupRecyclerAdapter == null) {
+                    groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), new ArrayList<GroupChatRealm>(), groupMessageSelectedCallback);
+                    groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
+                } else {
+                    if (dataModel.size() > 5) {
+                        showAllSharedLeadsTv.setEnabled(true);
+                        showAllSharedLeadsTv.setTextColor(getResources().getColor(R.color.colorAccentDark));
+                        List<GroupChatRealm> newList = dataModel.subList(0, 5);
+                        newGroupChatRealmList = new RealmList<>();
+                        for (GroupChatRealm item : newList) {
+                            newGroupChatRealmList.add(item);
+                        }
+
+                        groupRecyclerAdapter.OnDataSetChanged(newGroupChatRealmList);
+                    } else {
+                        showAllSharedLeadsTv.setEnabled(false);
+                        showAllSharedLeadsTv.setTextColor(getResources().getColor(R.color.colorPrimaryLight));
+                        groupRecyclerAdapter.OnDataSetChanged(dataModel);
+                    }
+                }
+                groupRecyclerAdapter.notifyDataSetChanged();
+            }
         }
     }
 

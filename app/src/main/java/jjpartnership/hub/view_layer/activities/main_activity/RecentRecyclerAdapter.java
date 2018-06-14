@@ -163,7 +163,9 @@ public class RecentRecyclerAdapter extends RecyclerView.Adapter<RecentRecyclerAd
                         holder.userName.setTextColor(context.getResources().getColor(R.color.grey_text));
                     }
 
-                    if(user != null)holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
+                    if(user != null){
+                        holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
+                    }
                 }
         setAnimation(holder.itemView, position);
     }

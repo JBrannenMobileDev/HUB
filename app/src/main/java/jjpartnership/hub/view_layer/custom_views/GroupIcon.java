@@ -143,15 +143,19 @@ public class GroupIcon extends LinearLayout {
 
     public void setTopLeftIconColor(int userColor){
         topLeftIv.setImageTintList(getContext().getResources().getColorStateList(UserColorUtil.getUserColor(userColor)));
+//        topLeftTv.setTextColor(getContext().getResources().getColor(UserColorUtil.getUserColorDark(userColor)));
     }
     public void setTopRightIconColor(int userColor){
         topRightIv.setImageTintList(getContext().getResources().getColorStateList(UserColorUtil.getUserColor(userColor)));
+//        topRightTv.setTextColor(getContext().getResources().getColor(UserColorUtil.getUserColorDark(userColor)));
     }
     public void setBottomLeftIconColor(int userColor){
         bottomLeftIv.setImageTintList(getContext().getResources().getColorStateList(UserColorUtil.getUserColor(userColor)));
+//        bottomLeftTv.setTextColor(getContext().getResources().getColor(UserColorUtil.getUserColorDark(userColor)));
     }
     public void setBottomRightIconColor(int userColor){
         bottomRightIv.setImageTintList(getContext().getResources().getColorStateList(UserColorUtil.getUserColor(userColor)));
+//        bottomRightTv.setTextColor(getContext().getResources().getColor(UserColorUtil.getUserColorDark(userColor)));
     }
     public void setTopLeftTv(String userName){
         topLeftTv.setText(String.valueOf(userName.charAt(0)));

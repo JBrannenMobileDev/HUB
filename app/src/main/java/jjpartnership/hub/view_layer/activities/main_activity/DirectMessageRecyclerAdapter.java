@@ -94,7 +94,9 @@ public class DirectMessageRecyclerAdapter extends RecyclerView.Adapter<DirectMes
         if(directItem.getMessageContent() != null && !directItem.getMessageContent().isEmpty()) {
             holder.messageContent.setText(directItem.getMessageContent());
         }
-        if(user != null)holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
+        if(user != null){
+            holder.userIcon.setBackgroundTintList(context.getResources().getColorStateList(UserColorUtil.getUserColor(user.getUserColor())));
+        }
     }
 
     @Override

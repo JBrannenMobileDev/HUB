@@ -792,6 +792,7 @@ public class FirebaseSyncManager {
                 if(request.getMostRecentGroupMessage() != null && !request.getMostRecentGroupMessage().getReadByUids().contains(UserPreferences.getInstance().getUid())){
                     temp.setNewMessage(true);
                 }
+
                 if(temp.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
                     recentRowItems.add(temp);
                 }
@@ -852,7 +853,7 @@ public class FirebaseSyncManager {
             newRowItem.setMessageContent(item.getMessageContent());
             newRowItem.setMessageCreatedAtTime(item.getMessageCreatedAtTime());
             newRowItem.setMessageOwnerName(item.getMessageOwnerName());
-            if(item.isNewMessage()) {
+            if(item.isNewMessage() && !item.getMessageOwnerUid().equals(UserPreferences.getInstance().getUid())) {
                 recentRowItems.add(newRowItem);
             }else if(item.getMessageCreatedAtTime() > twoWeeksAgo.getTimeInMillis()){
                 recentRowItems.add(newRowItem);
