@@ -28,6 +28,7 @@ import jjpartnership.hub.utils.TwoResponseCallback;
 import jjpartnership.hub.utils.UserPreferences;
 import jjpartnership.hub.view_layer.activities.account_activity.new_group_message_fragment.NewGroupMessageDialogFragment;
 import jjpartnership.hub.view_layer.activities.direct_message_activity.DirectMessageActivity;
+import jjpartnership.hub.view_layer.activities.request_account_access_activity.RequestAccountAccessActivity;
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 
 public class AccountDetailsFragment extends Fragment implements AccountDetailsView{
@@ -65,6 +66,11 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
                 getArguments().getString("account_id"));
 
         return v;
+    }
+
+    @OnClick(R.id.request_account_access_tv)
+    public void onRequestAccessClicked(){
+        getActivity().startActivity(new Intent(getActivity().getApplicationContext(), RequestAccountAccessActivity.class));
     }
 
     private void initCallbacks() {

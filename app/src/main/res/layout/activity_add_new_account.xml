@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccentDark"
+    android:focusableInTouchMode="true"
+    tools:context="jjpartnership.hub.view_layer.activities.add_new_account_activity.AddNewAccountActivity">
+
+    <jjpartnership.hub.view_layer.custom_views.AutoScrollAdjustableScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:gravity="bottom"
+                    android:text="Company Name"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView29"
+                    android:layout_width="wrap_content"
+                    android:layout_height="30dp"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:gravity="bottom"
+                    android:text="Clear form"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
+                android:id="@+id/backAwareEditText3"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_rectangle_user_input_bg"
+                android:hint="company name..."
+                android:paddingBottom="8dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:textColor="@color/colorPrimary"
+                android:textColorHint="@color/colorPrimaryLight" />
+
+            <TextView
+                android:id="@+id/textView24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="32dp"
+                android:text="Company Address"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView23"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:text="Address line 1:"
+                android:textColor="@color/white" />
+
+            <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
+                android:id="@+id/backAwareEditText2"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_rectangle_user_input_bg"
+                android:hint="Street address, P.O box"
+                android:paddingBottom="8dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:textColor="@color/colorPrimary"
+                android:textColorHint="@color/colorPrimaryLight" />
+
+            <TextView
+                android:id="@+id/textView25"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:text="Address line 2: (optional)"
+                android:textColor="@color/white" />
+
+            <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
+                android:id="@+id/backAwareEditText4"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/rounded_rectangle_user_input_bg"
+                android:hint="Apartment, suite, unit, building, floor, etc."
+                android:paddingBottom="8dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="4dp"
+                android:textColor="@color/colorPrimary"
+                android:textColorHint="@color/colorPrimaryLight" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="64dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="City:"
+                        android:textColor="@color/white" />
+
+                    <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
+                        android:id="@+id/backAwareEditText5"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/rounded_rectangle_user_input_bg"
+                        android:hint="city..."
+                        android:paddingBottom="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/colorPrimary"
+                        android:textColorHint="@color/colorPrimaryLight" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1.35"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="State:"
+                        android:textColor="@color/white" />
+
+                    <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
+                        android:id="@+id/backAwareEditText5"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/rounded_rectangle_user_input_bg"
+                        android:hint="state..."
+                        android:paddingBottom="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/colorPrimary"
+                        android:textColorHint="@color/colorPrimaryLight" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_weight="1.1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Postal:"
+                        android:textColor="@color/white" />
+
+                    <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
+                        android:id="@+id/backAwareEditText5"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginBottom="4dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/rounded_rectangle_user_input_bg"
+                        android:paddingBottom="8dp"
+                        android:paddingEnd="8dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="4dp"
+                        android:textColor="@color/colorPrimary"
+                        android:textColorHint="@color/colorPrimaryLight" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </jjpartnership.hub.view_layer.custom_views.AutoScrollAdjustableScrollView>
+
+    <TextView
+        android:id="@+id/textView13"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorAccentMediumDark"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:text="Send Request"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+</FrameLayout>
+
+

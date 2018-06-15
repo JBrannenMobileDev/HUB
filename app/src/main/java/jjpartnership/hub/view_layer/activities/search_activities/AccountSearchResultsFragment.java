@@ -1,6 +1,7 @@
 package jjpartnership.hub.view_layer.activities.search_activities;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,10 +16,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import jjpartnership.hub.R;
 import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.view_layer.activities.main_activity.AccountRecyclerAdapter;
+import jjpartnership.hub.view_layer.activities.add_new_account_activity.AddNewAccountActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +39,6 @@ public class AccountSearchResultsFragment extends Fragment {
 
     @BindView(R.id.account_results_recycler_view)RecyclerView resultsRecycler;
     @BindView(R.id.search_results_empty_frame_layout)FrameLayout noResultsLayout;
-    @BindView(R.id.request_new_account_tv)TextView requestNewAccountButton;
     @BindView(R.id.no_results_user_input_tv)TextView noResultsUserInputText;
 
     private BaseCallback<AccountRowItem> accountSelectedCallback;
@@ -61,6 +63,11 @@ public class AccountSearchResultsFragment extends Fragment {
             }
         };
         return v;
+    }
+
+    @OnClick(R.id.request_new_account_tv)
+    public void onNewAccountRequestClicked(){
+        getActivity().startActivity(new Intent(getActivity().getApplicationContext(), AddNewAccountActivity.class));
     }
 
     public void onResultsReceived(List<AccountRowItem> items, String userInput){

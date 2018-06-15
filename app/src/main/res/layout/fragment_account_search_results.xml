@@ -4,7 +4,10 @@
     android:layout_height="match_parent"
     tools:context="jjpartnership.hub.view_layer.activities.search_activities.AccountSearchResultsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/account_results_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <FrameLayout
         android:id="@+id/search_results_empty_frame_layout"
@@ -73,9 +76,4 @@
             android:textColor="@color/colorPrimaryLight"
             android:textSize="18sp" />
     </FrameLayout>
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/account_results_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </FrameLayout>
