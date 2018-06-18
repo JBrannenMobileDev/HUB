@@ -68,11 +68,6 @@ public class AccountDetailsFragment extends Fragment implements AccountDetailsVi
         return v;
     }
 
-    @OnClick(R.id.request_account_access_tv)
-    public void onRequestAccessClicked(){
-        getActivity().startActivity(new Intent(getActivity().getApplicationContext(), RequestAccountAccessActivity.class));
-    }
-
     private void initCallbacks() {
         currentUserProfileSelectedCallback = new BaseCallback<String>() {
             @Override

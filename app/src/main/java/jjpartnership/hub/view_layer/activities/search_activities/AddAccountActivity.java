@@ -30,6 +30,7 @@ import jjpartnership.hub.utils.BaseCallback;
 import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.view_layer.activities.account_activity.AccountChatActivity;
+import jjpartnership.hub.view_layer.activities.add_new_account_activity.AddNewAccountActivity;
 import jjpartnership.hub.view_layer.activities.main_activity.AccountRecyclerAdapter;
 import jjpartnership.hub.view_layer.custom_views.BackAwareEditText;
 
@@ -125,7 +126,7 @@ public class AddAccountActivity extends AppCompatActivity{
 
     @OnClick(R.id.request_new_account_tv)
     public void onNewAccountClicked(){
-        
+        startActivity(new Intent(getApplicationContext(), AddNewAccountActivity.class));
     }
 
     public void onResultsReceived(List<AccountRowItem> items, String userInput){

@@ -34,7 +34,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/textView29"
+                    android:id="@+id/clear_form_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:layout_gravity="end"
@@ -48,7 +48,7 @@
             </FrameLayout>
 
             <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
-                android:id="@+id/backAwareEditText3"
+                android:id="@+id/company_name_back_et"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
@@ -56,12 +56,14 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_rectangle_user_input_bg"
                 android:hint="company name..."
+                android:inputType="textCapWords"
                 android:paddingBottom="8dp"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:paddingTop="4dp"
                 android:textColor="@color/colorPrimary"
-                android:textColorHint="@color/colorPrimaryLight" />
+                android:textColorHint="@color/colorPrimaryLight"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/textView24"
@@ -85,7 +87,7 @@
                 android:textColor="@color/white" />
 
             <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
-                android:id="@+id/backAwareEditText2"
+                android:id="@+id/address_1_back_et"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
@@ -93,12 +95,14 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_rectangle_user_input_bg"
                 android:hint="Street address, P.O box"
+                android:inputType="textPostalAddress"
                 android:paddingBottom="8dp"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:paddingTop="4dp"
                 android:textColor="@color/colorPrimary"
-                android:textColorHint="@color/colorPrimaryLight" />
+                android:textColorHint="@color/colorPrimaryLight"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/textView25"
@@ -111,7 +115,7 @@
                 android:textColor="@color/white" />
 
             <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
-                android:id="@+id/backAwareEditText4"
+                android:id="@+id/address_2_back_et"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginEnd="8dp"
@@ -119,12 +123,14 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/rounded_rectangle_user_input_bg"
                 android:hint="Apartment, suite, unit, building, floor, etc."
+                android:inputType="textPostalAddress"
                 android:paddingBottom="8dp"
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:paddingTop="4dp"
                 android:textColor="@color/colorPrimary"
-                android:textColorHint="@color/colorPrimaryLight" />
+                android:textColorHint="@color/colorPrimaryLight"
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -137,7 +143,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
                     android:layout_marginStart="8dp"
-                    android:layout_weight="1"
+                    android:layout_weight=".35"
                     android:orientation="vertical">
 
                     <TextView
@@ -149,19 +155,21 @@
                         android:textColor="@color/white" />
 
                     <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
-                        android:id="@+id/backAwareEditText5"
+                        android:id="@+id/city_et"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginBottom="4dp"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/rounded_rectangle_user_input_bg"
-                        android:hint="city..."
+                        android:hint="City..."
+                        android:inputType="textCapWords"
                         android:paddingBottom="8dp"
                         android:paddingEnd="8dp"
                         android:paddingStart="8dp"
                         android:paddingTop="4dp"
                         android:textColor="@color/colorPrimary"
-                        android:textColorHint="@color/colorPrimaryLight" />
+                        android:textColorHint="@color/colorPrimaryLight"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -170,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="2dp"
                     android:layout_marginStart="2dp"
-                    android:layout_weight="1.35"
+                    android:layout_weight=".35"
                     android:orientation="vertical">
 
                     <TextView
@@ -181,20 +189,22 @@
                         android:text="State:"
                         android:textColor="@color/white" />
 
-                    <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
-                        android:id="@+id/backAwareEditText5"
+                    <AutoCompleteTextView
+                        android:id="@+id/state_et"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginBottom="4dp"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/rounded_rectangle_user_input_bg"
-                        android:hint="state..."
+                        android:hint="State..."
+                        android:inputType="textCapWords"
                         android:paddingBottom="8dp"
                         android:paddingEnd="8dp"
                         android:paddingStart="8dp"
                         android:paddingTop="4dp"
                         android:textColor="@color/colorPrimary"
-                        android:textColorHint="@color/colorPrimaryLight" />
+                        android:textColorHint="@color/colorPrimaryLight"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 
@@ -203,7 +213,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginStart="2dp"
-                    android:layout_weight="1.1"
+                    android:layout_weight=".4"
                     android:orientation="vertical">
 
                     <TextView
@@ -211,22 +221,24 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="Postal:"
+                        android:text="ZIP Code:"
                         android:textColor="@color/white" />
 
                     <jjpartnership.hub.view_layer.custom_views.BackAwareEditText
-                        android:id="@+id/backAwareEditText5"
+                        android:id="@+id/zip_code_et"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginBottom="4dp"
                         android:layout_marginTop="8dp"
                         android:background="@drawable/rounded_rectangle_user_input_bg"
+                        android:inputType="number"
                         android:paddingBottom="8dp"
                         android:paddingEnd="8dp"
                         android:paddingStart="8dp"
                         android:paddingTop="4dp"
                         android:textColor="@color/colorPrimary"
-                        android:textColorHint="@color/colorPrimaryLight" />
+                        android:textColorHint="@color/colorPrimaryLight"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -234,15 +246,16 @@
     </jjpartnership.hub.view_layer.custom_views.AutoScrollAdjustableScrollView>
 
     <TextView
-        android:id="@+id/textView13"
+        android:id="@+id/send_account_request_tv"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="bottom"
         android:background="@color/colorAccentMediumDark"
         android:elevation="8dp"
+        android:enabled="false"
         android:gravity="center"
         android:text="Send Request"
-        android:textColor="@color/white"
+        android:textColor="@color/colorAccentVeryDark"
         android:textSize="18sp"
         android:textStyle="bold" />
 </FrameLayout>

@@ -1,5 +1,6 @@
 package jjpartnership.hub.view_layer.activities.account_activity;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -27,6 +28,7 @@ import jjpartnership.hub.view_layer.activities.account_activity.account_details_
 import jjpartnership.hub.view_layer.activities.account_activity.account_details_restricted_access_fragment.AccountDetailsRestrictedAccessFragment;
 import jjpartnership.hub.view_layer.activities.account_activity.customer_requests_fragment.CustomerRequestsFragment;
 import jjpartnership.hub.view_layer.activities.account_activity.sales_agent_fragment.SalesAgentsFragment;
+import jjpartnership.hub.view_layer.activities.request_account_access_activity.RequestAccountAccessActivity;
 
 public class AccountChatActivity extends AppCompatActivity implements SalesAgentsFragment.OnSalesChatFragmentInteractionListener,
         CustomerRequestsFragment.OnFragmentInteractionListener,
@@ -136,6 +138,11 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
             }
         });
+    }
+
+    @OnClick(R.id.request_account_access_tv)
+    public void onRequestAccessClicked(){
+        startActivity(new Intent(getApplicationContext(), RequestAccountAccessActivity.class));
     }
 
     @Override
