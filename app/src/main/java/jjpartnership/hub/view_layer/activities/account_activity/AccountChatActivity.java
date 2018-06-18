@@ -65,12 +65,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         colorOrange = ContextCompat.getColor(getApplicationContext(), R.color.colorOrange);
         colorGrey = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryVeryLight);
         initPager();
-        accountRequestBt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
                 R.color.colorAccentDark, true, getIntent().getStringExtra("account_name"));
     }

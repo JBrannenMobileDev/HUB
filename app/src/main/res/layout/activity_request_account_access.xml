@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorAccentVeryDark"
+    android:background="@color/colorAccentDark"
     tools:context="jjpartnership.hub.view_layer.activities.request_account_access_activity.RequestAccountAccessActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
@@ -22,7 +22,7 @@
             android:textColor="@color/white" />
 
         <TextView
-            android:id="@+id/textView22"
+            android:id="@+id/account_name_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
@@ -31,13 +31,38 @@
             android:textStyle="bold" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView19g"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:text="To:"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/manager_name_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Your Manager Name"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
-        android:id="@+id/backAwareAutofillMultiLineEditText2"
+        android:id="@+id/request_reason_et"
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="35dp"
+        android:layout_marginTop="40dp"
         android:background="@drawable/rounded_rectangle_user_input_bg"
         android:elevation="2dp"
         android:gravity="top"
@@ -51,16 +76,17 @@
         android:textColorHint="@color/colorPrimaryLight" />
 
     <TextView
-        android:id="@+id/textView20"
+        android:id="@+id/send_request_tv"
         android:layout_width="match_parent"
         android:layout_height="54dp"
         android:layout_gravity="bottom"
         android:layout_marginTop="350dp"
         android:background="@color/colorAccentMediumDark"
         android:elevation="4dp"
+        android:enabled="false"
         android:gravity="center"
-        android:text="SEND"
-        android:textColor="@color/white"
+        android:text="Send Request"
+        android:textColor="@color/colorAccentDark"
         android:textSize="18sp"
         android:textStyle="bold" />
 </FrameLayout>

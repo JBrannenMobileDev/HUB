@@ -702,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (recentModel.getRowItems() != null && recentModel.getRowItems().size() > 0) {
                 recent_empty_layout.setVisibility(View.GONE);
                 if (recentRecyclerAdapter == null) {
-                    recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), new MainRecentModel(new RealmList<RowItem>()), recentSelectedCallback);
+                    recentRecyclerAdapter = new RecentRecyclerAdapter(getApplicationContext(), recentModel, recentSelectedCallback);
                     recentRecyclerView.setAdapter(recentRecyclerAdapter);
                 } else {
                     for (int i = 0; i < recentModel.getRowItems().size(); i++) {
@@ -751,7 +751,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (dataModel.getRowItems() != null && dataModel.getRowItems().size() > 0) {
                 accounts_empty_layout.setVisibility(View.GONE);
                 if (accountsAdapter == null) {
-                    accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), new MainAccountsModel(new RealmList<AccountRowItem>()), accountSelectedCallback);
+                    accountsAdapter = new AccountRecyclerAdapter(getApplicationContext(), dataModel, accountSelectedCallback);
                     accountsRecyclerView.setAdapter(accountsAdapter);
                 } else {
                     if (dataModel.getRowItems().size() > 5) {
@@ -785,7 +785,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (dataModel.getDirectItems() != null && dataModel.getDirectItems().size() > 0) {
                 direct_messages_empty_state.setVisibility(View.GONE);
                 if (directRecyclerAdapter == null) {
-                    directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), new MainDirectMessagesModel(new RealmList<DirectItem>()), directMessageSelectedCallback);
+                    directRecyclerAdapter = new DirectMessageRecyclerAdapter(getApplicationContext(), dataModel, directMessageSelectedCallback);
                     directMessagesRecyclerView.setAdapter(directRecyclerAdapter);
                 } else {
                     if (dataModel.getDirectItems().size() > 5) {
@@ -819,7 +819,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (dataModel != null && dataModel.size() > 0) {
                 group_messages_empty_state.setVisibility(View.GONE);
                 if (groupRecyclerAdapter == null) {
-                    groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), new ArrayList<GroupChatRealm>(), groupMessageSelectedCallback);
+                    groupRecyclerAdapter = new GroupMessagesRecyclerAdapter(getApplicationContext(), dataModel, groupMessageSelectedCallback);
                     groupMessagesRecyclerView.setAdapter(groupRecyclerAdapter);
                 } else {
                     if (dataModel.size() > 5) {
