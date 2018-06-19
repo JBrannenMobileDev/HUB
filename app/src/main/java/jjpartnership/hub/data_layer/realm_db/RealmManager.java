@@ -279,7 +279,7 @@ public class RealmManager {
 
     public void insertOrUpdateGroupChatRealm(final GroupChatRealm groupChatRealm) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(groupChatRealm);

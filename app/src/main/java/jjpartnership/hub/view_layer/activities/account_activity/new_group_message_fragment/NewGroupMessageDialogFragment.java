@@ -152,10 +152,10 @@ public class NewGroupMessageDialogFragment extends DialogFragment implements Tag
         GroupChatRealm createdChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("groupName", groupName.getText().toString()).findFirst();
         if(createdChat != null) {
             Toast.makeText(getActivity(), "Group Created", Toast.LENGTH_SHORT).show();
+            dismiss();
         }else{
             Toast.makeText(getActivity(), "Unable to create Group. Check internet connection and try again.", Toast.LENGTH_LONG).show();
         }
-        dismiss();
     }
 
     @Override

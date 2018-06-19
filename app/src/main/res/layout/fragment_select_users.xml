@@ -11,6 +11,7 @@
         android:id="@+id/main_scrollview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="56dp"
         android:overScrollMode="never">
 
         <LinearLayout
@@ -80,4 +81,20 @@
             </FrameLayout>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/no_data_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorMainBg">
+
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Please select an account first."
+            android:textColor="@color/colorAccentVeryDark"
+            android:textSize="18sp" />
+    </FrameLayout>
 </FrameLayout>

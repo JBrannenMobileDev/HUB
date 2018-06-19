@@ -1,9 +1,7 @@
 package jjpartnership.hub.view_layer.activities.share_lead_activity;
 
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,45 +10,42 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import jjpartnership.hub.R;
+import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.ActionBarUtil;
+import jjpartnership.hub.utils.RealmUISingleton;
+import jjpartnership.hub.utils.UserPreferences;
 import mabbas007.tagsedittext.TagsEditText;
 
 public class ShareLeadActivity extends AppCompatActivity implements SelectAccountFragment.OnFragmentInteractionListener,
-        SelectUsersFragment.OnFragmentInteractionListener, TagsEditText.TagsEditListener{
+        SelectUsersFragment.OnFragmentInteractionListener, TagsEditText.TagsEditListener, ComposeMessageFragment.OnFragmentInteractionListener{
 
-    private static final String SELECT_USER = "Select Users";
-    private static final String SELECT_ACCOUNT = "Select Account";
-
-    @BindView(R.id.back_to_select_account_bt)ImageView backBt;
-    @BindView(R.id.forward_to_select_account_bt)ImageView forwardBt;
-    @BindView(R.id.title_tv)TextView title;
     @BindView(R.id.share_lead_view_pager)ViewPager viewPager;
     @BindView(R.id.new_group_message_tags)TagsEditText tags;
     @BindView(R.id.selected_account_name)TextView selectedAccountName;
+    @BindView(R.id.share_lead_tabs)TabLayout tabLayout;
+    @BindView(R.id.header_layout)LinearLayout header;
 
     private ShareLeadAdapter pagerAdapter;
     private ArrayList<String> agentNames;
-    private Map<String, String> selectedAgentIds;
     private String selectedAccountId;
+    private ArrayList<String> selectedAgentNames;
+    private ArrayList<String> selectedAgentIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,18 +54,21 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         setContentView(R.layout.activity_share_lead);
         ButterKnife.bind(this);
         agentNames = new ArrayList<>();
-        selectedAgentIds = new HashMap<>();
+        selectedAgentNames = new ArrayList<>();
+        selectedAgentIds = new ArrayList<>();
         initActionBar();
-        initpager();
-        initTagsView();
+        initPager();
     }
 
-    private void initpager() {
+    private void initPager() {
         pagerAdapter = new ShareLeadAdapter(getSupportFragmentManager());
-        pagerAdapter.addFragment(new SelectAccountFragment());
+        pagerAdapter.addFragment(new SelectAccountFragment(), "Select Account");
+        pagerAdapter.addFragment(new SelectUsersFragment(), "Select Users");
+        pagerAdapter.addFragment(new ComposeMessageFragment(), "Message");
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(3);
-        animateTitleTextChange(SELECT_ACCOUNT);
+        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabMode(TabLayout.MODE_FIXED);
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -80,18 +78,7 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
 
             @Override
             public void onPageSelected(int position) {
-                switch(position){
-                    case 0:
-                        animateTitleTextChange(SELECT_ACCOUNT);
-                        forwardBt.setVisibility(View.VISIBLE);
-                        backBt.setVisibility(View.GONE);
-                        break;
-                    case 1:
-                        animateTitleTextChange(SELECT_USER);
-                        backBt.setVisibility(View.VISIBLE);
-                        if(pagerAdapter.getCount() < 3) forwardBt.setVisibility(View.GONE);
-                        break;
-                }
+
             }
 
             @Override
@@ -125,47 +112,11 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
 
     @Override
     public void onAccountSelected(AccountRowItem account) {
+        initTagsView();
         selectedAccountId = account.getAccountIdFire();
-        if(pagerAdapter.getCount() == 1) {
-            Bundle bundle = new Bundle();
-            bundle.putString("accountId", selectedAccountId);
-            Fragment frag = new SelectUsersFragment();
-            frag.setArguments(bundle);
-            pagerAdapter.addFragment(frag);
-            pagerAdapter.notifyDataSetChanged();
-        }else{
-            pagerAdapter.updateAccountIdForUserFragment(account.getAccountIdFire());
-        }
-        viewPager.setCurrentItem(1);
-        backBt.setVisibility(View.VISIBLE);
-        forwardBt.setVisibility(View.GONE);
+        pagerAdapter.updateAccountIdForUserFragment(account.getAccountIdFire());
         selectedAccountName.setText(account.getAccountName());
-    }
-
-    private void animateTitleTextChange(final String text){
-        title.animate().scaleX(.0f).setDuration(150);
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                title.animate().scaleX(1f).setDuration(150);
-                title.setText(text);
-            }
-        }, 150);
-    }
-
-    @OnClick(R.id.back_to_select_account_bt)
-    public void onBackToAccountClicked(){
-        forwardBt.setVisibility(View.VISIBLE);
-        backBt.setVisibility(View.GONE);
-        viewPager.setCurrentItem(0);
-    }
-
-    @OnClick(R.id.forward_to_select_account_bt)
-    public void onForwardToUserSelectionClicked(){
         viewPager.setCurrentItem(1);
-        backBt.setVisibility(View.VISIBLE);
-        if(pagerAdapter.getCount() < 3) forwardBt.setVisibility(View.GONE);
     }
 
     @Override
@@ -181,10 +132,21 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
     @Override
     public void onUserChecboxClicked(UserRealm user, boolean checked) {
         if(checked) {
-            selectedAgentIds.put(user.getUid(), user.getUid());
-            tags.setTag(Integer.valueOf(user.getPhoneNumber()), user.getFirstName() + " " + user.getLastName());
+            selectedAgentNames.add(user.getFirstName() + " " + user.getLastName());
+            selectedAgentIds.add(user.getUid());
+            String[] selectedAgentsArray = new String[selectedAgentNames.size()];
+            selectedAgentsArray = selectedAgentNames.toArray(selectedAgentsArray);
+            tags.setTags(selectedAgentsArray);
         }else{
-            selectedAgentIds.remove(user.getUid());
+            for(int i = 0; i < selectedAgentNames.size(); i++){
+                if(selectedAgentNames.get(i).equalsIgnoreCase(user.getFirstName() + " " + user.getLastName())){
+                    selectedAgentNames.remove(i);
+                    selectedAgentIds.remove(i);
+                }
+            }
+            String[] selectedAgentsArray = new String[selectedAgentNames.size()];
+            selectedAgentsArray = selectedAgentNames.toArray(selectedAgentsArray);
+            tags.setTags(selectedAgentsArray);
         }
     }
 
@@ -194,21 +156,52 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         overridePendingTransition(R.anim.enter_from_right, R.anim.exit_to_right);
     }
 
+    @Override
+    public void onSoftKeyboardStateChanged(boolean visible) {
+        if(visible){
+            header.setVisibility(View.GONE);
+        }else{
+            header.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onSendLeadClicked(String message, String title) {
+        if(selectedAccountId != null && selectedAgentIds != null && selectedAgentIds.size() > 0 && message != null && message.length() > 0){
+            DataManager.getInstance().createNewGroupChat(selectedAgentIds, selectedAccountId, UserPreferences.getInstance().getUid(), title, message);
+            GroupChatRealm createdChat = RealmUISingleton.getInstance().getRealmInstance().where(GroupChatRealm.class).equalTo("groupName", title).findFirst();
+            if(createdChat != null) {
+                Toast.makeText(this, "Group Created", Toast.LENGTH_SHORT).show();
+                finish();
+            }else{
+                Toast.makeText(this, "Unable to create Group. Check internet connection and try again.", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     private class ShareLeadAdapter extends FragmentPagerAdapter {
         private List<Fragment> fragments;
+        private List<String> tabTitles;
 
-        private void addFragment(Fragment fragment){
+        private void addFragment(Fragment fragment, String tabTitle){
             fragments.add(fragment);
+            tabTitles.add(tabTitle);
         }
 
         public ShareLeadAdapter(FragmentManager fm) {
             super(fm);
             fragments = new ArrayList<>();
+            tabTitles = new ArrayList<>();
         }
 
         @Override
         public Fragment getItem(int pos) {
             return fragments.get(pos);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles.get(position);
         }
 
         @Override

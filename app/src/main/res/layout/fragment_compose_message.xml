@@ -1,0 +1,129 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="jjpartnership.hub.view_layer.activities.share_lead_activity.ComposeMessageFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:id="@+id/send_shared_lead_tv"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom"
+        android:background="@color/colorAccentMediumDark"
+        android:elevation="4dp"
+        android:enabled="false"
+        android:gravity="center_vertical"
+        android:text="Send Shared Lead"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccentDark"
+        android:textSize="18sp" />
+
+    <jjpartnership.hub.view_layer.custom_views.AutoScrollAdjustableScrollView
+        android:id="@+id/compose_message_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:id="@+id/accounts_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="Opportunity Title"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/accounts_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/rounded_rectangle_white_tile_bg"
+                android:elevation="2dp"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp">
+
+                <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
+                    android:id="@+id/opportunity_title_input_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:ems="10"
+                    android:hint="title..."
+                    android:inputType="textCapWords|textMultiLine"
+                    android:maxLines="1"
+                    android:paddingEnd="8dp"
+                    android:paddingStart="8dp"
+                    android:textColor="@color/colorAccentVeryDark"
+                    android:textColorHint="@color/colorPrimaryLight" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="24dp">
+
+                <TextView
+                    android:id="@+id/accounts_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="Message"
+                    android:textColor="@color/colorPrimaryLight"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/accounts_frame_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="85dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/rounded_rectangle_white_tile_bg"
+                android:elevation="2dp"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:background="@drawable/rounded_rectangle_user_input_bg">
+
+                </FrameLayout>
+
+                <jjpartnership.hub.view_layer.custom_views.BackAwareAutofillMultiLineEditText
+                    android:id="@+id/message_input_et"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:ems="10"
+                    android:hint="write a message..."
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:paddingEnd="8dp"
+                    android:paddingStart="8dp"
+                    android:textColor="@color/colorAccentVeryDark"
+                    android:textColorHint="@color/colorPrimaryLight" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </jjpartnership.hub.view_layer.custom_views.AutoScrollAdjustableScrollView>
+</FrameLayout>
