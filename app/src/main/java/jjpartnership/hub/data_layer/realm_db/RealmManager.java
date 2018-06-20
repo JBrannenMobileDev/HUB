@@ -1,15 +1,10 @@
 package jjpartnership.hub.data_layer.realm_db;
 
-import android.os.Handler;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmModel;
-import jjpartnership.hub.data_layer.DataManager;
 import jjpartnership.hub.data_layer.data_models.Account;
 import jjpartnership.hub.data_layer.data_models.AccountRealm;
 import jjpartnership.hub.data_layer.data_models.Company;
@@ -220,7 +215,7 @@ public class RealmManager {
 
     public void insertOrUpdateUserColor(final long color, final String uid) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(new UserColor(uid, color));
@@ -246,7 +241,7 @@ public class RealmManager {
             realmMessages.add(new MessageRealm(message));
         }
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmMessages);
@@ -257,7 +252,7 @@ public class RealmManager {
 
     public void insertOrUpdateDirectChat(final DirectChat newDirectChat) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(new DirectChatRealm(newDirectChat));
@@ -268,7 +263,7 @@ public class RealmManager {
 
     public void insertOrUpdateDirectChatRealm(final DirectChatRealm directChat) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(directChat);
@@ -294,7 +289,7 @@ public class RealmManager {
             realmRequests.add(new CustomerRequestRealm(request));
         }
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(realmRequests);
@@ -305,7 +300,7 @@ public class RealmManager {
 
     public void insertOrUpdateCustomerRequest(final CustomerRequestRealm request) {
         Realm realm = Realm.getDefaultInstance();
-        realm.executeTransactionAsync(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
                 bgRealm.copyToRealmOrUpdate(request);

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +29,7 @@ import jjpartnership.hub.data_layer.data_models.AccountRowItem;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
 import jjpartnership.hub.data_layer.data_models.UserRealm;
 import jjpartnership.hub.utils.ActionBarUtil;
+import jjpartnership.hub.utils.DpUtil;
 import jjpartnership.hub.utils.RealmUISingleton;
 import jjpartnership.hub.utils.UserPreferences;
 import mabbas007.tagsedittext.TagsEditText;
@@ -40,6 +42,8 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
     @BindView(R.id.selected_account_name)TextView selectedAccountName;
     @BindView(R.id.share_lead_tabs)TabLayout tabLayout;
     @BindView(R.id.header_layout)LinearLayout header;
+    @BindView(R.id.selected_account_linear_layout)LinearLayout selectedAccountLayout;
+    @BindView(R.id.tags_frame_layout)FrameLayout userTagsLayout;
 
     private ShareLeadAdapter pagerAdapter;
     private ArrayList<String> agentNames;
@@ -64,7 +68,7 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         pagerAdapter = new ShareLeadAdapter(getSupportFragmentManager());
         pagerAdapter.addFragment(new SelectAccountFragment(), "Select Account");
         pagerAdapter.addFragment(new SelectUsersFragment(), "Select Users");
-        pagerAdapter.addFragment(new ComposeMessageFragment(), "Message");
+        pagerAdapter.addFragment(new ComposeMessageFragment(), "Compose Message");
         viewPager.setAdapter(pagerAdapter);
         viewPager.setOffscreenPageLimit(3);
         tabLayout.setupWithViewPager(viewPager);
@@ -90,7 +94,7 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
 
     private void initActionBar() {
         ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
-                R.color.colorAccentDark, true, "Share Lead");
+                R.color.colorAccentVeryDark, true, "Share Lead");
     }
 
     private void initTagsView() {
@@ -116,7 +120,19 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
         selectedAccountId = account.getAccountIdFire();
         pagerAdapter.updateAccountIdForUserFragment(account.getAccountIdFire());
         selectedAccountName.setText(account.getAccountName());
-        viewPager.setCurrentItem(1);
+        animateShowSelectedAccountLayout();
+    }
+
+    private void animateShowSelectedAccountLayout() {
+        selectedAccountLayout.setScaleY(0);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                selectedAccountLayout.setVisibility(View.VISIBLE);
+                selectedAccountLayout.animate().scaleY(1).setDuration(150);
+            }
+        }, 10);
     }
 
     @Override
@@ -148,6 +164,23 @@ public class ShareLeadActivity extends AppCompatActivity implements SelectAccoun
             selectedAgentsArray = selectedAgentNames.toArray(selectedAgentsArray);
             tags.setTags(selectedAgentsArray);
         }
+
+        if(userTagsLayout.getVisibility() == View.GONE && selectedAgentIds.size() > 0){
+            animateShowUserTags();
+        }
+    }
+
+    private void animateShowUserTags() {
+        userTagsLayout.setScaleY(0);
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                userTagsLayout.setVisibility(View.VISIBLE);
+                userTagsLayout.animate().scaleY(1).setDuration(150);
+                userTagsLayout.animate().translationY(DpUtil.pxFromDp(getApplicationContext(), 8));
+            }
+        }, 10);
     }
 
     @Override

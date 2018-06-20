@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -33,6 +34,7 @@ public class ComposeMessageFragment extends Fragment {
     @BindView(R.id.message_input_et)BackAwareAutofillMultiLineEditText messageInput;
     @BindView(R.id.compose_message_scroll_view)AutoScrollAdjustableScrollView scrollView;
     @BindView(R.id.send_shared_lead_tv)TextView sendLead;
+    @BindView(R.id.send_image)ImageView sendIcon;
 
     private OnFragmentInteractionListener mListener;
 
@@ -129,9 +131,11 @@ public class ComposeMessageFragment extends Fragment {
         if(messageInput.getText().length() > 0 && titleInput.getText().length() > 0){
             sendLead.setEnabled(true);
             sendLead.setTextColor(Color.WHITE);
+            sendIcon.setImageTintList(getResources().getColorStateList(R.color.white));
         }else{
             sendLead.setEnabled(false);
             sendLead.setTextColor(getResources().getColor(R.color.colorAccentDark));
+            sendIcon.setImageTintList(getResources().getColorStateList(R.color.colorAccentDark));
         }
     }
 

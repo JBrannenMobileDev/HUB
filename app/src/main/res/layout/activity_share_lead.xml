@@ -21,12 +21,13 @@
 
 
         <LinearLayout
+            android:id="@+id/selected_account_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/title_tv3"
@@ -49,24 +50,25 @@
         </LinearLayout>
 
         <FrameLayout
+            android:id="@+id/tags_frame_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="8dp">
+            android:visibility="gone">
 
             <mabbas007.tagsedittext.TagsEditText
                 android:id="@+id/new_group_message_tags"
                 android:layout_width="match_parent"
                 android:layout_height="85dp"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="12dp"
                 android:layout_marginRight="8dp"
-                android:background="@drawable/rounded_rectangle_user_input_bg"
+                android:layout_marginTop="4dp"
+                android:backgroundTint="@android:color/transparent"
+                android:enabled="false"
                 android:gravity="top"
-                android:paddingLeft="26dp"
                 android:paddingRight="16dp"
                 android:textColor="@color/colorAccentMediumDark"
                 android:textSize="16dp"
                 TagsEditText:tagsBackground="@drawable/rounded_rectangle_tags"
-                TagsEditText:tagsCloseImageRight="@drawable/tag_close"
                 TagsEditText:tagsPaddingBottom="4dp"
                 TagsEditText:tagsPaddingLeft="8dp"
                 TagsEditText:tagsPaddingRight="8dp"
@@ -79,11 +81,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|center_vertical"
-                android:layout_marginLeft="12dp"
-                android:layout_marginTop="2dp"
+                android:layout_marginLeft="16dp"
                 android:gravity="center_vertical"
                 android:text="To:"
-                android:textColor="@color/colorPrimaryLight"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
 
         </FrameLayout>
@@ -91,13 +92,13 @@
         <android.support.design.widget.TabLayout
             android:id="@+id/share_lead_tabs"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="56dp"
             android:layout_marginEnd="4dp"
             android:layout_marginStart="4dp"
+            app:tabTextColor="@color/colorAccentMediumDark"
             app:tabGravity="fill"
             app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/white"
-            app:tabTextColor="@color/colorAccentVeryDark" />
+            app:tabSelectedTextColor="@color/white" />
 
     </LinearLayout>
 
