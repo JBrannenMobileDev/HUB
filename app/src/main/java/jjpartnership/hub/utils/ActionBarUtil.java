@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
+import jjpartnership.hub.R;
+
 /**
  * Created by Jonathan on 6/7/2018.
  */
@@ -25,5 +27,18 @@ public class ActionBarUtil {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(context.getResources().getColor(statusbarColor));
         }
+    }
+
+    public static void setStatusBarColor(AppCompatActivity context, int color){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = context.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(context.getResources().getColor(color));
+        }
+    }
+
+    public static void setActionBarColor(AppCompatActivity context, int color){
+        ActionBar actionbar = context.getSupportActionBar();
+        actionbar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(color)));
     }
 }

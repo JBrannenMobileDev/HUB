@@ -94,6 +94,9 @@
     <string name="sales_agent_welcome_message">ClickField is a messaging application that connects sales agents to their teams and to their customers. You share leads with your sales team and respond instantly to your customers\' inquiries, while keeping everyone in the loop!</string>
     <string name="customer_welcome_message">ClickField is a messaging application that connects you to your sales reps. Find out the correct sales rep for your needs in minutes!</string>
 
+    <string name="privacy_and_license_title">Privacy &amp; License</string>
+    <string name="app_version">Version 1.0.0</string>
+
     <string-array name="us_states">
         <item>Alabama</item>
         <item>Alaska</item>

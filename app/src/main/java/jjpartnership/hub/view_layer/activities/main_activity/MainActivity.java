@@ -68,6 +68,7 @@ import jjpartnership.hub.view_layer.activities.search_activities.NewDirectMessag
 import jjpartnership.hub.view_layer.activities.search_activities.SearchAllManager;
 import jjpartnership.hub.view_layer.activities.search_activities.SharedLeadsSearchResultFragment;
 import jjpartnership.hub.view_layer.activities.search_activities.UsersSearchResultFragment;
+import jjpartnership.hub.view_layer.activities.settings_activity.SettingsActivity;
 import jjpartnership.hub.view_layer.activities.share_lead_activity.ShareLeadActivity;
 import jjpartnership.hub.view_layer.activities.user_profile_activity.UserProfileActivity;
 import jjpartnership.hub.view_layer.custom_views.BackAwareSearchView;
@@ -526,9 +527,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_new_direct_message) {
             startActivity(new Intent(getApplicationContext(), NewDirectMessageActivity.class));
         } else if (id == R.id.nav_settings) {
-            FirebaseAuth.getInstance().signOut();
-            DataManager.getInstance().clearRealmData();
-            startActivity(new Intent(getApplicationContext(), BootActivity.class));
+            startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
         } else if(id == R.id.nav_share_lead){
             launchShareLeadIntent();
         }

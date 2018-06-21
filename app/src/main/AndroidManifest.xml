@@ -68,11 +68,14 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".view_layer.activities.add_new_account_activity.AddNewAccountActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view_layer.activities.request_account_access_activity.RequestAccountAccessActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".view_layer.activities.settings_activity.SettingsActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
