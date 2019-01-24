@@ -39,8 +39,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
 
     private ViewPagerAdapter adapter;
     private String accountId;
-    private int colorOrange;
-    private int colorGrey;
     private SalesAgentsFragment salesAgentFragment;
     private CustomerRequestsFragment customerRequestsFragment;
     private AccountDetailsFragment accountDetailsFragment;
@@ -62,8 +60,6 @@ public class AccountChatActivity extends AppCompatActivity implements SalesAgent
         salesAgentFragment.setArguments(bundle);
         customerRequestsFragment.setArguments(bundle);
         accountDetailsFragment.setArguments(bundle);
-        colorOrange = ContextCompat.getColor(getApplicationContext(), R.color.colorOrange);
-        colorGrey = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryVeryLight);
         initPager();
         ActionBarUtil.initActionBar(this, R.color.colorAccentDark, 0,
                 R.color.colorAccentDark, true, getIntent().getStringExtra("account_name"));

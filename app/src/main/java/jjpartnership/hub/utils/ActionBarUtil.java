@@ -15,8 +15,7 @@ import jjpartnership.hub.R;
  */
 
 public class ActionBarUtil {
-    public static void initActionBar(AppCompatActivity context, int actionBarColor, float elevation,
-                                     int statusbarColor, boolean enableBackButton, String title){
+    public static void initActionBar(AppCompatActivity context, int actionBarColor, float elevation, int statusbarColor, boolean enableBackButton, String title){
         ActionBar actionbar = context.getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(enableBackButton);
         actionbar.setElevation(elevation);

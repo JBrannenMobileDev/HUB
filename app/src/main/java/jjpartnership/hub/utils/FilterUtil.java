@@ -1,7 +1,5 @@
 package jjpartnership.hub.utils;
 
-import java.util.List;
-
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import jjpartnership.hub.data_layer.data_models.GroupChatRealm;
